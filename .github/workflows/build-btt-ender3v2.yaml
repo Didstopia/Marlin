@@ -1,0 +1,93 @@
+# Based on the following workflow by ColinM9991:
+# https://github.com/ColinM9991/Marlin/blob/skr-mini-e3/.github/workflows/compile-configs-custom.yml
+
+name: Build BTT SKR Mini E3 V3.0 (Ender 3 V2)
+
+on:
+  push:
+    branches:
+      # - 2.0.x
+      - bugfix-2.0.x
+
+jobs:
+  Build-UBL-BLTouch-SKR:
+    name: Build BL-Touch UBL SKR Mini E3 Files
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        grid: [3,5,10,15]
+        highspeed: [true,false]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: bugfix-2.0.x
+        persist-credentials: false
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    ## FIXME: Why was this here and is it necessary?
+    # - uses: actions/checkout@v2
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Cache PlatformIO
+      uses: actions/cache@v2
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+    - name: Set up Python
+      uses: actions/setup-python@v2
+    - name: Install PlatformIO
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+    - name: Run PlatformIO BL-Touch
+      id: build_configs
+      run: |
+        if ($HS); then HSTMP=-HS; else HSTMP=; fi;
+        echo "::set-output name=filename::E3V2-UBL-BLTouch-${GRID}x${GRID}${HSTMP}-SKR-${VERSION}.bin"
+
+        ## FIXME: Apply our custom configs from our firmware tests, which combine Jyers + BTT + Ender 3 V2 configs (plus our own tweaks)
+
+        git clone -b bugfix-2.0.x git@github.com:MarlinFirmware/Configurations.git Configurations
+        cp "Configurations/config/examples/Creality/Ender-3%20V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
+        cp "Configurations/config/examples/Creality/Ender-3%20V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
+        
+        sed -i "s/#define SERIAL_PORT .*/#define SERIAL_PORT -1/g" Marlin/Configuration.h
+        sed -i "s/#define MOTHERBOARD.*/#define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V3_0/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_EJERK.*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
+        sed -i "s/#define GRID_MAX_POINTS_X.*/#define GRID_MAX_POINTS_X $GRID/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_Kp .*/#define DEFAULT_Kp 33.14/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_Ki .*/#define DEFAULT_Ki 4.10/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_Kd .*/#define DEFAULT_Kd 66.90/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_bedKp .*/#define DEFAULT_bedKp 80.46/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_bedKi .*/#define DEFAULT_bedKi 15.24/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_bedKd .*/#define DEFAULT_bedKd 283.23/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_AXIS_STEPS_PER_UNIT.*/#define DEFAULT_AXIS_STEPS_PER_UNIT { 80, 80, 400, 97.8 }/g" Marlin/Configuration.h
+        sed -i "s/^#define NOZZLE_TO_PROBE_OFFSET.*/#define NOZZLE_TO_PROBE_OFFSET { -44, -7, -2.75 }/g" Marlin/Configuration.h
+        sed -i "s/#define S_CURVE_ACCELERATION/\/\/#define S_CURVE_ACCELERATION/g" Marlin/Configuration.h
+        sed -i -E "s/#define INVERT_Z_DIR.*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
+        sed -i -E "s/#define (X|Y|Z|E0)_DRIVER_TYPE.*/#define \1_DRIVER_TYPE TMC2209/g" Marlin/Configuration.h
+        sed -i -E "s/#define INVERT_(X|Y|E0)_DIR.*/#define INVERT_\1_DIR true/g" Marlin/Configuration.h
+        if ($HS); then TEMP=; else TEMP='\/\/'; fi;
+        sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define BLTOUCH_HS_MODE/$TEMP#define BLTOUCH_HS_MODE/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define USE_CONTROLLER_FAN/#define USE_CONTROLLER_FAN/g" Marlin/Configuration_adv.h
+        sed -i "s/#define CHOPPER_TIMING CHOPPER_DEFAULT_12V/#define CHOPPER_TIMING CHOPPER_DEFAULT_24V/g" Marlin/Configuration_adv.h
+        sed -i -E "s/#define (X|Y|E0)_CURRENT .*/#define \1_CURRENT 580/g" Marlin/Configuration_adv.h
+        pio run -e STM32F103RC_btt
+        mkdir -p "temp/E3V2-UBL-BLTouch-${GRID}x${GRID}${HSTMP}-SKR-${VERSION}"
+        mv .pio/build/STM32F103RC_btt/firmware.bin "temp/E3V2-UBL-BLTouch-${GRID}x${GRID}${HSTMP}-SKR-${VERSION}/firmware.bin"
+      env:
+        GRID: ${{ matrix.grid }}
+        HS: ${{ matrix.highspeed }}
+        VERSION: ${{ env.RELEASE_VERSION }}
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ steps.build_configs.outputs.filename }}
+        # path: temp/build.bin
+        path: temp/
