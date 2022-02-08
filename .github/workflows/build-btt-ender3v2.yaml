@@ -53,7 +53,7 @@ jobs:
 
         ## FIXME: Apply our custom configs from our firmware tests, which combine Jyers + BTT + Ender 3 V2 configs (plus our own tweaks)
 
-        git clone -b bugfix-2.0.x git@github.com:MarlinFirmware/Configurations.git Configurations
+        git clone -b bugfix-2.0.x https://github.com/MarlinFirmware/Configurations.git Configurations
         cp "Configurations/config/examples/Creality/Ender-3%20V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
         cp "Configurations/config/examples/Creality/Ender-3%20V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
         
