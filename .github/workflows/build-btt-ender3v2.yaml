@@ -8,6 +8,7 @@ on:
     branches:
       # - 2.0.x
       - bugfix-2.0.x
+  workflow_dispatch: # Can also be triggered manually
 
 jobs:
   Build-UBL-BLTouch-SKR:
