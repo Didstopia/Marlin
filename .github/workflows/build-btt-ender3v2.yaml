@@ -129,7 +129,7 @@ jobs:
         ## NOTE: This issues mentions that 5.0 is not even close to enough for Linear Advance to function properly:
         ##       https://github.com/MarlinFirmware/Marlin/issues/20649
         # Increase extruder jerk when using Linear Advance
-        #sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
         
         ## TODO: This MAY cause issues and is disabled in Creality's stock firmware!
         # Enable S-Curve Acceleration
