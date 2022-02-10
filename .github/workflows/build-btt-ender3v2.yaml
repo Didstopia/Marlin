@@ -207,6 +207,9 @@ jobs:
         # Disable UBL automatic saving
         sed -i "s/[^ ]*#define UBL_SAVE_ACTIVE_ON_M500/\/\/#define UBL_SAVE_ACTIVE_ON_M500/g" Marlin/Configuration.h
         
+        # Enable safe homing on the Z axis
+        sed -i "s/[^ ]*#define Z_SAFE_HOMING/\/\/#define Z_SAFE_HOMING/g" Marlin/Configuration.h
+        
         ## TODO: This may need tweaking and Creality's firmware has MUCH higher values?!
         # Reduce homing feed rates (homing speeds)
         sed -i "s/#define HOMING_FEEDRATE_MM_M .*/#define HOMING_FEEDRATE_MM_M { \(20\*60\), \(20\*60\), \(4\*60\) }/g" Marlin/Configuration.h
