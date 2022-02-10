@@ -31,7 +31,7 @@ jobs:
         persist-credentials: false
         
     - name: Prepare Environment
-      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      run: echo "RELEASE_VERSION=${GITHUB_BASE_REF}-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       
     ## FIXME: Why was this here and is it necessary?
     # - uses: actions/checkout@v2
@@ -66,9 +66,9 @@ jobs:
         cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
         cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
         
-        # Disable DWIN error message
+        # Patch for DWIN support with Jyers UI
         sed -i -E "s/^[^\/]*[ ]*#error \"DWIN_CREALITY_LCD requires a custom cable.*$/\/\/&:/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
-        
+        sed -i "s/DWIN_CREALITY_LCD/DWIN_CREALITY_LCD_JYERSUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
         ## TODO: Configure the following extra features from BTT:
         ## - PSU
         
