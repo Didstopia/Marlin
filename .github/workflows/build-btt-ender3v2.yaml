@@ -31,11 +31,10 @@ jobs:
         persist-credentials: false
         
     - name: Prepare Environment
-      run: echo "RELEASE_VERSION=${GITHUB_BASE_REF}-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      
+      run: echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+  
     ## FIXME: Why was this here and is it necessary?
-    # - uses: actions/checkout@v2
-    
+    # - uses: 
     - name: Cache pip
       uses: actions/cache@v2
       with:
@@ -113,7 +112,7 @@ jobs:
         # Set default/custom steps per unit, per axis
         sed -i "s/#define DEFAULT_AXIS_STEPS_PER_UNIT.*/#define DEFAULT_AXIS_STEPS_PER_UNIT { 80, 80, 400, 93 }/g" Marlin/Configuration.h
         
-        ## TODO: This is more than half of what Creality's firmware uses (500 for X and Y), needs more testing!
+        ## TODO: This is less than half of what Creality's firmware uses (500 for X and Y) and as such needs more testing!
         # Set default/custom maximum feedrate (movement speed)
         sed -i "s/#define DEFAULT_MAX_FEEDRATE.*/#define DEFAULT_MAX_FEEDRATE { 200, 200, 5, 25}/g" Marlin/Configuration.h
         
@@ -125,9 +124,10 @@ jobs:
         # Set default/custom maximum acceleration while moving/traveling
         sed -i "s/#define DEFAULT_TRAVEL_ACCELERATION.*/#define DEFAULT_TRAVEL_ACCELERATION 500/g" Marlin/Configuration.h
         
-        ## TODO: This MAY be causing issues with extruder skipping?!
+        ## TODO: This MAY be causing issues with extruder skipping?
+        ##       Creality and Jyers use 5, BTT uses 15, but neither have Linear Advance enabled, unlike BTT!
         # Increase extruder jerk when using Linear Advance
-        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
         
         ## TODO: This MAY cause issues and is disabled in Creality's stock firmware!
         # Enable S-Curve Acceleration
@@ -149,11 +149,9 @@ jobs:
         # Set default/custom nozzle offsets
         sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.5, -6.0, -1.10 }/g" Marlin/Configuration.h
         
-        ## TODO: Can this cause any issues?
         # Increase the probing margin (for BLTouch/UBL)
         sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
 
-        ## TODO: This may cause issues! Default Creality value is "(50*60)"
         # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL)
         sed -i "s/#define XY_PROBE_FEEDRATE .*/#define XY_PROBE_FEEDRATE (133*60)/g" Marlin/Configuration.h
 
@@ -182,7 +180,7 @@ jobs:
         
         ## TODO: Add a default/custom filament runout sensor distance
         # Set the default/custom runout sensor filament distance
-        sed -i "s/#define FILAMENT_RUNOUT_DISTANCE_MM .*/#define FILAMENT_RUNOUT_DISTANCE_MM 25/g" Marlin/Configuration.h
+        sed -i "s/#define FILAMENT_RUNOUT_DISTANCE_MM .*/#define FILAMENT_RUNOUT_DISTANCE_MM 0/g" Marlin/Configuration.h
         
         # Enable Universal Bed Leveling (UBL)
         sed -i "s/[^ ]*#define AUTO_BED_LEVELING_UBL/#define AUTO_BED_LEVELING_UBL/g" Marlin/Configuration.h
@@ -197,9 +195,8 @@ jobs:
         sed -i "s/[^ ]*#define DEBUG_LEVELING_FEATURE/#define DEBUG_LEVELING_FEATURE/g" Marlin/Configuration.h
         
         # Set the leveling grid size for the current firmware configuration
-        sed -i "s/#define GRID_MAX_POINTS_X.*/#define GRID_MAX_POINTS_X $GRID/g" Marlin/Configuration.h
+        sed -i "s/#define GRID_MAX_POINTS_X .*/#define GRID_MAX_POINTS_X $GRID/g" Marlin/Configuration.h
         
-        ## TODO: Can this cause any issues?
         # Increase default mesh inset for UBL
         sed -i "s/[^ ]*#define MESH_INSET .*/#define MESH_INSET 10/g" Marlin/Configuration.h
         
@@ -211,7 +208,7 @@ jobs:
         sed -i "s/[^ ]*#define Z_SAFE_HOMING/#define Z_SAFE_HOMING/g" Marlin/Configuration.h
         
         ## TODO: This may need tweaking and Creality's firmware has MUCH higher values?!
-        # Reduce homing feed rates (homing speeds)
+        # Reduce homing feed rate (homing speed)
         sed -i "s/#define HOMING_FEEDRATE_MM_M .*/#define HOMING_FEEDRATE_MM_M { \(20\*60\), \(20\*60\), \(4\*60\) }/g" Marlin/Configuration.h
         
         ## TODO: Why do we want this enabled? Purely for debugging, right?
@@ -221,7 +218,7 @@ jobs:
         # Clear EEPROM on startup after flashing a new firmware
         sed -i "s/[^ ]*#define EEPROM_INIT_NOW/#define EEPROM_INIT_NOW/g" Marlin/Configuration.h
         
-        ## TODO: Setup custom heating profiles (eg. PREHEAT_1_LABEL)
+        ## TODO: Setup custom heating profiles here (eg. PREHEAT_1_LABEL)
         
         # Enable nozzle parking when idle
         sed -i "s/[^ ]*#define NOZZLE_PARK_FEATURE/#define NOZZLE_PARK_FEATURE/g" Marlin/Configuration.h
@@ -237,12 +234,12 @@ jobs:
         sed -i "s/[^ ]*#define DWIN_CREALITY_LCD/\/\/#define DWIN_CREALITY_LCD/g" Marlin/Configuration.h
         sed -i "s/[^ ]*#define DWIN_CREALITY_LCD_JYERSUI/#define DWIN_CREALITY_LCD_JYERSUI/g" Marlin/Configuration.h
         
-        ## TODO: Configure Creality DWIN touch screen support
+        ## TODO: Configure Creality DWIN touch screen support here (if we ever get it working in the first place)
         
         # Enable software PWM fan control
         sed -i "s/[^ ]*#define FAN_SOFT_PWM/#define FAN_SOFT_PWM/g" Marlin/Configuration.h
         
-        ## TODO: Enable and configure NeoPixel LED driver support
+        ## TODO: Enable and configure NeoPixel LED driver support here
         
         ## END OF CONFIGURATION.H
         
@@ -322,15 +319,15 @@ jobs:
         # Enable advanced pausing for filament change
         sed -i "s/[^ ]*#define ADVANCED_PAUSE_FEATURE/#define ADVANCED_PAUSE_FEATURE/g" Marlin/Configuration_adv.h
         
-        ## TODO: This is "100" in Creality's firmware, 4x in BTT's recommendations, but which is correct?!
+        ## TODO: This is "100" in Creality's firmware, 4x in BTT's recommendations, but which is correct?! (0 in Jyers)
         # Configure filament unload length
         #sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
         
-        ## TODO: This is "6" in Creality's firmware, "10" in BTT's recommendations, but which is correct?!
+        ## TODO: This is "6" in Creality's firmware, "10" in BTT's recommendations, but which is correct?! (10 in Jyers)
         # Configure filament fast load feed rate (speed)
-        #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
+        sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
         
-        ## TODO: This is "0" in Creality's firmware, "350" in BTT's recommendations, but which is correct?!
+        ## TODO: This is "0" in Creality's firmware, "350" in BTT's recommendations, but which is correct?! (0 in Jyers)
         # Configure filament fast load length
         #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
         
