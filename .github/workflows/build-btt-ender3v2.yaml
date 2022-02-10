@@ -201,7 +201,7 @@ jobs:
         
         ## TODO: Can this cause any issues?
         # Increase default mesh inset for UBL
-        sed -i "s/[^ ]*#define MESH_INSET/#define MESH_INSET 10/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define MESH_INSET .*/#define MESH_INSET 10/g" Marlin/Configuration.h
         
         ## TODO: Why would we want to disable this though?
         # Disable UBL automatic saving
