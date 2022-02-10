@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        board: [STM32G0B1RE_btt]
         ## FIXME: Figure out which versions we want to build/support
         # grid: [3, 5, 10, 15]
         grid: [10]
@@ -396,21 +397,22 @@ jobs:
       run: |
         # Generate a name for the firmware and export it as a step output
         if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
-        FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}-SKR-${VERSION}"
+        FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}-${BOARD}-${VERSION}"
         echo "::set-output name=name::${FIRMWARE_NAME}"
         echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
       
         ## TODO: Get the board env name dynamically instead?
         # Compile the firmware
-        pio run -e STM32F103RC_btt
+        pio run -e $BOARD
         
         # Copy the firmware and configuration files to a named temporary folder
         mkdir -p "temp/${FIRMWARE_NAME}"
         ## TODO: Get the board env name dynamically instead?
-        cp .pio/build/STM32F103RC_btt/firmware.bin "temp/${FIRMWARE_NAME}/firmware.bin"
+        cp .pio/build/$BOARD/firmware.bin "temp/${FIRMWARE_NAME}/firmware.bin"
         cp Marlin/Configuration.h "temp/${FIRMWARE_NAME}/Configuration.h"
         cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configuration_adv.h"
       env:
+        BOARD: ${{ matrix.board }}
         GRID: ${{ matrix.grid }}
         HIGH_SPEED: ${{ matrix.high-speed }}
         VERSION: ${{ env.RELEASE_VERSION }}
