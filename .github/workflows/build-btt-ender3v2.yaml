@@ -182,7 +182,7 @@ jobs:
         
         ## TODO: Add a default/custom filament runout sensor distance
         # Set the default/custom runout sensor filament distance
-        sed -i "s/[^ ]*#define FILAMENT_RUNOUT_DISTANCE_MM/#define FILAMENT_RUNOUT_DISTANCE_MM 25/g" Marlin/Configuration.h
+        sed -i "s/#define FILAMENT_RUNOUT_DISTANCE_MM .*/#define FILAMENT_RUNOUT_DISTANCE_MM 25/g" Marlin/Configuration.h
         
         # Enable Universal Bed Leveling (UBL)
         sed -i "s/[^ ]*#define AUTO_BED_LEVELING_UBL/#define AUTO_BED_LEVELING_UBL/g" Marlin/Configuration.h
@@ -224,7 +224,7 @@ jobs:
         sed -i "s/[^ ]*#define NOZZLE_PARK_FEATURE/#define NOZZLE_PARK_FEATURE/g" Marlin/Configuration.h
         
         # Increase Z axis while nozzle parking
-        sed -i "s/[^ ]*#define NOZZLE_PARK_Z_RAISE_MIN/#define NOZZLE_PARK_Z_RAISE_MIN 5/g" Marlin/Configuration.h
+        sed -i "s/#define NOZZLE_PARK_Z_RAISE_MIN .*/#define NOZZLE_PARK_Z_RAISE_MIN 5/g" Marlin/Configuration.h
         
         ## FIXME: This also catches "PRINTCOUNTER_SAVE_INTERVAL" as is and should be fixed!
         # Enable print counting statistics
@@ -262,12 +262,12 @@ jobs:
         
         # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
         if ($HIGH_SPEED); then HS_ENABLED=; else HS_ENABLED='\/\/'; fi;
-        sed -i "s/[^ ]*#define BLTOUCH_HS_MODE.*/$HS_ENABLED#define BLTOUCH_HS_MODE true/g" Marlin/Configuration_adv.h
+        sed -i "s/#define BLTOUCH_HS_MODE.*/$HS_ENABLED#define BLTOUCH_HS_MODE true/g" Marlin/Configuration_adv.h
         
         ## TODO: Disable inactive Z to reduce sag with dual Z setups?
         
         # Enable DWIN display beep mute option
-        sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
+        sed -i "s/#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
 
         ## TODO: Do we need this and does this work?
         # Enable long filename support
