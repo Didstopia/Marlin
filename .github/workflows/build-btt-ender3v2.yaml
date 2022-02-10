@@ -249,7 +249,7 @@ jobs:
         
         # Enable mainboard/controller fan control
         sed -i "s/[^ ]*#define USE_CONTROLLER_FAN/#define USE_CONTROLLER_FAN/g" Marlin/Configuration_adv.h
-        sed -i "s/#define CONTROLLER_FAN_PIN .*/#define CONTROLLER_FAN_PIN FAN2_PIN/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define CONTROLLER_FAN_PIN .*/#define CONTROLLER_FAN_PIN FAN2_PIN/g" Marlin/Configuration_adv.h
         
         ## TODO: The config notes seem to indicate that this never actually shuts down the fan?!
         # Enable automatic fan control for the extruder and parts cooler
@@ -262,12 +262,12 @@ jobs:
         
         # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
         if ($HIGH_SPEED); then HS_ENABLED=; else HS_ENABLED='\/\/'; fi;
-        sed -i "s/#define BLTOUCH_HS_MODE.*/$HS_ENABLED#define BLTOUCH_HS_MODE true/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define BLTOUCH_HS_MODE .*/$HS_ENABLED#define BLTOUCH_HS_MODE true/g" Marlin/Configuration_adv.h
         
         ## TODO: Disable inactive Z to reduce sag with dual Z setups?
         
         # Enable DWIN display beep mute option
-        sed -i "s/#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
 
         ## TODO: Do we need this and does this work?
         # Enable long filename support
@@ -283,7 +283,7 @@ jobs:
         
         ## TODO: Do we need this and does this work?
         # Set SD card connection to be "onboard"
-        sed -i "s/#define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
+        sed -i "s/#[^ ]*define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
         
         ## TODO: Does this cause any issues? It's disabled in Creality's firmware!
         # Enable babystepping without homing
@@ -321,15 +321,15 @@ jobs:
         
         ## TODO: This is "100" in Creality's firmware, 4x in BTT's recommendations, but which is correct?!
         # Configure filament unload length
-        sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
         
         ## TODO: This is "6" in Creality's firmware, "10" in BTT's recommendations, but which is correct?!
         # Configure filament fast load feed rate (speed)
-        sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
         
         ## TODO: This is "0" in Creality's firmware, "350" in BTT's recommendations, but which is correct?!
         # Configure filament fast load length
-        sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
         
         # Enable head parking during pause and filament change
         sed -i "s/[^ ]*#define PARK_HEAD_ON_PAUSE/#define PARK_HEAD_ON_PAUSE/g" Marlin/Configuration_adv.h
