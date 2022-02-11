@@ -4,11 +4,19 @@
 name: Build BTT SKR Mini E3 V3.0 (Ender 3 V2)
 
 on:
+  # Trigger custom firmwares builds only on specific branches
   push:
     branches:
-      # - 2.0.x
+      - 2.0.x
       - bugfix-2.0.x
+  
+  # Allow manual builds with a configurable target branch
   workflow_dispatch: # Can also be triggered manually
+    inputs:
+      targetBranch:
+        description: 'Target Branch'
+        required: true
+        default: 'bugfix-2.0.x'
 
 jobs:
 
@@ -17,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # branch: [2.0.x, bugfix-2.0.x]
         board: [STM32G0B1RE_btt]
         ## FIXME: Figure out which versions we want to build/support
         # grid: [3, 5, 10, 15]
@@ -24,17 +33,27 @@ jobs:
         high-speed: [true, false]
     steps:
     
-    - name: Checkout Repository
+    - name: Prepare Target Branch
+      run: |
+        if [ -z "env.INPUT_TARGET_BRANCH" ]; then
+          echo "TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}" >> $GITHUB_ENV
+        else
+          echo "TARGET_BRANCH=${{ env.INPUT_TARGET_BRANCH }}" >> $GITHUB_ENV
+        fi
+    
+    # - name: Checkout Repository (${{ matrix.branch }})
+    # - name: Checkout Repository (${{ env.GITHUB_BASE_REF }})
+    - name: Checkout Repository (${{ env.TARGET_BRANCH }})
       uses: actions/checkout@v2
       with:
-        ref: bugfix-2.0.x
+        # ref: ${{ matrix.branch }}
+        # ref: ${{ env.CURRENT_BRANCH }}
+        ref: ${{ env.TARGET_BRANCH }}
         persist-credentials: false
         
-    - name: Prepare Environment
+    - name: Prepare Environment (${{ env.TARGET_BRANCH }})
       run: echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-  
-    ## FIXME: Why was this here and is it necessary?
-    # - uses: 
+    
     - name: Cache pip
       uses: actions/cache@v2
       with:
@@ -42,13 +61,13 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-          
+    
     - name: Cache PlatformIO
       uses: actions/cache@v2
       with:
         path: ~/.platformio
         key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-        
+    
     - name: Setup Python
       uses: actions/setup-python@v2
       
@@ -56,12 +75,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install --upgrade platformio
-        
-    - name: Configure Firmware
+    
+    - name: Configure Firmware (${{ env.TARGET_BRANCH }})
       id: configure_firmware
       run: |
         # Copy the latest default Ender 3 V2 config files in place
-        git clone -b bugfix-2.0.x https://github.com/MarlinFirmware/Configurations.git Configurations
+        git clone -b ${{ env.TARGET_BRANCH }} https://github.com/MarlinFirmware/Configurations.git Configurations
         cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
         cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
         
@@ -394,7 +413,7 @@ jobs:
         GRID: ${{ matrix.grid }}
         HIGH_SPEED: ${{ matrix.high-speed }}
         
-    - name: Compile Firmware
+    - name: Compile Firmware (${{ env.TARGET_BRANCH }})
       id: compile_firmware
       run: |
         # Generate a name for the firmware and export it as a step output
@@ -419,10 +438,11 @@ jobs:
         HIGH_SPEED: ${{ matrix.high-speed }}
         VERSION: ${{ env.RELEASE_VERSION }}
         
-    - name: Publish Artifacts
+    - name: Publish Artifacts (${{ env.TARGET_BRANCH }})
       uses: actions/upload-artifact@v2
       with:
         # name: ${{ steps.compile_firmware.outputs.filename }}
-        name: ${{ steps.compile_firmware.outputs.name }}.zip
+        # name: ${{ steps.compile_firmware.outputs.name }}.zip
+        name: ${{ steps.compile_firmware.outputs.name }}
         # path: temp/build.bin
         path: temp/
