@@ -64,7 +64,7 @@ jobs:
         persist-credentials: false
         
     - name: Prepare Environment (${{ env.TARGET_BRANCH }})
-      run: echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      run: echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${{ env.GITHUB_RUN_ID }}-${{ env.GITHUB_RUN_ATTEMPT }}" >> $GITHUB_ENV
     
     - name: Cache pip
       uses: actions/cache@v2
