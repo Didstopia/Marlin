@@ -35,7 +35,8 @@ jobs:
     
     - name: Prepare Target Branch
       run: |
-        if [ -z "env.INPUT_TARGET_BRANCH" ]; then
+        printenv
+        if [ -z "${{ env.INPUT_TARGET_BRANCH }}" ]; then
           echo "TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}" >> $GITHUB_ENV
         else
           echo "TARGET_BRANCH=${{ env.INPUT_TARGET_BRANCH }}" >> $GITHUB_ENV
