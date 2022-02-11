@@ -28,7 +28,9 @@ jobs:
     # Step 2: run the sync action
     - name: Sync upstream changes
       id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.2
+      # uses: aormsby/Fork-Sync-With-Upstream-action@master
+      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.2
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
       with:
         # Target branch in this repository
         target_sync_branch: 2.0.x
@@ -78,7 +80,9 @@ jobs:
     # Step 2: run the sync action
     - name: Sync upstream changes
       id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.2
+      # uses: aormsby/Fork-Sync-With-Upstream-action@master
+      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.2
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
       with:
         # Target branch in this repository
         target_sync_branch: bugfix-2.0.x
