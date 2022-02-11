@@ -39,7 +39,7 @@ jobs:
         TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
         
         # Allow overriding the target branch with manual builds
-        OVERRIDE_TARGET_BRANCH=${{ github.events.inputs.targetBranch }}
+        OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
         if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
           TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
         fi
