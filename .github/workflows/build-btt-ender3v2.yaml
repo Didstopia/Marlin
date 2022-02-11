@@ -444,6 +444,11 @@ jobs:
         sed -i "s/#define GANTRY_CALIBRATION_FEEDRATE.*/#define GANTRY_CALIBRATION_FEEDRATE 500/g" Marlin/Configuration_adv.h
         sed -i "s/#define GANTRY_CALIBRATION_COMMANDS_POST.*/#define GANTRY_CALIBRATION_COMMANDS_POST \"G28 Z\"/g" Marlin/Configuration_adv.h
         
+        ## WARNING: This may break something, be prepared!
+        # Enable mechanical gantry calibration on startup
+        sed -i "s/[^ ]*#define STARTUP_COMMANDS .*/#define STARTUP_COMMANDS \"M117 Auto-homing\\nG28\\nM117 Calibrating Z axis\\nG34\"/g" Marlin/Configuration_adv.h
+        
+        
         ## TODO: What about assisted tramming? Could that help us with bed leveling?
         ## TODO: What about G29_RETRY_AND_RECOVER? Can that help us with probing/leveling?
         ## TODO: Should we use STARTUP_COMMANDS to do homing (G28?) + G34 to calibrate the X gantry automatically on boot?
