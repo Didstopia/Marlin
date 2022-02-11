@@ -179,8 +179,10 @@ jobs:
         # Enable BLTouch/CRTouch support
         sed -i "s/[^ ]*#define BLTOUCH/#define BLTOUCH/g" Marlin/Configuration.h
         
+        ## TODO: Trying with a CRTouch right now, which meant lowering the Z offset, however there's a Z offset bug in Marlin atm too..
         # Set default/custom nozzle offsets
-        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.5, -6.0, -1.10 }/g" Marlin/Configuration.h
+        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.5, -6.0, -1.10 }/g" Marlin/Configuration.h
+        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.5, -6.0, -1.25 }/g" Marlin/Configuration.h
         
         # Increase the probing margin (for BLTouch/UBL)
         sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
@@ -189,14 +191,14 @@ jobs:
         sed -i "s/#define XY_PROBE_FEEDRATE .*/#define XY_PROBE_FEEDRATE (133*60)/g" Marlin/Configuration.h
 
         # Enable multiple probings (for BLTouch/UBL)
-        sed -i "s/#define MULTIPLE_PROBING .*/#define MULTIPLE_PROBING 2/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define MULTIPLE_PROBING .*/#define MULTIPLE_PROBING 2/g" Marlin/Configuration.h
 
         # Enable Z probe testing (for BLTouch/UBL)
         sed -i "s/[^ ]*#define Z_MIN_PROBE_REPEATABILITY_TEST/#define Z_MIN_PROBE_REPEATABILITY_TEST/g" Marlin/Configuration.h
         
         # Invert axis motor directions
-        sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
         sed -i -E "s/#define INVERT_(X|Y|E0)_DIR .*/#define INVERT_\1_DIR true/g" Marlin/Configuration.h
+        sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
         
         # Require homing after steppers have deactivated/unlocked
         sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
@@ -207,13 +209,17 @@ jobs:
         
         # Extend maximum X position for better probe reach (for BLTouch/UBL)
         sed -i "s/#define X_MAX_POS .*/#define X_MAX_POS X_BED_SIZE + 15/g" Marlin/Configuration.h
+        
+        ## TODO: Figure out a good value for this so we don't have to push against our printed endstops TOO hard!
+        # Lower maximum Z position for better mechanical gantry calibration
+        sed -i "s/#define >_MAX_POS .*/#define X_MAX_POS 250/g" Marlin/Configuration.h
 
         # Enable filament runout sensor
         sed -i "s/[^ ]*#define FILAMENT_RUNOUT_SENSOR/#define FILAMENT_RUNOUT_SENSOR/g" Marlin/Configuration.h
         
         ## TODO: Add a default/custom filament runout sensor distance
         # Set the default/custom runout sensor filament distance
-        sed -i "s/#define FILAMENT_RUNOUT_DISTANCE_MM .*/#define FILAMENT_RUNOUT_DISTANCE_MM 0/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define FILAMENT_RUNOUT_DISTANCE_MM .*/#define FILAMENT_RUNOUT_DISTANCE_MM 0/g" Marlin/Configuration.h
         
         # Enable Universal Bed Leveling (UBL)
         sed -i "s/[^ ]*#define AUTO_BED_LEVELING_UBL/#define AUTO_BED_LEVELING_UBL/g" Marlin/Configuration.h
@@ -310,13 +316,27 @@ jobs:
         # Enable scrolling filenames
         sed -i "s/[^ ]*#define SCROLL_LONG_FILENAMES/#define SCROLL_LONG_FILENAMES/g" Marlin/Configuration_adv.h
 
-        ## TODO: Do we need this and does this work?
+        ## TODO: Disabling this in case it helps speed up the SD card insertion/removal process?
         # Enable SD card automatic status reporting
-        sed -i "s/[^ ]*#define AUTO_REPORT_SD_STATUS/#define AUTO_REPORT_SD_STATUS/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define AUTO_REPORT_SD_STATUS/#define AUTO_REPORT_SD_STATUS/g" Marlin/Configuration_adv.h
         
         ## TODO: Do we need this and does this work?
         # Set SD card connection to be "onboard"
-        sed -i "s/#[^ ]*define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
+        
+        ## TODO: Not sure if this'll even work, but worth a try!
+        ## TODO: If it doesn't work, try also enabling "DISKIO_HOST_DRIVE"!
+        # Enable access to the SD card over USB
+        sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
+        
+        ## TODO: Does this show the remaining size? Or the time remaining when loading data? Or something else?
+        # Enable SD card percentage next to the progress bar
+        sed -i "s/[^ ]*#define SHOW_SD_PERCENT/#define SHOW_SD_PERCENT/g" Marlin/Configuration_adv.h
+        
+        ## TODO: What would happen if we enable "SD_IGNORE_AT_STARTUP" and go to the Print Menu? Would it then be enabled?
+        ##       Time to test this by enabling this option!
+        ## FIXME: Supposedly this is what allows USB access to the SD card on boot, HOWEVER I sure hope this doesn't mean we lose firmware flashing?!
+        sed -i "s/[^ ]*#define SD_IGNORE_AT_STARTUP/#define SD_IGNORE_AT_STARTUP/g" Marlin/Configuration_adv.h
         
         ## TODO: Does this cause any issues? It's disabled in Creality's firmware!
         # Enable babystepping without homing
@@ -416,9 +436,17 @@ jobs:
         
         # Configure additional options for mechanical gantry calibration
         sed -i "s/#define GANTRY_CALIBRATION_CURRENT.*/#define GANTRY_CALIBRATION_CURRENT Z_CURRENT \/ 3/g" Marlin/Configuration_adv.h
-        sed -i "s/#define GANTRY_CALIBRATION_EXTRA_HEIGHT.*/#define GANTRY_CALIBRATION_EXTRA_HEIGHT 15/g" Marlin/Configuration_adv.h
+        ## TODO: Adjust this after installing the mechanical endstops and testing G34, as we shouldn't have to move TOO much past the max height?!
+        #sed -i "s/#define GANTRY_CALIBRATION_EXTRA_HEIGHT.*/#define GANTRY_CALIBRATION_EXTRA_HEIGHT 15/g" Marlin/Configuration_adv.h
+        sed -i "s/#define GANTRY_CALIBRATION_EXTRA_HEIGHT.*/#define GANTRY_CALIBRATION_EXTRA_HEIGHT 0/g" Marlin/Configuration_adv.h
+        ## TODO: Should we lower the feed rate? Or is this already lowered?
         sed -i "s/#define GANTRY_CALIBRATION_FEEDRATE.*/#define GANTRY_CALIBRATION_FEEDRATE 500/g" Marlin/Configuration_adv.h
         sed -i "s/#define GANTRY_CALIBRATION_COMMANDS_POST.*/#define GANTRY_CALIBRATION_COMMANDS_POST \"G28 Z\"/g" Marlin/Configuration_adv.h
+        
+        ## TODO: What about assisted tramming? Could that help us with bed leveling?
+        ## TODO: What about G29_RETRY_AND_RECOVER? Can that help us with probing/leveling?
+        ## TODO: Should we use STARTUP_COMMANDS to do homing (G28?) + G34 to calibrate the X gantry automatically on boot?
+        ## TODO: How do HOST_ACTION_COMMANDS work? Can we not have custom commands in Jyers UI/DWIN display?
         
         ## END OF CONFIGURATION_ADV.H
       env:
