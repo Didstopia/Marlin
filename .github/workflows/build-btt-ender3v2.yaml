@@ -35,13 +35,22 @@ jobs:
     
     - name: Prepare Target Branch
       run: |
-        printenv
-        #if [ -z "${{ env.INPUT_TARGET_BRANCH }}" ]; then
-        if [ -z "${{ inputs.targetBranch }}" ]; then
-          echo "TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}" >> $GITHUB_ENV
+        # Target branch defaults to base ref
+        TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
+        
+        # Allow overriding the target branch with manual builds
+        OVERRIDE_TARGET_BRANCH=${{ inputs.targetBranch }}
+        if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
+          TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
+        fi
+        
+        # Ensure that we have a target branch
+        if [ -z "${TARGET_BRANCH}" ]; then
+          echo "ERROR: Could not detect target branch, unable to continue!"
+          exit 1
         else
-          #echo "TARGET_BRANCH=${{ env.INPUT_TARGET_BRANCH }}" >> $GITHUB_ENV
-          echo "TARGET_BRANCH=${{ inputs.targetBranch }}" >> $GITHUB_ENV
+          # Export the final target branch as a global environment variable
+          echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
         fi
     
     # - name: Checkout Repository (${{ matrix.branch }})
