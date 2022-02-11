@@ -336,7 +336,8 @@ jobs:
         ## TODO: What would happen if we enable "SD_IGNORE_AT_STARTUP" and go to the Print Menu? Would it then be enabled?
         ##       Time to test this by enabling this option!
         ## FIXME: Supposedly this is what allows USB access to the SD card on boot, HOWEVER I sure hope this doesn't mean we lose firmware flashing?!
-        sed -i "s/[^ ]*#define SD_IGNORE_AT_STARTUP/#define SD_IGNORE_AT_STARTUP/g" Marlin/Configuration_adv.h
+        ## FIXME: error "SD_IGNORE_AT_STARTUP is incompatible with POWER_LOSS_RECOVERY -> disabling for now
+        #sed -i "s/[^ ]*#define SD_IGNORE_AT_STARTUP/#define SD_IGNORE_AT_STARTUP/g" Marlin/Configuration_adv.h
         
         ## TODO: Does this cause any issues? It's disabled in Creality's firmware!
         # Enable babystepping without homing
