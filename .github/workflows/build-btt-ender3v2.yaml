@@ -446,7 +446,7 @@ jobs:
         
         ## WARNING: This may break something, be prepared!
         # Enable mechanical gantry calibration on startup
-        sed -i "s/[^ ]*#define STARTUP_COMMANDS .*/#define STARTUP_COMMANDS \"M117 Auto-homing\\nG28\\nM117 Calibrating Z axis\\nG34\"/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define STARTUP_COMMANDS .*/#define STARTUP_COMMANDS \"M117 Auto-homing\\\nG28\\\nM117 Calibrating Z axis\\\nG34\\\nM117 Done\"/g" Marlin/Configuration_adv.h
         
         
         ## TODO: What about assisted tramming? Could that help us with bed leveling?
