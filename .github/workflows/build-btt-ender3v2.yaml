@@ -33,29 +33,23 @@ jobs:
         high-speed: [true, false]
     steps:
     
-    ## TODO: Does this allow us to get more information? Probably not, right?
-    ##       It's like our inputs aren't working and that's the main issue?!
-    - uses: actions/checkout@v2
-    
     - name: Prepare Target Branch
       run: |
         # Target branch defaults to base ref
         TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
         
         # Allow overriding the target branch with manual builds
-        OVERRIDE_TARGET_BRANCH=${{ inputs.targetBranch }}
+        OVERRIDE_TARGET_BRANCH=${{ github.events.inputs.targetBranch }}
         if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
           TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
         fi
         
         # Ensure that we have a target branch
         if [ -z "${TARGET_BRANCH}" ]; then
-          echo "ERROR: Could not detect target branch, unable to continue!"
-          echo "::error title=Failure detected::Could not detect target branch, unable to continue"
+          echo "::error title=Missing target branch::Could not detect target branch, unable to continue"
           exit 1
         else
           # Export the final target branch as a global environment variable
-          echo "Target branch found, exporting as a global environment variable"
           echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
         fi
     
