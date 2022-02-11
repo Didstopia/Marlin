@@ -156,7 +156,7 @@
 #define EXP1_09_PIN                         PA15
 #define EXP1_03_PIN                         PD6
 
-#if EITHER(DWIN_CREALITY_LCD, IS_DWIN_MARLINUI)
+#if ANY(DWIN_CREALITY_LCD, DWIN_CREALITY_LCD_JYERSUI, IS_DWIN_MARLINUI)
   /**
    *        ------                ------                ------
    * (ENT) |10  9 | (BEEP)       |10  9 |              |10  9 |
