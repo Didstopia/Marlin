@@ -11,7 +11,7 @@ on:
       - bugfix-2.0.x
   
   # Allow manual builds with a configurable target branch
-  workflow_dispatch: # Can also be triggered manually
+  workflow_dispatch:
     inputs:
       targetBranch:
         description: 'Target Branch'
@@ -36,10 +36,12 @@ jobs:
     - name: Prepare Target Branch
       run: |
         printenv
-        if [ -z "${{ env.INPUT_TARGET_BRANCH }}" ]; then
+        #if [ -z "${{ env.INPUT_TARGET_BRANCH }}" ]; then
+        if [ -z "${{ inputs.targetBranch }}" ]; then
           echo "TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}" >> $GITHUB_ENV
         else
-          echo "TARGET_BRANCH=${{ env.INPUT_TARGET_BRANCH }}" >> $GITHUB_ENV
+          #echo "TARGET_BRANCH=${{ env.INPUT_TARGET_BRANCH }}" >> $GITHUB_ENV
+          echo "TARGET_BRANCH=${{ inputs.targetBranch }}" >> $GITHUB_ENV
         fi
     
     # - name: Checkout Repository (${{ matrix.branch }})
