@@ -98,6 +98,7 @@ jobs:
         
         # Patch for DWIN support with Jyers UI
         sed -i -E "s/^[^\/]*[ ]*#error \"DWIN_CREALITY_LCD requires a custom cable.*$/\/\/&:/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
+        ## FIXME: No longer necessary on bugfix-2.0.x, comment out when 2.0.x branch gets the fix merged?
         sed -i "s/DWIN_CREALITY_LCD/DWIN_CREALITY_LCD_JYERSUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
         ## TODO: Configure the following extra features from BTT:
         ## - PSU
@@ -448,6 +449,9 @@ jobs:
         # Enable mechanical gantry calibration on startup
         sed -i "s/[^ ]*#define STARTUP_COMMANDS .*/#define STARTUP_COMMANDS \"M117 Auto-homing..\\\nG28\\\nM117 Calibrating Z axis..\\\nG34\\\nM117 Ready.\"/g" Marlin/Configuration_adv.h
         
+        # Enable backlash compensation
+        sed -i "s/[^ ]*#define BACKLASH_COMPENSATION/#define BACKLASH_COMPENSATION/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define BACKLASH_GCODE/#define BACKLASH_GCODE/g" Marlin/Configuration_adv.h
         
         ## TODO: What about assisted tramming? Could that help us with bed leveling?
         ## TODO: What about G29_RETRY_AND_RECOVER? Can that help us with probing/leveling?
