@@ -28,8 +28,8 @@ jobs:
         # branch: [2.0.x, bugfix-2.0.x]
         board: [STM32G0B1RE_btt]
         ## FIXME: Figure out which versions we want to build/support
-        # grid: [3, 5, 10, 15]
-        grid: [10]
+        grid: [3, 5, 10, 15]
+        # grid: [10]
         high-speed: [true, false]
     steps:
     
