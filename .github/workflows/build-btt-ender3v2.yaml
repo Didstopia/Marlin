@@ -180,10 +180,10 @@ jobs:
         # Enable BLTouch/CRTouch support
         sed -i "s/[^ ]*#define BLTOUCH/#define BLTOUCH/g" Marlin/Configuration.h
         
-        ## TODO: Trying with a CRTouch right now, which meant lowering the Z offset, however there's a Z offset bug in Marlin atm too..
+        ## TODO: Calibrated -1.150 Z offset, but -1.250 may work better?
         # Set default/custom nozzle offsets
-        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.5, -6.0, -1.10 }/g" Marlin/Configuration.h
-        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.5, -6.0, -1.25 }/g" Marlin/Configuration.h
+        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.150 }/g" Marlin/Configuration.h
+        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.250 }/g" Marlin/Configuration.h
         
         # Increase the probing margin (for BLTouch/UBL)
         sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
@@ -447,7 +447,7 @@ jobs:
         
         ## WARNING: This may break something, be prepared!
         # Enable mechanical gantry calibration on startup
-        sed -i "s/[^ ]*#define STARTUP_COMMANDS .*/#define STARTUP_COMMANDS \"M117 Auto-homing..\\\nG28\\\nM117 Calibrating Z axis..\\\nG34\\\nM117 Ready.\"/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define STARTUP_COMMANDS .*/#define STARTUP_COMMANDS \"M117 Auto-homing..\\\nG28\\\nM117 Calibrating Z axis..\\\nG34\\\nM117 Ready.\"/g" Marlin/Configuration_adv.h
         
         # Enable backlash compensation
         sed -i "s/[^ ]*#define BACKLASH_COMPENSATION/#define BACKLASH_COMPENSATION/g" Marlin/Configuration_adv.h
