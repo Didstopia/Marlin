@@ -10,6 +10,13 @@ on:
       - 2.0.x
       - bugfix-2.0.x
   
+  ## FIXME: How can we trigger new builds for both branches OR detect which branch had new commits?!
+  # Trigger after the upstream sync workflow has completed
+  workflow_run:
+    workflows: ["Sync Upstream"]
+    types:
+      - completed
+  
   # Allow manual builds with a configurable target branch
   workflow_dispatch:
     inputs:
