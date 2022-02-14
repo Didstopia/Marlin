@@ -182,8 +182,10 @@ jobs:
         
         ## TODO: Calibrated -1.150 Z offset, but -1.250 may work better?
         # Set default/custom nozzle offsets
-        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.150 }/g" Marlin/Configuration.h
-        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.250 }/g" Marlin/Configuration.h
+        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.150 }/g" Marlin/Configuration.h
+        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.250 }/g" Marlin/Configuration.h
+        ## TODO: Try to see if we use a zero Z offset, then set it manually after flashing, if that'll fix the issues?!
+        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, 0.0 }/g" Marlin/Configuration.h
         
         # Increase the probing margin (for BLTouch/UBL)
         sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
