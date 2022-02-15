@@ -191,7 +191,9 @@ jobs:
         # Set default/custom nozzle offsets
         #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.150 }/g" Marlin/Configuration.h
         ## NOTE: Confirmed that a Z offset of -1.16 with bed heated up to 60C and probed with CRTouch gives consistent results
-        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.160 }/g" Marlin/Configuration.h
+        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.160 }/g" Marlin/Configuration.h
+        ## NOTE: New Brozzl nozzle, lowering Z offset further
+        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.260 }/g" Marlin/Configuration.h
         
         # Increase the probing margin (for BLTouch/UBL)
         sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
