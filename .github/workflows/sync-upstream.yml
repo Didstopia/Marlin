@@ -48,16 +48,30 @@ jobs:
         test_mode: false
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
-    - name: New commits found
+    - name: Build Trigger
       if: steps.sync.outputs.has_new_commits == 'true'
-      run: echo "New commits were found to sync."
+      run: |
+        echo "New commits were found and synced, triggering a new firmware build"
+        - name: Directory update request
+        [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
+        curl --request POST \
+          --url https://api.github.com/repos/Didstopia/Marlin/actions/workflows/build-btt-ender3v2.yaml/dispatches \
+          --header 'Content-Type: application/json' \
+          --header 'Accept: application/vnd.github.v3+json' \
+          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --data '{
+              "ref": "skr-mini-e3-v3-0",
+              "inputs": {
+                "targetBranch": "2.0.x"
+              }
+            }'
     
-    - name: No new commits
-      if: steps.sync.outputs.has_new_commits == 'false'
-      run: echo "There were no new commits."
+    # - name: No new commits
+    #   if: steps.sync.outputs.has_new_commits == 'false'
+    #   run: echo "There were no new commits."
       
-    - name: Show value of 'has_new_commits'
-      run: echo ${{ steps.sync.outputs.has_new_commits }}
+    # - name: Show value of 'has_new_commits'
+    #   run: echo ${{ steps.sync.outputs.has_new_commits }}
 
   sync_bugfix_branch:
     runs-on: ubuntu-latest
@@ -100,13 +114,27 @@ jobs:
         test_mode: false
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
-    - name: New commits found
+    - name: Build Trigger
       if: steps.sync.outputs.has_new_commits == 'true'
-      run: echo "New commits were found to sync."
+      run: |
+        echo "New commits were found and synced, triggering a new firmware build"
+        - name: Directory update request
+        [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
+        curl --request POST \
+          --url https://api.github.com/repos/Didstopia/Marlin/actions/workflows/build-btt-ender3v2.yaml/dispatches \
+          --header 'Content-Type: application/json' \
+          --header 'Accept: application/vnd.github.v3+json' \
+          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --data '{
+              "ref": "skr-mini-e3-v3-0",
+              "inputs": {
+                "targetBranch": "bugfix-2.0.x"
+              }
+            }'
     
-    - name: No new commits
-      if: steps.sync.outputs.has_new_commits == 'false'
-      run: echo "There were no new commits."
+    # - name: No new commits
+    #   if: steps.sync.outputs.has_new_commits == 'false'
+    #   run: echo "There were no new commits."
       
-    - name: Show value of 'has_new_commits'
-      run: echo ${{ steps.sync.outputs.has_new_commits }}
+    # - name: Show value of 'has_new_commits'
+    #   run: echo ${{ steps.sync.outputs.has_new_commits }}
