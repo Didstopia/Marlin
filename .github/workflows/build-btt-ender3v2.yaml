@@ -496,6 +496,12 @@ jobs:
         sed -i "s/#define BUFSIZE .*/#define BUFSIZE 32/g" Marlin/Configuration_adv.h
         sed -i "s/#define TX_BUFFER_SIZE .*/#define TX_BUFFER_SIZE 32/g" Marlin/Configuration_adv.h
         
+        ## TODO: Testing temp changes
+        sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 30/g" Marlin/Configuration_adv.h
+        sed -i "s/#define WATCH_TEMP_INCREASE .*/#define WATCH_TEMP_INCREASE 3/g" Marlin/Configuration_adv.h
+        sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 180/g" Marlin/Configuration_adv.h
+        sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 180/g" Marlin/Configuration_adv.h
+        
         ## TODO: What about assisted tramming? Could that help us with bed leveling?
         ## TODO: What about G29_RETRY_AND_RECOVER? Can that help us with probing/leveling?
         ## TODO: Should we use STARTUP_COMMANDS to do homing (G28?) + G34 to calibrate the X gantry automatically on boot?
