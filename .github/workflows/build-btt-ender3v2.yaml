@@ -205,16 +205,16 @@ jobs:
         
         # Increase the probing margin (for BLTouch/UBL)
         sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
-
+        
         # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL)
         sed -i "s/#define XY_PROBE_FEEDRATE .*/#define XY_PROBE_FEEDRATE (133*60)/g" Marlin/Configuration.h
-
+        
         # Enable multiple probings (for BLTouch/UBL)
         sed -i "s/[^ ]*#define MULTIPLE_PROBING .*/#define MULTIPLE_PROBING 2/g" Marlin/Configuration.h
-
+        
         # Enable Z probe testing (for BLTouch/UBL)
         sed -i "s/[^ ]*#define Z_MIN_PROBE_REPEATABILITY_TEST/#define Z_MIN_PROBE_REPEATABILITY_TEST/g" Marlin/Configuration.h
-        
+       
         # Invert axis motor directions
         sed -i -E "s/#define INVERT_(X|Y|E0)_DIR .*/#define INVERT_\1_DIR true/g" Marlin/Configuration.h
         sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
@@ -232,7 +232,7 @@ jobs:
         ## TODO: Figure out a good value for this so we don't have to push against our printed endstops TOO hard!
         # Lower maximum Z position for better mechanical gantry calibration
         sed -i "s/#define Z_MAX_POS .*/#define Z_MAX_POS 250/g" Marlin/Configuration.h
-
+        
         # Enable filament runout sensor
         sed -i "s/[^ ]*#define FILAMENT_RUNOUT_SENSOR/#define FILAMENT_RUNOUT_SENSOR/g" Marlin/Configuration.h
         
@@ -325,15 +325,15 @@ jobs:
         
         # Enable DWIN display beep mute option
         sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
-
+        
         ## TODO: Do we need this and does this work?
         # Enable long filename support
         sed -i "s/[^ ]*#define LONG_FILENAME_HOST_SUPPORT/#define LONG_FILENAME_HOST_SUPPORT/g" Marlin/Configuration_adv.h
-
+        
         ## TODO: Do we need this and does this work?
         # Enable scrolling filenames
         sed -i "s/[^ ]*#define SCROLL_LONG_FILENAMES/#define SCROLL_LONG_FILENAMES/g" Marlin/Configuration_adv.h
-
+        
         ## TODO: Disabling this in case it helps speed up the SD card insertion/removal process?
         # Enable SD card automatic status reporting
         #sed -i "s/[^ ]*#define AUTO_REPORT_SD_STATUS/#define AUTO_REPORT_SD_STATUS/g" Marlin/Configuration_adv.h
@@ -439,7 +439,7 @@ jobs:
         
         # Change the default chopper voltage from 12V to 24V
         sed -i "s/#define CHOPPER_TIMING CHOPPER_DEFAULT_12V/#define CHOPPER_TIMING CHOPPER_DEFAULT_24V/g" Marlin/Configuration_adv.h
-
+        
         # Enable stepper driver debugging
         sed -i "s/[^ ]*#define TMC_DEBUG/#define TMC_DEBUG/g" Marlin/Configuration_adv.h
         
