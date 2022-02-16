@@ -284,7 +284,9 @@ jobs:
         # Configure stepper motor driver currents
         sed -i "s/#define X_CURRENT .*/#define X_CURRENT 580/g" Marlin/Configuration_adv.h
         sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 580/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 725/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 725/g" Marlin/Configuration_adv.h
+        ## TODO: Boosting Z axis current in hopes of fixing any binding and Z offset issues..
+        sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 1000/g" Marlin/Configuration_adv.h
         sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 650/g" Marlin/Configuration_adv.h
         
         # Configure stepper motor driver currents when homing
