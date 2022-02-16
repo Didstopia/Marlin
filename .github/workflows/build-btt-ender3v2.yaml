@@ -330,7 +330,7 @@ jobs:
         sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 30/g" Marlin/Configuration_adv.h
         sed -i "s/#define WATCH_TEMP_INCREASE .*/#define WATCH_TEMP_INCREASE 3/g" Marlin/Configuration_adv.h
         sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 180/g" Marlin/Configuration_adv.h
-        sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 180/g" Marlin/Configuration_adv.h
+        sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 180/g" Marlin/Configuration_adv.h
         
         ## END OF CONFIGURATION_ADV.H
       env:
