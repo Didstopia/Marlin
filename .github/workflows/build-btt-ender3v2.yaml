@@ -35,7 +35,8 @@ jobs:
         # branch: [2.0.x, bugfix-2.0.x]
         board: [STM32G0B1RE_btt]
         ## FIXME: Figure out which versions we want to build/support
-        grid: [3, 5, 10, 15]
+        #grid: [3, 5, 10, 15]
+        grid: [3, 5, 10]
         # grid: [10]
         high-speed: [true, false]
     steps:
@@ -124,21 +125,25 @@ jobs:
         # Change to the correct motherboard
         sed -i "s/#define MOTHERBOARD .*/#define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V3_0/g" Marlin/Configuration.h
         
+        ## TODO: Attempting to increase the default baudrate
         # Change to the correct baud rate
-        sed -i "s/#define BAUDRATE .*/#define BAUDRATE 115200/g" Marlin/Configuration.h
+        #sed -i "s/#define BAUDRATE .*/#define BAUDRATE 115200/g" Marlin/Configuration.h
+        sed -i "s/#define BAUDRATE .*/#define BAUDRATE 250000/g" Marlin/Configuration.h
         
         # Set a custom machine name
         sed -i "s/#define CUSTOM_MACHINE_NAME .*/#define CUSTOM_MACHINE_NAME \"Ender-3 V2 (BTT SKR Mini E3)\"/g" Marlin/Configuration.h
         
+        ## TODO: Reverting back to stock, just in case that helps, as we can always calibrate at runtime
         # Set default/custom hotend PID values (calibrated with 200C stock hotend temperature)
-        sed -i "s/#define DEFAULT_Kp .*/#define DEFAULT_Kp 23.20/g" Marlin/Configuration.h
-        sed -i "s/#define DEFAULT_Ki .*/#define DEFAULT_Ki 1.88/g" Marlin/Configuration.h
-        sed -i "s/#define DEFAULT_Kd .*/#define DEFAULT_Kd 71.69/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_Kp .*/#define DEFAULT_Kp 23.20/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_Ki .*/#define DEFAULT_Ki 1.88/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_Kd .*/#define DEFAULT_Kd 71.69/g" Marlin/Configuration.h
         
+        ## TODO: Reverting back to stock, just in case that helps, as we can always calibrate at runtime
         # Set default/custom bed PID values (calibrated with 60C magnetic bed temperature)
-        sed -i "s/#define DEFAULT_bedKp .*/#define DEFAULT_bedKp 103.83/g" Marlin/Configuration.h
-        sed -i "s/#define DEFAULT_bedKi .*/#define DEFAULT_bedKi 20.44/g" Marlin/Configuration.h
-        sed -i "s/#define DEFAULT_bedKd .*/#define DEFAULT_bedKd 351.64/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_bedKp .*/#define DEFAULT_bedKp 103.83/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_bedKi .*/#define DEFAULT_bedKi 20.44/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_bedKd .*/#define DEFAULT_bedKd 351.64/g" Marlin/Configuration.h
         
         ## TODO: Creality's firmware has this set to 1000 so this needs more testing!
         # Set maximum length to extrude within a single extrusion
@@ -167,8 +172,9 @@ jobs:
         ##       Creality and Jyers use 5, BTT uses 15, but neither have Linear Advance enabled, unlike BTT!
         ## NOTE: This issues mentions that 5.0 is not even close to enough for Linear Advance to function properly:
         ##       https://github.com/MarlinFirmware/Marlin/issues/20649
+        ## TODO: UPDATE: Disabling for now, also disabled linear advance
         # Increase extruder jerk when using Linear Advance
-        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
+        #sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
         
         ## TODO: This MAY cause issues and is disabled in Creality's stock firmware!
         # Enable S-Curve Acceleration
@@ -193,7 +199,9 @@ jobs:
         ## NOTE: Confirmed that a Z offset of -1.16 with bed heated up to 60C and probed with CRTouch gives consistent results
         #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.160 }/g" Marlin/Configuration.h
         ## NOTE: New Brozzl nozzle, lowering Z offset further
-        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.260 }/g" Marlin/Configuration.h
+        #sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, -1.260 }/g" Marlin/Configuration.h
+        ## NOTE: Resetting Z offset to zero, so it has to be calibrated at runtime
+        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, 0 }/g" Marlin/Configuration.h
         
         # Increase the probing margin (for BLTouch/UBL)
         sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
@@ -223,12 +231,12 @@ jobs:
         
         ## TODO: Figure out a good value for this so we don't have to push against our printed endstops TOO hard!
         # Lower maximum Z position for better mechanical gantry calibration
-        sed -i "s/#define >_MAX_POS .*/#define X_MAX_POS 250/g" Marlin/Configuration.h
+        sed -i "s/#define Z_MAX_POS .*/#define Z_MAX_POS 250/g" Marlin/Configuration.h
 
         # Enable filament runout sensor
         sed -i "s/[^ ]*#define FILAMENT_RUNOUT_SENSOR/#define FILAMENT_RUNOUT_SENSOR/g" Marlin/Configuration.h
         
-        ## TODO: Add a default/custom filament runout sensor distance
+        ## FIXME: Add a default/custom filament runout sensor distance
         # Set the default/custom runout sensor filament distance
         sed -i "s/[^ ]*#define FILAMENT_RUNOUT_DISTANCE_MM .*/#define FILAMENT_RUNOUT_DISTANCE_MM 0/g" Marlin/Configuration.h
         
@@ -238,8 +246,9 @@ jobs:
         # Enable leveling after completion (for BLTouch/UBL)
         sed -i "s/[^ ]*#define RESTORE_LEVELING_AFTER_G28/#define RESTORE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
         
+        ## TODO: Disabled for now
         # Enable preheating before leveling
-        sed -i "s/[^ ]*#define PREHEAT_BEFORE_LEVELING/#define PREHEAT_BEFORE_LEVELING/g" Marlin/Configuration.h
+        #sed -i "s/[^ ]*#define PREHEAT_BEFORE_LEVELING/#define PREHEAT_BEFORE_LEVELING/g" Marlin/Configuration.h
         
         # Enable leveling debugging
         sed -i "s/[^ ]*#define DEBUG_LEVELING_FEATURE/#define DEBUG_LEVELING_FEATURE/g" Marlin/Configuration.h
@@ -314,8 +323,6 @@ jobs:
         if ($HIGH_SPEED); then HS_ENABLED=; else HS_ENABLED='\/\/'; fi;
         sed -i "s/[^ ]*#define BLTOUCH_HS_MODE .*/$HS_ENABLED#define BLTOUCH_HS_MODE true/g" Marlin/Configuration_adv.h
         
-        ## TODO: Disable inactive Z to reduce sag with dual Z setups?
-        
         # Enable DWIN display beep mute option
         sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
 
@@ -332,17 +339,20 @@ jobs:
         #sed -i "s/[^ ]*#define AUTO_REPORT_SD_STATUS/#define AUTO_REPORT_SD_STATUS/g" Marlin/Configuration_adv.h
         
         ## TODO: Do we need this and does this work?
+        ## TODO: UPDATE: We likely don't need this, so disabling for now
         # Set SD card connection to be "onboard"
-        sed -i "s/[^ ]*#define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
         
         ## TODO: Not sure if this'll even work, but worth a try!
         ## TODO: If it doesn't work, try also enabling "DISKIO_HOST_DRIVE"!
+        ## TODO: UPDATE: Disabling for now
         # Enable access to the SD card over USB
-        sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
         
         ## TODO: Does this show the remaining size? Or the time remaining when loading data? Or something else?
+        ## TODO: UPDATE: Disabling for now
         # Enable SD card percentage next to the progress bar
-        sed -i "s/[^ ]*#define SHOW_SD_PERCENT/#define SHOW_SD_PERCENT/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define SHOW_SD_PERCENT/#define SHOW_SD_PERCENT/g" Marlin/Configuration_adv.h
         
         ## TODO: What would happen if we enable "SD_IGNORE_AT_STARTUP" and go to the Print Menu? Would it then be enabled?
         ##       Time to test this by enabling this option!
@@ -351,28 +361,34 @@ jobs:
         #sed -i "s/[^ ]*#define SD_IGNORE_AT_STARTUP/#define SD_IGNORE_AT_STARTUP/g" Marlin/Configuration_adv.h
         
         ## TODO: Does this cause any issues? It's disabled in Creality's firmware!
+        ## TODO: UPDATE: Disabling for now
         # Enable babystepping without homing
-        sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
         
         ## TODO: Does this cause any issues? It's disabled in Creality's firmware!
+        ## TODO: UPDATE: Disabling for now
         # Enable babystepping always available
-        sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
         
         ## TODO: Do we need this and does this work?
+        ## TODO: UPDATE: Disabling for now
         # Enable displaying of babysteps
-        sed -i "s/[^ ]*#define BABYSTEP_DISPLAY_TOTAL/#define BABYSTEP_DISPLAY_TOTAL/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define BABYSTEP_DISPLAY_TOTAL/#define BABYSTEP_DISPLAY_TOTAL/g" Marlin/Configuration_adv.h
         
         ## TODO: This is disabled in Creality's firmware and needs further testing!
+        ## TODO: UPDATE: Disabling for now
         # Enable linear advance
-        sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h
         
         ## TODO: Again no idea if this will even work correctly!
+        ## TODO: UPDATE: Disabling for now
         # Tweak linear advance configuration
-        sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h
         
         ## TODO: Again no idea if this will even work correctly!
+        ## TODO: UPDATE: Disabling for now
         # Enable s-curve acceleration with linear advance
-        sed -i "s/[^ ]*#define EXPERIMENTAL_SCURVE/#define EXPERIMENTAL_SCURVE/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define EXPERIMENTAL_SCURVE/#define EXPERIMENTAL_SCURVE/g" Marlin/Configuration_adv.h
         
         ## TODO: This is disabled in Creality's firmware and needs further testing!
         # Tweak ARC configuration
@@ -387,6 +403,7 @@ jobs:
         ## TODO: This is "100" in Creality's firmware, 4x in BTT's recommendations, but which is correct?! (0 in Jyers)
         # Configure filament unload length
         #sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
+        sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 0/g" Marlin/Configuration_adv.h
         
         ## TODO: This is "6" in Creality's firmware, "10" in BTT's recommendations, but which is correct?! (10 in Jyers)
         # Configure filament fast load feed rate (speed)
@@ -399,8 +416,9 @@ jobs:
         # Enable head parking during pause and filament change
         sed -i "s/[^ ]*#define PARK_HEAD_ON_PAUSE/#define PARK_HEAD_ON_PAUSE/g" Marlin/Configuration_adv.h
         
+        ## TODO: Disabling for now
         # Enabling homing before parking for filament change
-        sed -i "s/[^ ]*#define HOME_BEFORE_FILAMENT_CHANGE/#define HOME_BEFORE_FILAMENT_CHANGE/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define HOME_BEFORE_FILAMENT_CHANGE/#define HOME_BEFORE_FILAMENT_CHANGE/g" Marlin/Configuration_adv.h
         
         # Enable display and g-code support for filament loading and unloading
         sed -i "s/[^ ]*#define FILAMENT_LOAD_UNLOAD_GCODES/#define FILAMENT_LOAD_UNLOAD_GCODES/g" Marlin/Configuration_adv.h
@@ -425,12 +443,14 @@ jobs:
         # Enable stepper driver debugging
         sed -i "s/[^ ]*#define TMC_DEBUG/#define TMC_DEBUG/g" Marlin/Configuration_adv.h
         
+        ## TODO: UPDATE: Disabling for now
         # Enable automatic position reports
-        sed -i "s/[^ ]*#define AUTO_REPORT_POSITION/#define AUTO_REPORT_POSITION/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define AUTO_REPORT_POSITION/#define AUTO_REPORT_POSITION/g" Marlin/Configuration_adv.h
         
+        ## TODO: UPDATE: Disabling for now
         # Customize the position reporting
-        sed -i "s/[^ ]*#define M114_DETAIL/#define M114_DETAIL/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define REPORT_FAN_CHANGE/#define REPORT_FAN_CHANGE/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define M114_DETAIL/#define M114_DETAIL/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define REPORT_FAN_CHANGE/#define REPORT_FAN_CHANGE/g" Marlin/Configuration_adv.h
         
         # Enable meatpack g-code compression
         sed -i "s/[^ ]*#define MEATPACK_ON_SERIAL_PORT_1/#define MEATPACK_ON_SERIAL_PORT_1/g" Marlin/Configuration_adv.h
@@ -438,10 +458,11 @@ jobs:
         # Enable host actions commands
         sed -i "s/[^ ]*#define HOST_ACTION_COMMANDS/#define HOST_ACTION_COMMANDS/g" Marlin/Configuration_adv.h
         
+        ## TODO: UPDATE: Disabling partially for now
         # Customize host action commands
-        sed -i "s/[^ ]*#define HOST_PAUSE_M76/#define HOST_PAUSE_M76/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define HOST_PAUSE_M76/#define HOST_PAUSE_M76/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define HOST_PROMPT_SUPPORT/#define HOST_PROMPT_SUPPORT/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define HOST_STATUS_NOTIFICATIONS/#define HOST_STATUS_NOTIFICATIONS/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define HOST_STATUS_NOTIFICATIONS/#define HOST_STATUS_NOTIFICATIONS/g" Marlin/Configuration_adv.h
         
         # Enable mechanical gantry calibration
         sed -i "s/[^ ]*#define MECHANICAL_GANTRY_CALIBRATION/#define MECHANICAL_GANTRY_CALIBRATION/g" Marlin/Configuration_adv.h
@@ -459,9 +480,21 @@ jobs:
         # Enable mechanical gantry calibration on startup
         #sed -i "s/[^ ]*#define STARTUP_COMMANDS .*/#define STARTUP_COMMANDS \"M117 Auto-homing..\\\nG28\\\nM117 Calibrating Z axis..\\\nG34\\\nM117 Ready.\"/g" Marlin/Configuration_adv.h
         
+        ## TODO: Disabled, as it didn't seem to do anything, plus supposedly doesn't even work with a BLTouch/CRTouch
         # Enable backlash compensation
-        sed -i "s/[^ ]*#define BACKLASH_COMPENSATION/#define BACKLASH_COMPENSATION/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define BACKLASH_GCODE/#define BACKLASH_GCODE/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define BACKLASH_COMPENSATION/#define BACKLASH_COMPENSATION/g" Marlin/Configuration_adv.h
+        #sed -i "s/[^ ]*#define BACKLASH_GCODE/#define BACKLASH_GCODE/g" Marlin/Configuration_adv.h
+        
+        ## TODO: Testing if this works with DWIN + JyersUI
+        # Lower the bootscreen timeout
+        sed -i "s/#define BOOTSCREEN_TIMEOUT .*/#define BOOTSCREEN_TIMEOUT 0/g" Marlin/Configuration_adv.h
+        
+        ## TODO: Testing memory/buffer tweaks and BufferBuddy + OctoPrint
+        sed -i "s/[^ ]*#define ADVANCED_OK/#define ADVANCED_OK/g" Marlin/Configuration_adv.h
+        sed -i "s/#define BLOCK_BUFFER_SIZE .*/#define BLOCK_BUFFER_SIZE 64/g" Marlin/Configuration_adv.h
+        sed -i "s/#define MAX_CMD_SIZE .*/#define MAX_CMD_SIZE 96/g" Marlin/Configuration_adv.h
+        sed -i "s/#define BUFSIZE .*/#define BUFSIZE 32/g" Marlin/Configuration_adv.h
+        sed -i "s/#define TX_BUFFER_SIZE .*/#define TX_BUFFER_SIZE 32/g" Marlin/Configuration_adv.h
         
         ## TODO: What about assisted tramming? Could that help us with bed leveling?
         ## TODO: What about G29_RETRY_AND_RECOVER? Can that help us with probing/leveling?
