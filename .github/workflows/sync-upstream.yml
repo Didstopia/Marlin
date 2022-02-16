@@ -52,7 +52,6 @@ jobs:
       if: steps.sync.outputs.has_new_commits == 'true'
       run: |
         echo "New commits were found and synced, triggering a new firmware build"
-        - name: Directory update request
         [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
         curl --request POST \
           --url https://api.github.com/repos/Didstopia/Marlin/actions/workflows/build-btt-ender3v2.yaml/dispatches \
@@ -118,7 +117,6 @@ jobs:
       if: steps.sync.outputs.has_new_commits == 'true'
       run: |
         echo "New commits were found and synced, triggering a new firmware build"
-        - name: Directory update request
         [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
         curl --request POST \
           --url https://api.github.com/repos/Didstopia/Marlin/actions/workflows/build-btt-ender3v2.yaml/dispatches \
