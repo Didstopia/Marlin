@@ -191,7 +191,6 @@ jobs:
         sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
         
         # Require homing after steppers have deactivated/unlocked (and before trying to move)
-        #sed -i "s/[^ ]*#define NO_MOTION_BEFORE_HOMING/#define NO_MOTION_BEFORE_HOMING/g" Marlin/Configuration.h
         sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
         
         # Increase bed size for probing (for BLTouch/UBL)
@@ -216,7 +215,6 @@ jobs:
         # Enable leveling after completion (for BLTouch/UBL)
         ## NOTE: Only enable one of these, not both!
         sed -i "s/[^ ]*#define RESTORE_LEVELING_AFTER_G28/#define RESTORE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
-        #sed -i "s/[^ ]*#define ENABLE_LEVELING_AFTER_G28/#define ENABLE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
         
         ## FIXME: This MAY need to be set back to 10 instead of 0
         # Set default fade height (for BLTouch/UBL)
@@ -362,10 +360,6 @@ jobs:
         sed -i "s/[^ ]*#define DOUBLECLICK_FOR_Z_BABYSTEPPING/#define DOUBLECLICK_FOR_Z_BABYSTEPPING/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define BABYSTEP_DISPLAY_TOTAL/#define BABYSTEP_DISPLAY_TOTAL/g" Marlin/Configuration_adv.h
         
-        ## TODO: This is disabled in BTT config, so keeping it disabled I guess?
-        # Tweak ARC configuration
-        #sed -i "s/[^ ]*#define ARC_P_CIRCLES/#define ARC_P_CIRCLES/g" Marlin/Configuration_adv.h
-        
         # Enable emergency parser
         sed -i "s/[^ ]*#define EMERGENCY_PARSER/#define EMERGENCY_PARSER/g" Marlin/Configuration_adv.h
         
@@ -381,7 +375,6 @@ jobs:
         sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
         
         # Configure filament fast load feed rate (speed)
-        #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
         sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 6/g" Marlin/Configuration_adv.h
         
         # Enable head parking during pause and filament change
