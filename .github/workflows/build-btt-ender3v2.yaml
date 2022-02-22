@@ -190,7 +190,8 @@ jobs:
         sed -i -E "s/#define INVERT_(X|Y|E0)_DIR .*/#define INVERT_\1_DIR true/g" Marlin/Configuration.h
         sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
         
-        # Require homing after steppers have deactivated/unlocked
+        # Require homing after steppers have deactivated/unlocked (and before trying to move)
+        sed -i "s/[^ ]*#define NO_MOTION_BEFORE_HOMING/#define NO_MOTION_BEFORE_HOMING/g" Marlin/Configuration.h
         sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
         
         # Increase bed size for probing (for BLTouch/UBL)
@@ -261,6 +262,30 @@ jobs:
         
         # Enable software PWM fan control
         sed -i "s/[^ ]*#define FAN_SOFT_PWM/#define FAN_SOFT_PWM/g" Marlin/Configuration.h
+        
+        # Adjust min/max temperatures
+        sed -i "s/#define HEATER_0_MINTEMP .*/#define HEATER_0_MINTEMP 5/g" Marlin/Configuration.h
+        sed -i "s/#define BED_MINTEMP .*/#define BED_MINTEMP 5/g" Marlin/Configuration.h
+        sed -i "s/#define BED_MAXTEMP .*/#define BED_MAXTEMP 120/g" Marlin/Configuration.h
+        
+        # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
+        sed -i "s/[^ ]*#define THERMAL_PROTECTION_CHAMBER/#define THERMAL_PROTECTION_CHAMBER/g" Marlin/Configuration.h
+        
+        ## TODO: This needs proper testing!
+        # Disable endstops interrupt compatibility
+        sed -i "s/[^ ]*#define ENDSTOP_INTERRUPTS_FEATURE/\/\/#define ENDSTOP_INTERRUPTS_FEATURE/g" Marlin/Configuration.h
+        
+        ## TODO: This needs proper testing!
+        # Disable classic jerk
+        sed -i "s/[^ ]*#define CLASSIC_JERK/#define CLASSIC_JERK/g" Marlin/Configuration.h
+        
+        # Disable extrapolating beyond the grid
+        sed -i "s/[^ ]*#define EXTRAPOLATE_BEYOND_GRID/\/\/#define EXTRAPOLATE_BEYOND_GRID/g" Marlin/Configuration.h
+        
+        # Enable bed level corner adjustments
+        sed -i "s/[^ ]*#define LEVEL_BED_CORNERS/#define LEVEL_BED_CORNERS/g" Marlin/Configuration.h
+        
+        
         
         ## END OF CONFIGURATION.H
         
