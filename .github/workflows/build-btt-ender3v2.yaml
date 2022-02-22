@@ -353,12 +353,6 @@ jobs:
         # Enable SD card host drive support
         sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
         
-        ## TODO: LIN_ADVANCE_K needs to be calibrated per device, values is from 0.0 to 2.0
-        # Enable and configure linear advance
-        sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h
-        sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define EXPERIMENTAL_SCURVE/#define EXPERIMENTAL_SCURVE/g" Marlin/Configuration_adv.h
-        
         # Configure babystepping
         sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
