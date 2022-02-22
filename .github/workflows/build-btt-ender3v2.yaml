@@ -285,6 +285,9 @@ jobs:
         # Enable mesh validation support
         sed -i "s/[^ ]*#define G26_MESH_VALIDATION/#define G26_MESH_VALIDATION/g" Marlin/Configuration.h
         
+        # Increase DEFAULT_EJERK from 5 to 15 for linear advance
+        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration_adv.h
+        
         
         
         ## END OF CONFIGURATION.H
@@ -354,9 +357,6 @@ jobs:
         sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define EXPERIMENTAL_SCURVE/#define EXPERIMENTAL_SCURVE/g" Marlin/Configuration_adv.h
         
-        # Increase DEFAULT_EJERK from 5 to 15 for linear advance
-        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration_adv.h
-        
         # Configure babystepping
         sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
@@ -409,7 +409,7 @@ jobs:
         
         # Enable fan control options in LCD (might not work with DWIN?)
         sed -i "s/[^ ]*#define CONTROLLER_FAN_EDITABLE/#define CONTROLLER_FAN_EDITABLE/g" Marlin/Configuration_adv.h
-
+        
         # Enable showing remaining time (this probably only works with LCDs and not with DWIN?)
         sed -i "s/[^ ]*#define SHOW_REMAINING_TIME/#define SHOW_REMAINING_TIME/g" Marlin/Configuration_adv.h
         
