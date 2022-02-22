@@ -326,7 +326,7 @@ jobs:
         
         # Enable DWIN display beep mute option
         sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
-
+        
         # Enable additional display features (some are useful when used with OctoPrint for example)
         sed -i "s/[^ ]*#define STATUS_MESSAGE_SCROLLING/#define STATUS_MESSAGE_SCROLLING/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define LCD_SET_PROGRESS_MANUALLY/#define LCD_SET_PROGRESS_MANUALLY/g" Marlin/Configuration_adv.h
@@ -337,7 +337,7 @@ jobs:
         
         # Set default SD card connection type
         sed -i "s/[^ ]*#define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
-
+        
         # Enable UTF filename support
         sed -i "s/[^ ]*#define UTF_FILENAME_SUPPORT/#define UTF_FILENAME_SUPPORT/g" Marlin/Configuration_adv.h
         
