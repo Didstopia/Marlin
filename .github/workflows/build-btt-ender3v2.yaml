@@ -286,7 +286,7 @@ jobs:
         sed -i "s/[^ ]*#define G26_MESH_VALIDATION/#define G26_MESH_VALIDATION/g" Marlin/Configuration.h
         
         # Increase DEFAULT_EJERK from 5 to 15 for linear advance
-        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration_adv.h
+        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
         
         
         
