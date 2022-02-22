@@ -191,11 +191,9 @@ jobs:
         sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
         
         # Require homing after steppers have deactivated/unlocked (and before trying to move)
-        #sed -i "s/[^ ]*#define NO_MOTION_BEFORE_HOMING/#define NO_MOTION_BEFORE_HOMING/g" Marlin/Configuration.h
         sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
         
         # Increase bed size for probing (for BLTouch/UBL)
-        #sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 230/g" Marlin/Configuration.h
         sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 235/g" Marlin/Configuration.h
         
         # Extend maximum X position for better probe reach (for BLTouch/UBL)
@@ -216,7 +214,6 @@ jobs:
         # Enable leveling after completion (for BLTouch/UBL)
         ## NOTE: Only enable one of these, not both!
         sed -i "s/[^ ]*#define RESTORE_LEVELING_AFTER_G28/#define RESTORE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
-        #sed -i "s/[^ ]*#define ENABLE_LEVELING_AFTER_G28/#define ENABLE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
         
         ## FIXME: This MAY need to be set back to 10 instead of 0
         # Set default fade height (for BLTouch/UBL)
@@ -234,11 +231,8 @@ jobs:
         # Disable UBL automatic mesh saving
         sed -i "s/[^ ]*#define UBL_SAVE_ACTIVE_ON_M500/\/\/#define UBL_SAVE_ACTIVE_ON_M500/g" Marlin/Configuration.h
         
-        ## TODO: Should this be "((X_BED_SIZE - 10) / 2)" intead of X_CENTER, same with Y?
         # Enable safe homing on the Z axis
         sed -i "s/[^ ]*#define Z_SAFE_HOMING/#define Z_SAFE_HOMING/g" Marlin/Configuration.h
-        #sed -i "s/#define Z_SAFE_HOMING_X_POINT .*/#define Z_SAFE_HOMING_X_POINT X_CENTER/g" Marlin/Configuration.h
-        #sed -i "s/#define Z_SAFE_HOMING_Y_POINT .*/#define Z_SAFE_HOMING_Y_POINT Y_CENTER/g" Marlin/Configuration.h
         
         # Reduce homing feed rate (homing speed)
         sed -i "s/#define HOMING_FEEDRATE_MM_M .*/#define HOMING_FEEDRATE_MM_M { \(20\*60\), \(20\*60\), \(4\*60\) }/g" Marlin/Configuration.h
