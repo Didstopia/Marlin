@@ -191,6 +191,7 @@ jobs:
         sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
         
         # Require homing after steppers have deactivated/unlocked (and before trying to move)
+        sed -i "s/[^ ]*#define NO_MOTION_BEFORE_HOMING/#define NO_MOTION_BEFORE_HOMING/g" Marlin/Configuration.h
         sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
         
         # Increase bed size for probing (for BLTouch/UBL)
