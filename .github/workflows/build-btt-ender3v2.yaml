@@ -352,11 +352,7 @@ jobs:
         sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define DOUBLECLICK_FOR_Z_BABYSTEPPING/#define DOUBLECLICK_FOR_Z_BABYSTEPPING/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define BABYSTEP_DISPLAY_TOTAL/#define BABYSTEP_DISPLAY_TOTAL/g" Marlin/Configuration_adv.h
-        
-        ## TODO: This is disabled in BTT config, so keeping it disabled I guess?
-        # Tweak ARC configuration
-        #sed -i "s/[^ ]*#define ARC_P_CIRCLES/#define ARC_P_CIRCLES/g" Marlin/Configuration_adv.h
-        
+                
         # Enable emergency parser
         sed -i "s/[^ ]*#define EMERGENCY_PARSER/#define EMERGENCY_PARSER/g" Marlin/Configuration_adv.h
         
@@ -365,7 +361,6 @@ jobs:
         
         ## FIXME: This might still cause the extruder jerkiness when set above zero!
         # Configure filament unload length
-        #sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 0/g" Marlin/Configuration_adv.h
         sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
         
         ## FIXME: This might still cause the extruder jerkiness when set above zero!
@@ -373,7 +368,6 @@ jobs:
         sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
         
         # Configure filament fast load feed rate (speed)
-        #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
         sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 6/g" Marlin/Configuration_adv.h
         
         # Enable head parking during pause and filament change
@@ -405,11 +399,7 @@ jobs:
         
         # Enable fan control options in LCD (might not work with DWIN?)
         sed -i "s/[^ ]*#define CONTROLLER_FAN_EDITABLE/#define CONTROLLER_FAN_EDITABLE/g" Marlin/Configuration_adv.h
-        
-        ## TODO: While this makes sense, wouldn't this cause issues eg. when bed leveling for long enough to trigger this?
-        # Enable hotend idle timeout
-        #sed -i "s/[^ ]*#define HOTEND_IDLE_TIMEOUT/#define HOTEND_IDLE_TIMEOUT/g" Marlin/Configuration_adv.h
-        
+                
         # Enable showing remaining time (this probably only works with LCDs and not with DWIN?)
         sed -i "s/[^ ]*#define SHOW_REMAINING_TIME/#define SHOW_REMAINING_TIME/g" Marlin/Configuration_adv.h
         
@@ -418,16 +408,9 @@ jobs:
         
         ## TODO: Dropping all currents just a bit to attempt to cool down the motors
         # Configure stepper motor driver currents
-        #sed -i "s/#define X_CURRENT .*/#define X_CURRENT 580/g" Marlin/Configuration_adv.h
         sed -i "s/#define X_CURRENT .*/#define X_CURRENT 560/g" Marlin/Configuration_adv.h
-        #sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 580/g" Marlin/Configuration_adv.h
         sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 560/g" Marlin/Configuration_adv.h
-        #sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 725/g" Marlin/Configuration_adv.h
-        ## TODO: Boosting Z axis current in hopes of fixing any binding and Z offset issues..
-        ## NOTE: 580 x 2 = 1160 - 10% = 1000 (10% is a good safety margin)
         sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 1000/g" Marlin/Configuration_adv.h
-        ## TODO: Trying slightly increased extruder currents, see if that helps or heats up too much etc.
-        #sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 650/g" Marlin/Configuration_adv.h
         sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 670/g" Marlin/Configuration_adv.h
         
         ## TODO: Why should we lower the currents when homing? Just for safety, when homing is done at drastically reduced speeds?
@@ -473,12 +456,8 @@ jobs:
         sed -i "s/#define TX_BUFFER_SIZE .*/#define TX_BUFFER_SIZE 32/g" Marlin/Configuration_adv.h
         
         ## TODO: Testing temp changes
-        #sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 30/g" Marlin/Configuration_adv.h
         sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 20/g" Marlin/Configuration_adv.h
-        #sed -i "s/#define WATCH_TEMP_INCREASE .*/#define WATCH_TEMP_INCREASE 3/g" Marlin/Configuration_adv.h
-        #sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 180/g" Marlin/Configuration_adv.h
         sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 20/g" Marlin/Configuration_adv.h
-        #sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 180/g" Marlin/Configuration_adv.h
         sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 60/g" Marlin/Configuration_adv.h
         
         ## END OF CONFIGURATION_ADV.H
