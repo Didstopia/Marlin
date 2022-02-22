@@ -109,10 +109,10 @@ jobs:
         sed -E -i "s/(#define +STRING_DISTRIBUTION_DATE) .*$/\1 \"$DIST_DATE\"/g" Marlin/src/inc/Version.h
         sed -E -i "s/(#define +STRING_DISTRIBUTION_DATE) .*$/\1 \"$DIST_DATE\"/g" Marlin/Version.h
         
-        # Patch build FOO
+        # Patch build details
         sed -E -i "s/(#define +MACHINE_NAME) .*$/\1 \"Ender 3 V2\"/g" Marlin/src/inc/Version.h
-        sed -E -i "s/(#define +SOURCE_CODE_URL) .*$/\1 \"github.com/Didstopia/Marlin\"/g" Marlin/src/inc/Version.h
-        sed -E -i "s/(#define +WEBSITE_URL) .*$/\1 \"github.com/Didstopia/Marlin\"/g" Marlin/src/inc/Version.h
+        sed -E -i "s/(#define +SOURCE_CODE_URL) .*$/\1 \"github.com\/Didstopia\/Marlin\"/g" Marlin/src/inc/Version.h
+        sed -E -i "s/(#define +WEBSITE_URL) .*$/\1 \"github.com\/Didstopia\/Marlin\"/g" Marlin/src/inc/Version.h
         
         
         
