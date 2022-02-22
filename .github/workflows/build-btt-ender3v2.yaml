@@ -234,6 +234,7 @@ jobs:
         # Disable UBL automatic mesh saving
         sed -i "s/[^ ]*#define UBL_SAVE_ACTIVE_ON_M500/\/\/#define UBL_SAVE_ACTIVE_ON_M500/g" Marlin/Configuration.h
         
+        ## TODO: Should this be "((X_BED_SIZE - 10) / 2)" intead of X_CENTER, same with Y?
         # Enable safe homing on the Z axis
         sed -i "s/[^ ]*#define Z_SAFE_HOMING/#define Z_SAFE_HOMING/g" Marlin/Configuration.h
         #sed -i "s/#define Z_SAFE_HOMING_X_POINT .*/#define Z_SAFE_HOMING_X_POINT X_CENTER/g" Marlin/Configuration.h
@@ -435,7 +436,6 @@ jobs:
         sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 560/g" Marlin/Configuration_adv.h
         #sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 725/g" Marlin/Configuration_adv.h
         ## TODO: Boosting Z axis current in hopes of fixing any binding and Z offset issues..
-        ## NOTE: 580 x 2 = 1160 - 10% = 1000 (10% is a good safety margin)
         sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 1000/g" Marlin/Configuration_adv.h
         ## TODO: Trying slightly increased extruder currents, see if that helps or heats up too much etc.
         #sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 650/g" Marlin/Configuration_adv.h
