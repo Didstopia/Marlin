@@ -287,6 +287,9 @@ jobs:
         # Enable bed level corner adjustments
         sed -i "s/[^ ]*#define LEVEL_BED_CORNERS/#define LEVEL_BED_CORNERS/g" Marlin/Configuration.h
         
+        # Enable mesh validation support
+        sed -i "s/[^ ]*#define G26_MESH_VALIDATION/#define G26_MESH_VALIDATION/g" Marlin/Configuration.h
+        
         
         
         ## END OF CONFIGURATION.H
