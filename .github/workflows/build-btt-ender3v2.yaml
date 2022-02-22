@@ -84,6 +84,16 @@ jobs:
     - name: Configure Firmware (${{ env.TARGET_BRANCH }})
       id: configure_firmware
       run: |
+        # Setup error handling
+        set -eE -o functrace
+        failure() {
+          local lineno=$1
+          local msg=$2
+          #echo "Failed at $lineno: $msg"
+          echo "::error line=$lineno::$msg"
+        }
+        trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+      
         # Copy the latest default Ender 3 V2 config files in place
         git clone -b ${{ env.TARGET_BRANCH }} https://github.com/MarlinFirmware/Configurations.git Configurations
         cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
