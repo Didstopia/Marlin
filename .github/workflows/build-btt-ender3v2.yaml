@@ -275,7 +275,7 @@ jobs:
         
         ## TODO: This needs proper testing!
         # Disable classic jerk
-        sed -i "s/[^ ]*#define CLASSIC_JERK/#define CLASSIC_JERK/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define CLASSIC_JERK/\/\/#define CLASSIC_JERK/g" Marlin/Configuration.h
         
         # Disable extrapolating beyond the grid
         sed -i "s/[^ ]*#define EXTRAPOLATE_BEYOND_GRID/\/\/#define EXTRAPOLATE_BEYOND_GRID/g" Marlin/Configuration.h
@@ -307,7 +307,7 @@ jobs:
         
         ## TODO: Why would we keep this disabled? It's quicker, what are the drawbacks?
         # Disable quick homing
-        sed -i "s/[^ ]*#define QUICK_HOME/\/\/#define QUICK_HOME/g" Marlin/Configuration_adv.h
+        # sed -i "s/[^ ]*#define QUICK_HOME/\/\/#define QUICK_HOME/g" Marlin/Configuration_adv.h
         
         # Disable power loss recovery
         sed -i "s/[^ ]*#define POWER_LOSS_RECOVERY/\/\/#define POWER_LOSS_RECOVERY/g" Marlin/Configuration_adv.h
@@ -322,6 +322,9 @@ jobs:
         ## TODO: This needs testing!
         # Disable adaptive step smoothing
         sed -i "s/[^ ]*#define ADAPTIVE_STEP_SMOOTHING/\/\/#define ADAPTIVE_STEP_SMOOTHING/g" Marlin/Configuration_adv.h
+        
+        # Adjust slowdown divisor when disabling adaptive step smoothing
+        sed -i "s/#define SLOWDOWN_DIVISOR .*/#define SLOWDOWN_DIVISOR 8/g" Marlin/Configuration_adv.h
         
         # Enable DWIN display beep mute option
         sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
@@ -400,7 +403,7 @@ jobs:
         sed -i "s/[^ ]*#define IMPROVE_HOMING_RELIABILITY/#define IMPROVE_HOMING_RELIABILITY/g" Marlin/Configuration_adv.h
         
         # Disable square wave stepping (beta feature)
-        sed -i "s/[^ ]*#define SQUARE_WAVE_STEPPING/\/\/#define SQUARE_WAVE_STEPPING/g" Marlin/Configuration_adv.h
+        # sed -i "s/[^ ]*#define SQUARE_WAVE_STEPPING/\/\/#define SQUARE_WAVE_STEPPING/g" Marlin/Configuration_adv.h
         
         # Enable additional reporting etc. features
         sed -i "s/[^ ]*#define AUTO_REPORT_POSITION/#define AUTO_REPORT_POSITION/g" Marlin/Configuration_adv.h
