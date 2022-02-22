@@ -124,8 +124,11 @@ jobs:
         # Set a custom machine name
         sed -i "s/#define CUSTOM_MACHINE_NAME .*/#define CUSTOM_MACHINE_NAME \"Ender-3 V2 (BTT SKR Mini E3)\"/g" Marlin/Configuration.h
         
+        # Set minimum extruder temperature when extruding
+        sed -i "s/#define EXTRUDE_MINTEMP .*/#define EXTRUDE_MINTEMP 170/g" Marlin/Configuration.h
+        
         # Set maximum length to extrude within a single extrusion
-        sed -i "s/#define EXTRUDE_MAXLENGTH .*/#define EXTRUDE_MAXLENGTH 600/g" Marlin/Configuration.h 
+        sed -i "s/#define EXTRUDE_MAXLENGTH .*/#define EXTRUDE_MAXLENGTH 600/g" Marlin/Configuration.h
         
         # Change the motor drivers
         sed -i -E "s/#define (X|Y|Z|E0)_DRIVER_TYPE .*/#define \1_DRIVER_TYPE TMC2209/g" Marlin/Configuration.h
@@ -163,6 +166,10 @@ jobs:
         # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL)
         sed -i "s/#define XY_PROBE_FEEDRATE .*/#define XY_PROBE_FEEDRATE (133*60)/g" Marlin/Configuration.h
         
+        # Set min/max probe offsets
+        sed -i "s/#define Z_PROBE_OFFSET_RANGE_MIN .*/#define Z_PROBE_OFFSET_RANGE_MIN -20/g" Marlin/Configuration.h
+        sed -i "s/#define Z_PROBE_OFFSET_RANGE_MAX .*/#define Z_PROBE_OFFSET_RANGE_MAX 20/g" Marlin/Configuration.h
+        
         # Enable multiple probings (for BLTouch/UBL)
         sed -i "s/[^ ]*#define MULTIPLE_PROBING .*/#define MULTIPLE_PROBING 2/g" Marlin/Configuration.h
         
@@ -177,7 +184,8 @@ jobs:
         sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
         
         # Increase bed size for probing (for BLTouch/UBL)
-        sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 230/g" Marlin/Configuration.h
+        #sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 230/g" Marlin/Configuration.h
+        sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 235/g" Marlin/Configuration.h
         
         # Extend maximum X position for better probe reach (for BLTouch/UBL)
         sed -i "s/#define X_MAX_POS .*/#define X_MAX_POS X_BED_SIZE + 15/g" Marlin/Configuration.h
@@ -195,7 +203,12 @@ jobs:
         sed -i "s/[^ ]*#define AUTO_BED_LEVELING_UBL/#define AUTO_BED_LEVELING_UBL/g" Marlin/Configuration.h
         
         # Enable leveling after completion (for BLTouch/UBL)
-        sed -i "s/[^ ]*#define RESTORE_LEVELING_AFTER_G28/#define RESTORE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
+        #sed -i "s/[^ ]*#define RESTORE_LEVELING_AFTER_G28/#define RESTORE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define ENABLE_LEVELING_AFTER_G28/#define ENABLE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
+        
+        ## FIXME: This MAY need to be set back to 10 instead of 0
+        # Set default fade height (for BLTouch/UBL)
+        sed -i "s/[^ ]*#define DEFAULT_LEVELING_FADE_HEIGHT .*/#define DEFAULT_LEVELING_FADE_HEIGHT 0.0/g" Marlin/Configuration.h
         
         # Enable leveling debugging
         sed -i "s/[^ ]*#define DEBUG_LEVELING_FEATURE/#define DEBUG_LEVELING_FEATURE/g" Marlin/Configuration.h
@@ -211,6 +224,8 @@ jobs:
         
         # Enable safe homing on the Z axis
         sed -i "s/[^ ]*#define Z_SAFE_HOMING/#define Z_SAFE_HOMING/g" Marlin/Configuration.h
+        sed -i "s/#define Z_SAFE_HOMING_X_POINT .*/#define Z_SAFE_HOMING_X_POINT X_CENTER/g" Marlin/Configuration.h
+        sed -i "s/#define Z_SAFE_HOMING_Y_POINT .*/#define Z_SAFE_HOMING_Y_POINT Y_CENTER/g" Marlin/Configuration.h
         
         # Reduce homing feed rate (homing speed)
         sed -i "s/#define HOMING_FEEDRATE_MM_M .*/#define HOMING_FEEDRATE_MM_M { \(20\*60\), \(20\*60\), \(4\*60\) }/g" Marlin/Configuration.h
@@ -251,6 +266,12 @@ jobs:
         sed -i "s/#define E0_AUTO_FAN_PIN .*/#define E0_AUTO_FAN_PIN FAN1_PIN/g" Marlin/Configuration_adv.h
         sed -i "s/#define COOLER_AUTO_FAN_PIN .*/#define COOLER_AUTO_FAN_PIN FAN_PIN/g" Marlin/Configuration_adv.h
         
+        # Disable quick homing
+        sed -i "s/[^ ]*#define QUICK_HOME/\/\/#define QUICK_HOME/g" Marlin/Configuration_adv.h
+        
+        # Disable power loss recovery
+        sed -i "s/[^ ]*#define POWER_LOSS_RECOVERY/\/\/#define POWER_LOSS_RECOVERY/g" Marlin/Configuration_adv.h
+        
         # Lower homing bump
         sed -i "s/#define HOMING_BUMP_MM .*/#define HOMING_BUMP_MM { 4, 4, 2 }/g" Marlin/Configuration_adv.h
         
@@ -260,12 +281,27 @@ jobs:
         
         # Enable DWIN display beep mute option
         sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
+
+        # Enable UTF filename support
+        sed -i "s/[^ ]*#define UTF_FILENAME_SUPPORT/#define UTF_FILENAME_SUPPORT/g" Marlin/Configuration_adv.h
         
         # Enable long filename support
         sed -i "s/[^ ]*#define LONG_FILENAME_HOST_SUPPORT/#define LONG_FILENAME_HOST_SUPPORT/g" Marlin/Configuration_adv.h
         
         # Enable scrolling filenames
         sed -i "s/[^ ]*#define SCROLL_LONG_FILENAMES/#define SCROLL_LONG_FILENAMES/g" Marlin/Configuration_adv.h
+        
+        # Enable automatic reporting of SD card status
+        sed -i "s/[^ ]*#define AUTO_REPORT_SD_STATUS/#define AUTO_REPORT_SD_STATUS/g" Marlin/Configuration_adv.h
+        
+        # Disable SD card host drive support
+        sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
+        
+        # Configure babystepping
+        sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define DOUBLECLICK_FOR_Z_BABYSTEPPING/#define DOUBLECLICK_FOR_Z_BABYSTEPPING/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define BABYSTEP_DISPLAY_TOTAL/#define BABYSTEP_DISPLAY_TOTAL/g" Marlin/Configuration_adv.h
         
         # Tweak ARC configuration
         sed -i "s/[^ ]*#define ARC_P_CIRCLES/#define ARC_P_CIRCLES/g" Marlin/Configuration_adv.h
@@ -276,17 +312,54 @@ jobs:
         # Enable advanced pausing for filament change
         sed -i "s/[^ ]*#define ADVANCED_PAUSE_FEATURE/#define ADVANCED_PAUSE_FEATURE/g" Marlin/Configuration_adv.h
         
+        ## FIXME: This might still cause the extruder jerkiness when set above zero!
         # Configure filament unload length
-        sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 0/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 0/g" Marlin/Configuration_adv.h
+        sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
+        
+        ## FIXME: This might still cause the extruder jerkiness when set above zero!
+        # Configure filament fast load length
+        #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
         
         # Configure filament fast load feed rate (speed)
-        sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10/g" Marlin/Configuration_adv.h
         
         # Enable head parking during pause and filament change
         sed -i "s/[^ ]*#define PARK_HEAD_ON_PAUSE/#define PARK_HEAD_ON_PAUSE/g" Marlin/Configuration_adv.h
         
+        # Run homing before changing filament
+        sed -i "s/[^ ]*#define HOME_BEFORE_FILAMENT_CHANGE/#define HOME_BEFORE_FILAMENT_CHANGE/g" Marlin/Configuration_adv.h
+        
         # Enable display and g-code support for filament loading and unloading
         sed -i "s/[^ ]*#define FILAMENT_LOAD_UNLOAD_GCODES/#define FILAMENT_LOAD_UNLOAD_GCODES/g" Marlin/Configuration_adv.h
+        
+        # Configure hybrid threshold (still disabled by default)
+        sed -i "s/#define Z_HYBRID_THRESHOLD .*/#define Z_HYBRID_THRESHOLD 20/g" Marlin/Configuration_adv.h
+        
+        # Configure sensorless homing (still disably by default)
+        sed -i "s/#define X_STALL_SENSITIVITY .*/#define X_STALL_SENSITIVITY 72/g" Marlin/Configuration_adv.h
+        sed -i "s/#define Y_STALL_SENSITIVITY .*/#define Y_STALL_SENSITIVITY 70/g" Marlin/Configuration_adv.h
+        sed -i "s/#define Z_STALL_SENSITIVITY .*/#define Z_STALL_SENSITIVITY 10/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define IMPROVE_HOMING_RELIABILITY/#define IMPROVE_HOMING_RELIABILITY/g" Marlin/Configuration_adv.h
+        
+        # Disable square wave stepping (beta feature)
+        sed -i "s/[^ ]*#define SQUARE_WAVE_STEPPING/\/\/#define SQUARE_WAVE_STEPPING/g" Marlin/Configuration_adv.h
+        
+        # Enable additional reporting etc. features
+        sed -i "s/[^ ]*#define AUTO_REPORT_POSITION/#define AUTO_REPORT_POSITION/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define M114_DETAIL/#define M114_DETAIL/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define REPORT_FAN_CHANGE/#define REPORT_FAN_CHANGE/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define HOST_PAUSE_M76/#define HOST_PAUSE_M76/g" Marlin/Configuration_adv.h
+        
+        # Enable fan control options in LCD (might not work with DWIN?)
+        sed -i "s/[^ ]*#define CONTROLLER_FAN_EDITABLE/#define CONTROLLER_FAN_EDITABLE/g" Marlin/Configuration_adv.h
+        
+        ## TODO: While this makes sense, wouldn't this cause issues eg. when bed leveling for long enough to trigger this?
+        # Enable hotend idle timeout
+        #sed -i "s/[^ ]*#define HOTEND_IDLE_TIMEOUT/#define HOTEND_IDLE_TIMEOUT/g" Marlin/Configuration_adv.h
+        
+        # Enable showing remaining time (this probably only works with LCDs and not with DWIN?)
+        sed -i "s/[^ ]*#define SHOW_REMAINING_TIME/#define SHOW_REMAINING_TIME/g" Marlin/Configuration_adv.h
         
         # Configure the current multiplier when holding/locked
         sed -i "s/#define HOLD_MULTIPLIER .*/#define HOLD_MULTIPLIER 0.3/g" Marlin/Configuration_adv.h
@@ -334,7 +407,8 @@ jobs:
         sed -i "s/#define GANTRY_CALIBRATION_CURRENT.*/#define GANTRY_CALIBRATION_CURRENT Z_CURRENT \/ 3/g" Marlin/Configuration_adv.h
         sed -i "s/#define GANTRY_CALIBRATION_EXTRA_HEIGHT.*/#define GANTRY_CALIBRATION_EXTRA_HEIGHT 10/g" Marlin/Configuration_adv.h
         sed -i "s/#define GANTRY_CALIBRATION_FEEDRATE.*/#define GANTRY_CALIBRATION_FEEDRATE 500/g" Marlin/Configuration_adv.h
-        sed -i "s/#define GANTRY_CALIBRATION_COMMANDS_POST.*/#define GANTRY_CALIBRATION_COMMANDS_POST \"G28 Z\"/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define GANTRY_CALIBRATION_COMMANDS_POST.*/#define GANTRY_CALIBRATION_COMMANDS_POST \"G28 Z\"/g" Marlin/Configuration_adv.h
+        sed -i "s/#define GANTRY_CALIBRATION_COMMANDS_POST.*/#define GANTRY_CALIBRATION_COMMANDS_POST \"G28\"/g" Marlin/Configuration_adv.h
         
         # Lower the bootscreen timeout
         sed -i "s/#define BOOTSCREEN_TIMEOUT .*/#define BOOTSCREEN_TIMEOUT 0/g" Marlin/Configuration_adv.h
@@ -347,10 +421,13 @@ jobs:
         sed -i "s/#define TX_BUFFER_SIZE .*/#define TX_BUFFER_SIZE 32/g" Marlin/Configuration_adv.h
         
         ## TODO: Testing temp changes
-        sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 30/g" Marlin/Configuration_adv.h
-        sed -i "s/#define WATCH_TEMP_INCREASE .*/#define WATCH_TEMP_INCREASE 3/g" Marlin/Configuration_adv.h
-        sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 180/g" Marlin/Configuration_adv.h
-        sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 180/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 30/g" Marlin/Configuration_adv.h
+        sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 20/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define WATCH_TEMP_INCREASE .*/#define WATCH_TEMP_INCREASE 3/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 180/g" Marlin/Configuration_adv.h
+        sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 20/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 180/g" Marlin/Configuration_adv.h
+        sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 60/g" Marlin/Configuration_adv.h
         
         ## END OF CONFIGURATION_ADV.H
       env:
