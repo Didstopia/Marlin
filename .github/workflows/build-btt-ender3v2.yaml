@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         board: [STM32G0B1RE_btt]
-        grid: [3, 5, 10]
+        grid: [3, 5, 10, 15]
         high-speed: [true, false]
     steps:
     
@@ -93,6 +93,16 @@ jobs:
         sed -i -E "s/^[^\/]*[ ]*#error \"DWIN_CREALITY_LCD requires a custom cable.*$/\/\/&:/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
         ## FIXME: No longer necessary on bugfix-2.0.x, comment out when 2.0.x branch gets the fix merged?
         sed -i "s/DWIN_CREALITY_LCD/DWIN_CREALITY_LCD_JYERSUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
+        
+        # Patch build date
+        DIST_DATE=$( date +"%Y-%m-%d" )
+        sed -E -i "s/(#define +STRING_DISTRIBUTION_DATE) .*$/\1 \"$DIST_DATE\"/g" Marlin/src/inc/Version.h
+        sed -E -i "s/(#define +STRING_DISTRIBUTION_DATE) .*$/\1 \"$DIST_DATE\"/g" Marlin/Version.h
+        
+        # Patch build FOO
+        sed -E -i "s/(#define +MACHINE_NAME) .*$/\1 \"Ender 3 V2\"/g" Marlin/src/inc/Version.h
+        sed -E -i "s/(#define +SOURCE_CODE_URL) .*$/\1 \"github.com/Didstopia/Marlin\"/g" Marlin/src/inc/Version.h
+        sed -E -i "s/(#define +WEBSITE_URL) .*$/\1 \"github.com/Didstopia/Marlin\"/g" Marlin/src/inc/Version.h
         
         
         
@@ -281,14 +291,22 @@ jobs:
         # Configure the current multiplier when holding/locked
         sed -i "s/#define HOLD_MULTIPLIER .*/#define HOLD_MULTIPLIER 0.3/g" Marlin/Configuration_adv.h
         
+        ## TODO: Dropping all currents just a bit to attempt to cool down the motors
         # Configure stepper motor driver currents
-        sed -i "s/#define X_CURRENT .*/#define X_CURRENT 580/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 580/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define X_CURRENT .*/#define X_CURRENT 580/g" Marlin/Configuration_adv.h
+        sed -i "s/#define X_CURRENT .*/#define X_CURRENT 560/g" Marlin/Configuration_adv.h
+        #sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 580/g" Marlin/Configuration_adv.h
+        sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 560/g" Marlin/Configuration_adv.h
         #sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 725/g" Marlin/Configuration_adv.h
         ## TODO: Boosting Z axis current in hopes of fixing any binding and Z offset issues..
+        ## NOTE: 580 x 2 = 1160 - 10% = 1000 (10% is a good safety margin)
         sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 1000/g" Marlin/Configuration_adv.h
-        sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 650/g" Marlin/Configuration_adv.h
+        ## TODO: Trying slightly increased extruder currents, see if that helps or heats up too much etc.
+        #sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 650/g" Marlin/Configuration_adv.h
+        sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 670/g" Marlin/Configuration_adv.h
         
+        ## TODO: Why should we lower the currents when homing? Just for safety, when homing is done at drastically reduced speeds?
+        ##       But wouldn't this potentially cause issues, eg. missed steps?
         # Configure stepper motor driver currents when homing
         sed -i "s/#define X_CURRENT_HOME .*/#define X_CURRENT_HOME X_CURRENT \/ 2/g" Marlin/Configuration_adv.h
         sed -i "s/#define Y_CURRENT_HOME .*/#define Y_CURRENT_HOME Y_CURRENT \/ 2/g" Marlin/Configuration_adv.h
@@ -358,6 +376,9 @@ jobs:
         cp .pio/build/$BOARD/firmware.bin "temp/${FIRMWARE_NAME}/firmware.bin"
         cp Marlin/Configuration.h "temp/${FIRMWARE_NAME}/Configuration.h"
         cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configuration_adv.h"
+        
+        # Include the latest DWIN display firmware with all build artifacts
+        cp -R "Configurations/config/examples/Creality/Ender-3 V2/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
       env:
         BOARD: ${{ matrix.board }}
         GRID: ${{ matrix.grid }}
