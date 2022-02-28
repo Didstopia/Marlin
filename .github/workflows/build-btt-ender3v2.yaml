@@ -223,7 +223,6 @@ jobs:
         
         ## TODO: Reverting back to 10
         # Set default fade height, which helps with warped beds and more uniform results (for BLTouch/UBL)
-        sed -i "s/[^ ]*#define DEFAULT_LEVELING_FADE_HEIGHT .*/#define DEFAULT_LEVELING_FADE_HEIGHT 0.0/g" Marlin/Configuration.h
         sed -i "s/[^ ]*#define DEFAULT_LEVELING_FADE_HEIGHT .*/#define DEFAULT_LEVELING_FADE_HEIGHT 10.0/g" Marlin/Configuration.h
         
         # Enable leveling debugging
@@ -298,8 +297,6 @@ jobs:
         sed -i "s/#define TOUCH_IDLE_SLEEP .*/#define TOUCH_IDLE_SLEEP 300/g" Marlin/Configuration.h
         
         ## END OF CONFIGURATION.H
-        
-        
         
         ## BEGIN CONFIGURATION_ADV.H
         
@@ -462,14 +459,12 @@ jobs:
         # Lower the bootscreen timeout
         sed -i "s/#define BOOTSCREEN_TIMEOUT .*/#define BOOTSCREEN_TIMEOUT 0/g" Marlin/Configuration_adv.h
         
-        ## TODO: Testing memory/buffer tweaks and BufferBuddy + OctoPrint
         sed -i "s/[^ ]*#define ADVANCED_OK/#define ADVANCED_OK/g" Marlin/Configuration_adv.h
         sed -i "s/#define BLOCK_BUFFER_SIZE .*/#define BLOCK_BUFFER_SIZE 64/g" Marlin/Configuration_adv.h
         sed -i "s/#define MAX_CMD_SIZE .*/#define MAX_CMD_SIZE 96/g" Marlin/Configuration_adv.h
         sed -i "s/#define BUFSIZE .*/#define BUFSIZE 32/g" Marlin/Configuration_adv.h
         sed -i "s/#define TX_BUFFER_SIZE .*/#define TX_BUFFER_SIZE 32/g" Marlin/Configuration_adv.h
         
-        ## TODO: Testing temp changes
         sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 20/g" Marlin/Configuration_adv.h
         sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 20/g" Marlin/Configuration_adv.h
         sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 60/g" Marlin/Configuration_adv.h
