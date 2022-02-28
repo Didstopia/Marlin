@@ -93,11 +93,7 @@ jobs:
           echo "::error line=$lineno::$msg"
         }
         trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
-        
-        # Dummy fix for disabling sed replacements
-        touch Marlin/Configuration.h_DISABLED
-        touch Marlin/Configuration_adv.h_DISABLED
-      
+              
         # Copy the latest default Ender 3 V2 config files in place
         git clone -b ${{ env.TARGET_BRANCH }} https://github.com/MarlinFirmware/Configurations.git Configurations
         cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
@@ -199,7 +195,6 @@ jobs:
         sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
         
         # Increase bed size for probing (for BLTouch/UBL)
-        #sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 230/g" Marlin/Configuration.h
         sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 235/g" Marlin/Configuration.h
         
         # Extend maximum X position for better probe reach (for BLTouch/UBL)
@@ -288,11 +283,7 @@ jobs:
         
         # Enable mesh validation support
         sed -i "s/[^ ]*#define G26_MESH_VALIDATION/#define G26_MESH_VALIDATION/g" Marlin/Configuration.h
-        
-        ## TODO: Disabled due to disabling Linear Advance for now
-        # Increase DEFAULT_EJERK from 5 to 15 for linear advance
-        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h_DISABLED
-        
+                
         # Turn off display after 5 minutes
         sed -i "s/#define TOUCH_IDLE_SLEEP .*/#define TOUCH_IDLE_SLEEP 300/g" Marlin/Configuration.h
         
@@ -357,13 +348,7 @@ jobs:
         
         # Enable SD card host drive support
         sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
-        
-        ## TODO: Disabled due to disabling Linear Advance for now
-        # Enable and configure linear advance
-        sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h_DISABLED
-        sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h_DISABLED
-        sed -i "s/[^ ]*#define EXPERIMENTAL_SCURVE/#define EXPERIMENTAL_SCURVE/g" Marlin/Configuration_adv.h_DISABLED
-        
+                
         # Configure babystepping
         sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
