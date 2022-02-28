@@ -221,9 +221,10 @@ jobs:
         ## NOTE: Only enable one of these, not both!
         sed -i "s/[^ ]*#define RESTORE_LEVELING_AFTER_G28/#define RESTORE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
         
-        ## FIXME: This MAY need to be set back to 10 instead of 0
-        # Set default fade height (for BLTouch/UBL)
+        ## TODO: Reverting back to 10
+        # Set default fade height, which helps with warped beds and more uniform results (for BLTouch/UBL)
         sed -i "s/[^ ]*#define DEFAULT_LEVELING_FADE_HEIGHT .*/#define DEFAULT_LEVELING_FADE_HEIGHT 0.0/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define DEFAULT_LEVELING_FADE_HEIGHT .*/#define DEFAULT_LEVELING_FADE_HEIGHT 10.0/g" Marlin/Configuration.h
         
         # Enable leveling debugging
         sed -i "s/[^ ]*#define DEBUG_LEVELING_FEATURE/#define DEBUG_LEVELING_FEATURE/g" Marlin/Configuration.h
