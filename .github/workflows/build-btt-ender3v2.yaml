@@ -112,7 +112,7 @@ jobs:
         # Patch build details
         sed -E -i "s/(#define +MACHINE_NAME) .*$/\1 \"Ender 3 V2\"/g" Marlin/src/inc/Version.h
         sed -E -i "s/(#define +SOURCE_CODE_URL) .*$/\1 \"github.com\/Didstopia\/Marlin\"/g" Marlin/src/inc/Version.h
-        sed -E -i "s/(#define +WEBSITE_URL) .*$/\1 \"github.com\/Didstopia\/Marlin\"/g" Marlin/src/inc/Version.h
+        sed -E -i "s/(#define +WEBSITE_URL) .*$/\1 \"Didstopia\/Marlin\"/g" Marlin/src/inc/Version.h
         
         
         
@@ -273,6 +273,7 @@ jobs:
         # Disable endstops interrupt compatibility
         sed -i "s/[^ ]*#define ENDSTOP_INTERRUPTS_FEATURE/\/\/#define ENDSTOP_INTERRUPTS_FEATURE/g" Marlin/Configuration.h
         
+        ## TODO: Should we disable this due to potential issues with Junction Deviation still?
         ## TODO: This needs proper testing!
         # Disable classic jerk
         sed -i "s/[^ ]*#define CLASSIC_JERK/\/\/#define CLASSIC_JERK/g" Marlin/Configuration.h
@@ -286,8 +287,9 @@ jobs:
         # Enable mesh validation support
         sed -i "s/[^ ]*#define G26_MESH_VALIDATION/#define G26_MESH_VALIDATION/g" Marlin/Configuration.h
         
+        ## TODO: Disabled due to disabling Linear Advance for now
         # Increase DEFAULT_EJERK from 5 to 15 for linear advance
-        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h
+        sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h_DISABLED
         
         
         
@@ -355,11 +357,12 @@ jobs:
         # Enable SD card host drive support
         sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
         
+        ## TODO: Disabled due to disabling Linear Advance for now
         ## TODO: LIN_ADVANCE_K needs to be calibrated per device, values is from 0.0 to 2.0
         # Enable and configure linear advance
-        sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h
-        sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define EXPERIMENTAL_SCURVE/#define EXPERIMENTAL_SCURVE/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h_DISABLED
+        sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h_DISABLED
+        sed -i "s/[^ ]*#define EXPERIMENTAL_SCURVE/#define EXPERIMENTAL_SCURVE/g" Marlin/Configuration_adv.h_DISABLED
         
         # Configure babystepping
         sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
