@@ -83,7 +83,7 @@ jobs:
     
     - name: Configure Firmware (${{ env.TARGET_BRANCH }})
       id: configure_firmware
-      run: |
+      run: |-
         # Setup error handling
         set -eE -o functrace
         failure() {
