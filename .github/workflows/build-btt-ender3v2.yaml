@@ -269,12 +269,10 @@ jobs:
         # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
         sed -i "s/[^ ]*#define THERMAL_PROTECTION_CHAMBER/#define THERMAL_PROTECTION_CHAMBER/g" Marlin/Configuration.h
         
-        ## TODO: This needs proper testing!
         # Disable endstops interrupt compatibility
         sed -i "s/[^ ]*#define ENDSTOP_INTERRUPTS_FEATURE/\/\/#define ENDSTOP_INTERRUPTS_FEATURE/g" Marlin/Configuration.h
         
         ## TODO: Should we disable this due to potential issues with Junction Deviation still?
-        ## TODO: This needs proper testing!
         # Disable classic jerk
         sed -i "s/[^ ]*#define CLASSIC_JERK/\/\/#define CLASSIC_JERK/g" Marlin/Configuration.h
         
@@ -290,8 +288,6 @@ jobs:
         ## TODO: Disabled due to disabling Linear Advance for now
         # Increase DEFAULT_EJERK from 5 to 15 for linear advance
         sed -i "s/#define DEFAULT_EJERK .*/#define DEFAULT_EJERK 15.0/g" Marlin/Configuration.h_DISABLED
-        
-        
         
         ## END OF CONFIGURATION.H
         
@@ -358,7 +354,6 @@ jobs:
         sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
         
         ## TODO: Disabled due to disabling Linear Advance for now
-        ## TODO: LIN_ADVANCE_K needs to be calibrated per device, values is from 0.0 to 2.0
         # Enable and configure linear advance
         sed -i "s/[^ ]*#define LIN_ADVANCE/#define LIN_ADVANCE/g" Marlin/Configuration_adv.h_DISABLED
         sed -i "s/#define LIN_ADVANCE_K .*/#define LIN_ADVANCE_K 0.0/g" Marlin/Configuration_adv.h_DISABLED
@@ -376,11 +371,9 @@ jobs:
         # Enable advanced pausing for filament change
         sed -i "s/[^ ]*#define ADVANCED_PAUSE_FEATURE/#define ADVANCED_PAUSE_FEATURE/g" Marlin/Configuration_adv.h
         
-        ## FIXME: This might still cause the extruder jerkiness when set above zero!
         # Configure filament unload length
         sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
         
-        ## FIXME: This might still cause the extruder jerkiness when set above zero!
         # Configure filament fast load length
         sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
         
@@ -424,9 +417,7 @@ jobs:
         # Configure stepper motor driver currents
         sed -i "s/#define X_CURRENT .*/#define X_CURRENT 560/g" Marlin/Configuration_adv.h
         sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 560/g" Marlin/Configuration_adv.h
-        ## TODO: Boosting Z axis current in hopes of fixing any binding and Z offset issues..
         sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 1000/g" Marlin/Configuration_adv.h
-        ## TODO: Trying slightly increased extruder currents, see if that helps or heats up too much etc.
         sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 670/g" Marlin/Configuration_adv.h
         
         ## TODO: Why should we lower the currents when homing? Just for safety, when homing is done at drastically reduced speeds?
