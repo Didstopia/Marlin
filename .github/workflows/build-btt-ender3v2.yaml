@@ -93,6 +93,10 @@ jobs:
           echo "::error line=$lineno::$msg"
         }
         trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+        
+        # Dummy fix for disabling sed replacements
+        touch Marlin/Configuration.h_DISABLED
+        touch Marlin/Configuration_adv.h_DISABLED
       
         # Copy the latest default Ender 3 V2 config files in place
         git clone -b ${{ env.TARGET_BRANCH }} https://github.com/MarlinFirmware/Configurations.git Configurations
