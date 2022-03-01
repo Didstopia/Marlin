@@ -14,12 +14,11 @@ on:
   workflow_dispatch:
     inputs:
       targetBranch:
-        description: 'Target Branch'
+        description: "Target Branch"
         required: true
-        default: 'bugfix-2.0.x'
+        default: "bugfix-2.0.x"
 
 jobs:
-
   build-firmwares:
     name: Build Firmwares
     runs-on: ubuntu-latest
@@ -29,472 +28,422 @@ jobs:
         grid: [3, 5, 10, 15]
         high-speed: [true, false]
     steps:
-    
-    - name: Prepare Target Branch
-      run: |
-        # Target branch defaults to base ref
-        TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
-        
-        # Allow overriding the target branch with manual builds
-        OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
-        if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
-          TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
-        fi
-        
-        # Ensure that we have a target branch
-        if [ -z "${TARGET_BRANCH}" ]; then
-          echo "::error title=Missing target branch::Could not detect target branch, unable to continue"
-          exit 1
-        else
-          # Export the final target branch as a global environment variable
-          echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
-        fi
-    
-    - name: Checkout Repository (${{ env.TARGET_BRANCH }})
-      uses: actions/checkout@v2
-      with:
-        ref: ${{ env.TARGET_BRANCH }}
-        persist-credentials: false
-        
-    - name: Prepare Environment (${{ env.TARGET_BRANCH }})
-      run: echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
-    
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    
-    - name: Cache PlatformIO
-      uses: actions/cache@v2
-      with:
-        path: ~/.platformio
-        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-    
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      
-    - name: Install PlatformIO
-      run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade platformio
-    
-    - name: Configure Firmware (${{ env.TARGET_BRANCH }})
-      id: configure_firmware
-      run: |-
-        # Setup error handling
-        set -eE -o functrace
-        failure() {
-          local lineno=$1
-          local msg=$2
-          #echo "Failed at $lineno: $msg"
-          echo "::error line=$lineno::$msg"
-        }
-        trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
-              
-        # Copy the latest default Ender 3 V2 config files in place
-        git clone -b ${{ env.TARGET_BRANCH }} https://github.com/MarlinFirmware/Configurations.git Configurations
-        cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
-        cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
-        
-        # Patch for DWIN support with Jyers UI
-        sed -i -E "s/^[^\/]*[ ]*#error \"DWIN_CREALITY_LCD requires a custom cable.*$/\/\/&:/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
-        ## FIXME: No longer necessary on bugfix-2.0.x, comment out when 2.0.x branch gets the fix merged?
-        sed -i "s/DWIN_CREALITY_LCD/DWIN_CREALITY_LCD_JYERSUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
-        
-        # Patch build date
-        DIST_DATE=$( date +"%Y-%m-%d" )
-        sed -E -i "s/(#define +STRING_DISTRIBUTION_DATE) .*$/\1 \"$DIST_DATE\"/g" Marlin/src/inc/Version.h
-        sed -E -i "s/(#define +STRING_DISTRIBUTION_DATE) .*$/\1 \"$DIST_DATE\"/g" Marlin/Version.h
-        
-        # Patch build details
-        sed -E -i "s/(#define +MACHINE_NAME) .*$/\1 \"Ender 3 V2\"/g" Marlin/src/inc/Version.h
-        sed -E -i "s/(#define +SOURCE_CODE_URL) .*$/\1 \"github.com\/Didstopia\/Marlin\"/g" Marlin/src/inc/Version.h
-        sed -E -i "s/(#define +WEBSITE_URL) .*$/\1 \"Didstopia\/Marlin\"/g" Marlin/src/inc/Version.h
-        
-        
-        
-        ## BEGIN CONFIGURATION_ADV.H
-        
-        # Set a custom author
-        AUTHOR="Didstopia, BTT-SKR-Mini-E3-V3.0"
-        sed -i -E "s/(.*STRING_CONFIG_H_AUTHOR \"\()(.*)(\)\".*)/\1${AUTHOR}\3/g" Marlin/Configuration.h
-        
-        # Fix the serial port
-        sed -i "s/#define SERIAL_PORT .*/#define SERIAL_PORT -1/g" Marlin/Configuration.h
-        
-        # Change to the correct motherboard
-        sed -i "s/#define MOTHERBOARD .*/#define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V3_0/g" Marlin/Configuration.h
-        
-        # Change to the correct baud rate
-        sed -i "s/#define BAUDRATE .*/#define BAUDRATE 250000/g" Marlin/Configuration.h
-        
-        # Set a custom machine name
-        sed -i "s/#define CUSTOM_MACHINE_NAME .*/#define CUSTOM_MACHINE_NAME \"Ender-3 V2 (BTT SKR Mini E3)\"/g" Marlin/Configuration.h
-        
-        # Set minimum extruder temperature when extruding
-        sed -i "s/#define EXTRUDE_MINTEMP .*/#define EXTRUDE_MINTEMP 170/g" Marlin/Configuration.h
-        
-        # Set maximum length to extrude within a single extrusion
-        sed -i "s/#define EXTRUDE_MAXLENGTH .*/#define EXTRUDE_MAXLENGTH 600/g" Marlin/Configuration.h
-        
-        # Change the motor drivers
-        sed -i -E "s/#define (X|Y|Z|E0)_DRIVER_TYPE .*/#define \1_DRIVER_TYPE TMC2209/g" Marlin/Configuration.h
-        
-        # Set default/custom steps per unit, per axis
-        sed -i "s/#define DEFAULT_AXIS_STEPS_PER_UNIT.*/#define DEFAULT_AXIS_STEPS_PER_UNIT { 80, 80, 400, 93 }/g" Marlin/Configuration.h
-        
-        # Set default/custom maximum feedrate (movement speed)
-        sed -i "s/#define DEFAULT_MAX_FEEDRATE.*/#define DEFAULT_MAX_FEEDRATE { 200, 200, 5, 25}/g" Marlin/Configuration.h
-        
-        # Set default/custom maximum acceleration
-        sed -i "s/#define DEFAULT_MAX_ACCELERATION.*/#define DEFAULT_MAX_ACCELERATION { 1000, 1000, 100, 10000 }/g" Marlin/Configuration.h
-        
-        # Set default/custom maximum acceleration while moving/traveling
-        sed -i "s/#define DEFAULT_TRAVEL_ACCELERATION.*/#define DEFAULT_TRAVEL_ACCELERATION 500/g" Marlin/Configuration.h
-        
-        # Enable S-Curve Acceleration
-        sed -i "s/[^ ]*#define S_CURVE_ACCELERATION/#define S_CURVE_ACCELERATION/g" Marlin/Configuration.h
-        
-        # Disable Z axis endstop switch support (we use BLTouch/CRTouch instead)
-        sed -i "s/[^ ]*#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN/\/\/#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN/g" Marlin/Configuration.h
-        
-        # Enable Z homing using a probe
-        sed -i "s/[^ ]*#define USE_PROBE_FOR_Z_HOMING/#define USE_PROBE_FOR_Z_HOMING/g" Marlin/Configuration.h
-        
-        # Enable BLTouch/CRTouch support
-        sed -i "s/[^ ]*#define BLTOUCH/#define BLTOUCH/g" Marlin/Configuration.h
-        
-        # Set default/custom nozzle offsets
-        sed -i "s/#define NOZZLE_TO_PROBE_OFFSET .*/#define NOZZLE_TO_PROBE_OFFSET { -45.8, -5.4, 0 }/g" Marlin/Configuration.h
-        
-        # Increase the probing margin (for BLTouch/UBL)
-        sed -i "s/#define PROBING_MARGIN .*/#define PROBING_MARGIN 20/g" Marlin/Configuration.h
-        
-        # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL)
-        sed -i "s/#define XY_PROBE_FEEDRATE .*/#define XY_PROBE_FEEDRATE (133*60)/g" Marlin/Configuration.h
-        
-        # Set min/max probe offsets
-        sed -i "s/#define Z_PROBE_OFFSET_RANGE_MIN .*/#define Z_PROBE_OFFSET_RANGE_MIN -20/g" Marlin/Configuration.h
-        sed -i "s/#define Z_PROBE_OFFSET_RANGE_MAX .*/#define Z_PROBE_OFFSET_RANGE_MAX 20/g" Marlin/Configuration.h
-        
-        # Enable multiple probings (for BLTouch/UBL)
-        sed -i "s/[^ ]*#define MULTIPLE_PROBING .*/#define MULTIPLE_PROBING 2/g" Marlin/Configuration.h
-        
-        # Enable Z probe testing (for BLTouch/UBL)
-        sed -i "s/[^ ]*#define Z_MIN_PROBE_REPEATABILITY_TEST/#define Z_MIN_PROBE_REPEATABILITY_TEST/g" Marlin/Configuration.h
-        
-        # Invert axis motor directions
-        sed -i -E "s/#define INVERT_(X|Y|E0)_DIR .*/#define INVERT_\1_DIR true/g" Marlin/Configuration.h
-        sed -i "s/#define INVERT_Z_DIR .*/#define INVERT_Z_DIR false/g" Marlin/Configuration.h
-        
-        # Require homing after steppers have deactivated/unlocked (and before trying to move)
-        sed -i "s/[^ ]*#define NO_MOTION_BEFORE_HOMING/#define NO_MOTION_BEFORE_HOMING/g" Marlin/Configuration.h
-        sed -i "s/[^ ]*#define HOME_AFTER_DEACTIVATE/#define HOME_AFTER_DEACTIVATE/g" Marlin/Configuration.h
-        
-        # Increase bed size for probing (for BLTouch/UBL)
-        sed -i -E "s/#define (X|Y)_BED_SIZE .*/#define \1_BED_SIZE 235/g" Marlin/Configuration.h
-        
-        # Extend maximum X position for better probe reach (for BLTouch/UBL)
-        sed -i "s/#define X_MAX_POS .*/#define X_MAX_POS X_BED_SIZE + 15/g" Marlin/Configuration.h
-        
-        # Lower maximum Z position for better mechanical gantry calibration
-        sed -i "s/#define Z_MAX_POS .*/#define Z_MAX_POS 250/g" Marlin/Configuration.h
-        
-        # Enable filament runout sensor
-        sed -i "s/[^ ]*#define FILAMENT_RUNOUT_SENSOR/#define FILAMENT_RUNOUT_SENSOR/g" Marlin/Configuration.h
-        
-        # Set the default/custom runout sensor filament distance
-        sed -i "s/[^ ]*#define FILAMENT_RUNOUT_DISTANCE_MM .*/#define FILAMENT_RUNOUT_DISTANCE_MM 0/g" Marlin/Configuration.h
-        
-        # Enable Universal Bed Leveling (UBL)
-        sed -i "s/[^ ]*#define AUTO_BED_LEVELING_UBL/#define AUTO_BED_LEVELING_UBL/g" Marlin/Configuration.h
-        
-        # Enable leveling after completion (for BLTouch/UBL)
-        ## NOTE: Only enable one of these, not both!
-        sed -i "s/[^ ]*#define RESTORE_LEVELING_AFTER_G28/#define RESTORE_LEVELING_AFTER_G28/g" Marlin/Configuration.h
-        
-        ## TODO: Reverting back to 10
-        # Set default fade height, which helps with warped beds and more uniform results (for BLTouch/UBL)
-        sed -i "s/[^ ]*#define DEFAULT_LEVELING_FADE_HEIGHT .*/#define DEFAULT_LEVELING_FADE_HEIGHT 10.0/g" Marlin/Configuration.h
-        
-        # Enable leveling debugging
-        sed -i "s/[^ ]*#define DEBUG_LEVELING_FEATURE/#define DEBUG_LEVELING_FEATURE/g" Marlin/Configuration.h
-        
-        # Set the leveling grid size for the current firmware configuration
-        sed -i "s/#define GRID_MAX_POINTS_X .*/#define GRID_MAX_POINTS_X $GRID/g" Marlin/Configuration.h
-        
-        # Increase default mesh inset for UBL
-        sed -i "s/[^ ]*#define MESH_INSET .*/#define MESH_INSET 10/g" Marlin/Configuration.h
-        
-        # Disable UBL automatic mesh saving
-        sed -i "s/[^ ]*#define UBL_SAVE_ACTIVE_ON_M500/\/\/#define UBL_SAVE_ACTIVE_ON_M500/g" Marlin/Configuration.h
-        
-        # Enable safe homing on the Z axis
-        sed -i "s/[^ ]*#define Z_SAFE_HOMING/#define Z_SAFE_HOMING/g" Marlin/Configuration.h
-        
-        # Reduce homing feed rate (homing speed)
-        sed -i "s/#define HOMING_FEEDRATE_MM_M .*/#define HOMING_FEEDRATE_MM_M { \(20\*60\), \(20\*60\), \(4\*60\) }/g" Marlin/Configuration.h
-        
-        # Enable EEPROM feedback
-        sed -i "s/[^ ]*#define EEPROM_CHITCHAT/#define EEPROM_CHITCHAT/g" Marlin/Configuration.h
-        
-        # Clear EEPROM on startup after flashing a new firmware
-        sed -i "s/[^ ]*#define EEPROM_INIT_NOW/#define EEPROM_INIT_NOW/g" Marlin/Configuration.h
-        
-        # Enable nozzle parking when idle
-        sed -i "s/[^ ]*#define NOZZLE_PARK_FEATURE/#define NOZZLE_PARK_FEATURE/g" Marlin/Configuration.h
-        
-        # Increase Z axis while nozzle parking
-        sed -i "s/#define NOZZLE_PARK_Z_RAISE_MIN .*/#define NOZZLE_PARK_Z_RAISE_MIN 5/g" Marlin/Configuration.h
-        
-        # Enable print counting statistics
-        sed -i "s/[^ ]*#define PRINTCOUNTER/#define PRINTCOUNTER/g" Marlin/Configuration.h
-        
-        # Switch from Creality UI to Jyers UI
-        sed -i "s/[^ ]*#define DWIN_CREALITY_LCD/\/\/#define DWIN_CREALITY_LCD/g" Marlin/Configuration.h
-        sed -i "s/[^ ]*#define DWIN_CREALITY_LCD_JYERSUI/#define DWIN_CREALITY_LCD_JYERSUI/g" Marlin/Configuration.h
-        
-        # Enable software PWM fan control
-        sed -i "s/[^ ]*#define FAN_SOFT_PWM/#define FAN_SOFT_PWM/g" Marlin/Configuration.h
-        
-        # Adjust min/max temperatures
-        sed -i "s/#define HEATER_0_MINTEMP .*/#define HEATER_0_MINTEMP 5/g" Marlin/Configuration.h
-        sed -i "s/#define BED_MINTEMP .*/#define BED_MINTEMP 5/g" Marlin/Configuration.h
-        sed -i "s/#define BED_MAXTEMP .*/#define BED_MAXTEMP 120/g" Marlin/Configuration.h
-        
-        # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
-        sed -i "s/[^ ]*#define THERMAL_PROTECTION_CHAMBER/#define THERMAL_PROTECTION_CHAMBER/g" Marlin/Configuration.h
-        
-        # Disable endstops interrupt compatibility
-        sed -i "s/[^ ]*#define ENDSTOP_INTERRUPTS_FEATURE/\/\/#define ENDSTOP_INTERRUPTS_FEATURE/g" Marlin/Configuration.h
-        
-        ## TODO: Should we disable this due to potential issues with Junction Deviation still?
-        # Disable classic jerk
-        sed -i "s/[^ ]*#define CLASSIC_JERK/\/\/#define CLASSIC_JERK/g" Marlin/Configuration.h
-        
-        # Disable extrapolating beyond the grid
-        sed -i "s/[^ ]*#define EXTRAPOLATE_BEYOND_GRID/\/\/#define EXTRAPOLATE_BEYOND_GRID/g" Marlin/Configuration.h
-        
-        # Enable bed level corner adjustments
-        sed -i "s/[^ ]*#define LEVEL_BED_CORNERS/#define LEVEL_BED_CORNERS/g" Marlin/Configuration.h
-        
-        # Enable mesh validation support
-        sed -i "s/[^ ]*#define G26_MESH_VALIDATION/#define G26_MESH_VALIDATION/g" Marlin/Configuration.h
-                
-        # Turn off display after 5 minutes
-        sed -i "s/#define TOUCH_IDLE_SLEEP .*/#define TOUCH_IDLE_SLEEP 300/g" Marlin/Configuration.h
-        
-        ## END OF CONFIGURATION.H
-        
-        ## BEGIN CONFIGURATION_ADV.H
-        
-        # Enable mainboard/controller fan control
-        sed -i "s/[^ ]*#define USE_CONTROLLER_FAN/#define USE_CONTROLLER_FAN/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define CONTROLLER_FAN_PIN .*/#define CONTROLLER_FAN_PIN FAN2_PIN/g" Marlin/Configuration_adv.h
-        
-        # Enable automatic fan control for the extruder and parts cooler
-        sed -i "s/#define E0_AUTO_FAN_PIN .*/#define E0_AUTO_FAN_PIN FAN1_PIN/g" Marlin/Configuration_adv.h
-        sed -i "s/#define COOLER_AUTO_FAN_PIN .*/#define COOLER_AUTO_FAN_PIN FAN_PIN/g" Marlin/Configuration_adv.h
-        
-        ## TODO: Why would we keep this disabled? It's quicker, what are the drawbacks?
-        # Disable quick homing
-        sed -i "s/[^ ]*#define QUICK_HOME/\/\/#define QUICK_HOME/g" Marlin/Configuration_adv.h
-        
-        # Disable power loss recovery
-        sed -i "s/[^ ]*#define POWER_LOSS_RECOVERY/\/\/#define POWER_LOSS_RECOVERY/g" Marlin/Configuration_adv.h
-        
-        # Lower homing bump
-        sed -i "s/#define HOMING_BUMP_MM .*/#define HOMING_BUMP_MM { 4, 4, 2 }/g" Marlin/Configuration_adv.h
-        
-        # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
-        if ($HIGH_SPEED); then HS_ENABLED=; else HS_ENABLED='\/\/'; fi;
-        sed -i "s/[^ ]*#define BLTOUCH_HS_MODE .*/$HS_ENABLED#define BLTOUCH_HS_MODE true/g" Marlin/Configuration_adv.h
-        
-        ## TODO: This needs testing!
-        # Disable adaptive step smoothing
-        sed -i "s/[^ ]*#define ADAPTIVE_STEP_SMOOTHING/\/\/#define ADAPTIVE_STEP_SMOOTHING/g" Marlin/Configuration_adv.h
-        
-        # Adjust slowdown divisor when disabling adaptive step smoothing
-        sed -i "s/#define SLOWDOWN_DIVISOR .*/#define SLOWDOWN_DIVISOR 8/g" Marlin/Configuration_adv.h
-        
-        # Enable DWIN display beep mute option
-        sed -i "s/[^ ]*#define SOUND_MENU_ITEM/#define SOUND_MENU_ITEM/g" Marlin/Configuration_adv.h
-        
-        # Enable additional display features (some are useful when used with OctoPrint for example)
-        sed -i "s/[^ ]*#define STATUS_MESSAGE_SCROLLING/#define STATUS_MESSAGE_SCROLLING/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define LCD_SET_PROGRESS_MANUALLY/#define LCD_SET_PROGRESS_MANUALLY/g" Marlin/Configuration_adv.h
-        
-        ## TODO: Why would BTT have this disabled?
-        # Disable dynamic memory allocation in SD card menus
-        sed -i "s/[^ ]*#define SDSORT_DYNAMIC_RAM .*/#define SDSORT_DYNAMIC_RAM false/g" Marlin/Configuration_adv.h
-        
-        # Set default SD card connection type
-        sed -i "s/[^ ]*#define SDCARD_CONNECTION .*/#define SDCARD_CONNECTION ONBOARD/g" Marlin/Configuration_adv.h
-        
-        # Enable UTF filename support
-        sed -i "s/[^ ]*#define UTF_FILENAME_SUPPORT/#define UTF_FILENAME_SUPPORT/g" Marlin/Configuration_adv.h
-        
-        # Enable long filename support
-        sed -i "s/[^ ]*#define LONG_FILENAME_HOST_SUPPORT/#define LONG_FILENAME_HOST_SUPPORT/g" Marlin/Configuration_adv.h
-        
-        # Enable scrolling filenames
-        sed -i "s/[^ ]*#define SCROLL_LONG_FILENAMES/#define SCROLL_LONG_FILENAMES/g" Marlin/Configuration_adv.h
-        
-        # Enable automatic reporting of SD card status
-        sed -i "s/[^ ]*#define AUTO_REPORT_SD_STATUS/#define AUTO_REPORT_SD_STATUS/g" Marlin/Configuration_adv.h
-        
-        # Enable SD card host drive support
-        sed -i "s/[^ ]*#define NO_SD_HOST_DRIVE/\/\/#define NO_SD_HOST_DRIVE/g" Marlin/Configuration_adv.h
-                
-        # Configure babystepping
-        sed -i "s/[^ ]*#define BABYSTEP_WITHOUT_HOMING/#define BABYSTEP_WITHOUT_HOMING/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define BABYSTEP_ALWAYS_AVAILABLE/#define BABYSTEP_ALWAYS_AVAILABLE/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define DOUBLECLICK_FOR_Z_BABYSTEPPING/#define DOUBLECLICK_FOR_Z_BABYSTEPPING/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define BABYSTEP_DISPLAY_TOTAL/#define BABYSTEP_DISPLAY_TOTAL/g" Marlin/Configuration_adv.h
-        
-        # Enable emergency parser
-        sed -i "s/[^ ]*#define EMERGENCY_PARSER/#define EMERGENCY_PARSER/g" Marlin/Configuration_adv.h
-        
-        # Enable advanced pausing for filament change
-        sed -i "s/[^ ]*#define ADVANCED_PAUSE_FEATURE/#define ADVANCED_PAUSE_FEATURE/g" Marlin/Configuration_adv.h
-        
-        # Configure filament unload length
-        sed -i "s/#define FILAMENT_CHANGE_UNLOAD_LENGTH .*/#define FILAMENT_CHANGE_UNLOAD_LENGTH 400/g" Marlin/Configuration_adv.h
-        
-        # Configure filament fast load length
-        sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*/#define FILAMENT_CHANGE_FAST_LOAD_LENGTH 350/g" Marlin/Configuration_adv.h
-        
-        # Configure filament fast load feed rate (speed)
-        sed -i "s/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*/#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 6/g" Marlin/Configuration_adv.h
-        
-        # Enable head parking during pause and filament change
-        sed -i "s/[^ ]*#define PARK_HEAD_ON_PAUSE/#define PARK_HEAD_ON_PAUSE/g" Marlin/Configuration_adv.h
-        
-        # Run homing before changing filament
-        sed -i "s/[^ ]*#define HOME_BEFORE_FILAMENT_CHANGE/#define HOME_BEFORE_FILAMENT_CHANGE/g" Marlin/Configuration_adv.h
-        
-        # Enable display and g-code support for filament loading and unloading
-        sed -i "s/[^ ]*#define FILAMENT_LOAD_UNLOAD_GCODES/#define FILAMENT_LOAD_UNLOAD_GCODES/g" Marlin/Configuration_adv.h
-        
-        # Configure hybrid threshold (still disabled by default)
-        sed -i "s/#define Z_HYBRID_THRESHOLD .*/#define Z_HYBRID_THRESHOLD 20/g" Marlin/Configuration_adv.h
-        
-        # Configure sensorless homing (still disably by default)
-        sed -i "s/#define X_STALL_SENSITIVITY .*/#define X_STALL_SENSITIVITY 72/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Y_STALL_SENSITIVITY .*/#define Y_STALL_SENSITIVITY 70/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Z_STALL_SENSITIVITY .*/#define Z_STALL_SENSITIVITY 10/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define IMPROVE_HOMING_RELIABILITY/#define IMPROVE_HOMING_RELIABILITY/g" Marlin/Configuration_adv.h
-        
-        # Enable additional reporting etc. features
-        sed -i "s/[^ ]*#define AUTO_REPORT_POSITION/#define AUTO_REPORT_POSITION/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define M114_DETAIL/#define M114_DETAIL/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define REPORT_FAN_CHANGE/#define REPORT_FAN_CHANGE/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define HOST_PAUSE_M76/#define HOST_PAUSE_M76/g" Marlin/Configuration_adv.h
-        
-        # Enable fan control options in LCD (might not work with DWIN?)
-        sed -i "s/[^ ]*#define CONTROLLER_FAN_EDITABLE/#define CONTROLLER_FAN_EDITABLE/g" Marlin/Configuration_adv.h
-        
-        # Enable showing remaining time (this probably only works with LCDs and not with DWIN?)
-        sed -i "s/[^ ]*#define SHOW_REMAINING_TIME/#define SHOW_REMAINING_TIME/g" Marlin/Configuration_adv.h
-        
-        # Configure the current multiplier when holding/locked
-        sed -i "s/#define HOLD_MULTIPLIER .*/#define HOLD_MULTIPLIER 0.3/g" Marlin/Configuration_adv.h
-        
-        ## TODO: Dropping all currents just a bit to attempt to cool down the motors
-        # Configure stepper motor driver currents
-        sed -i "s/#define X_CURRENT .*/#define X_CURRENT 560/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Y_CURRENT .*/#define Y_CURRENT 560/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Z_CURRENT .*/#define Z_CURRENT 1000/g" Marlin/Configuration_adv.h
-        sed -i "s/#define E0_CURRENT .*/#define E0_CURRENT 670/g" Marlin/Configuration_adv.h
-        
-        ## TODO: Why should we lower the currents when homing? Just for safety, when homing is done at drastically reduced speeds?
-        ##       But wouldn't this potentially cause issues, eg. missed steps?
-        # Configure stepper motor driver currents when homing
-        sed -i "s/#define X_CURRENT_HOME .*/#define X_CURRENT_HOME X_CURRENT \/ 2/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Y_CURRENT_HOME .*/#define Y_CURRENT_HOME Y_CURRENT \/ 2/g" Marlin/Configuration_adv.h
-        sed -i "s/#define Z_CURRENT_HOME .*/#define Z_CURRENT_HOME Z_CURRENT \/ 2/g" Marlin/Configuration_adv.h
-        
-        # Change the default chopper voltage from 12V to 24V
-        sed -i "s/#define CHOPPER_TIMING CHOPPER_DEFAULT_12V/#define CHOPPER_TIMING CHOPPER_DEFAULT_24V/g" Marlin/Configuration_adv.h
-        
-        # Enable stepper driver debugging
-        sed -i "s/[^ ]*#define TMC_DEBUG/#define TMC_DEBUG/g" Marlin/Configuration_adv.h
-        
-        # Enable meatpack g-code compression
-        sed -i "s/[^ ]*#define MEATPACK_ON_SERIAL_PORT_1/#define MEATPACK_ON_SERIAL_PORT_1/g" Marlin/Configuration_adv.h
-        
-        # Enable host actions commands
-        sed -i "s/[^ ]*#define HOST_ACTION_COMMANDS/#define HOST_ACTION_COMMANDS/g" Marlin/Configuration_adv.h
-        
-        # Customize host action commands
-        sed -i "s/[^ ]*#define HOST_PROMPT_SUPPORT/#define HOST_PROMPT_SUPPORT/g" Marlin/Configuration_adv.h
-        
-        # Enable mechanical gantry calibration
-        sed -i "s/[^ ]*#define MECHANICAL_GANTRY_CALIBRATION/#define MECHANICAL_GANTRY_CALIBRATION/g" Marlin/Configuration_adv.h
-        
-        # Configure additional options for mechanical gantry calibration
-        sed -i "s/#define GANTRY_CALIBRATION_CURRENT.*/#define GANTRY_CALIBRATION_CURRENT Z_CURRENT \/ 3/g" Marlin/Configuration_adv.h
-        sed -i "s/#define GANTRY_CALIBRATION_EXTRA_HEIGHT.*/#define GANTRY_CALIBRATION_EXTRA_HEIGHT 10/g" Marlin/Configuration_adv.h
-        sed -i "s/#define GANTRY_CALIBRATION_FEEDRATE.*/#define GANTRY_CALIBRATION_FEEDRATE 500/g" Marlin/Configuration_adv.h
-        sed -i "s/#define GANTRY_CALIBRATION_COMMANDS_POST.*/#define GANTRY_CALIBRATION_COMMANDS_POST \"G28\"/g" Marlin/Configuration_adv.h
-        
-        # Lower the bootscreen timeout
-        sed -i "s/#define BOOTSCREEN_TIMEOUT .*/#define BOOTSCREEN_TIMEOUT 0/g" Marlin/Configuration_adv.h
-        
-        sed -i "s/[^ ]*#define ADVANCED_OK/#define ADVANCED_OK/g" Marlin/Configuration_adv.h
-        sed -i "s/#define BLOCK_BUFFER_SIZE .*/#define BLOCK_BUFFER_SIZE 64/g" Marlin/Configuration_adv.h
-        sed -i "s/#define MAX_CMD_SIZE .*/#define MAX_CMD_SIZE 96/g" Marlin/Configuration_adv.h
-        sed -i "s/#define BUFSIZE .*/#define BUFSIZE 32/g" Marlin/Configuration_adv.h
-        sed -i "s/#define TX_BUFFER_SIZE .*/#define TX_BUFFER_SIZE 32/g" Marlin/Configuration_adv.h
-        
-        sed -i "s/#define WATCH_TEMP_PERIOD .*/#define WATCH_TEMP_PERIOD 20/g" Marlin/Configuration_adv.h
-        sed -i "s/#define THERMAL_PROTECTION_BED_PERIOD .*/#define THERMAL_PROTECTION_BED_PERIOD 20/g" Marlin/Configuration_adv.h
-        sed -i "s/#define WATCH_BED_TEMP_PERIOD .*/#define WATCH_BED_TEMP_PERIOD 60/g" Marlin/Configuration_adv.h
-        
-        # Turn off display after 30 seconds
-        sed -i "s/#define LCD_BACKLIGHT_TIMEOUT .*/#define LCD_BACKLIGHT_TIMEOUT 30/g" Marlin/Configuration_adv.h
-        
-        ## END OF CONFIGURATION_ADV.H
-      env:
-        GRID: ${{ matrix.grid }}
-        HIGH_SPEED: ${{ matrix.high-speed }}
-        
-    - name: Compile Firmware (${{ env.TARGET_BRANCH }})
-      id: compile_firmware
-      run: |
-        # Generate a name for the firmware and export it as a step output
-        if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
-        FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}-${BOARD}-${VERSION}"
-        echo "::set-output name=name::${FIRMWARE_NAME}"
-        echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
-      
-        ## TODO: Get the board env name dynamically instead?
-        # Compile the firmware
-        pio run -e $BOARD
-        
-        # Copy the firmware and configuration files to a named temporary folder
-        mkdir -p "temp/${FIRMWARE_NAME}"
-        ## TODO: Get the board env name dynamically instead?
-        cp .pio/build/$BOARD/firmware.bin "temp/${FIRMWARE_NAME}/firmware.bin"
-        cp Marlin/Configuration.h "temp/${FIRMWARE_NAME}/Configuration.h"
-        cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configuration_adv.h"
-        
-        # Include the latest DWIN display firmware with all build artifacts
-        cp -R "Configurations/config/examples/Creality/Ender-3 V2/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
-      env:
-        BOARD: ${{ matrix.board }}
-        GRID: ${{ matrix.grid }}
-        HIGH_SPEED: ${{ matrix.high-speed }}
-        VERSION: ${{ env.RELEASE_VERSION }}
-        
-    - name: Publish Artifacts (${{ env.TARGET_BRANCH }})
-      uses: actions/upload-artifact@v2
-      with:
-        # name: ${{ steps.compile_firmware.outputs.filename }}
-        # name: ${{ steps.compile_firmware.outputs.name }}.zip
-        name: ${{ steps.compile_firmware.outputs.name }}
-        # path: temp/build.bin
-        path: temp/
+      - name: Prepare Target Branch
+        run: |
+          # Target branch defaults to base ref
+          TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
+
+          # Allow overriding the target branch with manual builds
+          OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
+          if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
+            TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
+          fi
+
+          # Ensure that we have a target branch
+          if [ -z "${TARGET_BRANCH}" ]; then
+            echo "::error title=Missing target branch::Could not detect target branch, unable to continue"
+            exit 1
+          else
+            # Export the final target branch as a global environment variable
+            echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout Repository (${{ env.TARGET_BRANCH }})
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          persist-credentials: false
+
+      - name: Prepare Environment (${{ env.TARGET_BRANCH }})
+        run: echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v2
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+
+      - name: Prepare Build Script
+        id: configure_build_script
+        run: |-
+          # Download the latest helper build script
+          wget \
+            https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/scripts/configure_build_script.sh \
+            -O .github/workflows/scripts/configure_build_script.sh
+
+      - name: Configure Firmware (${{ env.TARGET_BRANCH }})
+        id: configure_firmware
+        run: |-
+          # Setup error handling
+          shopt -s extdebug
+          declare -F wttr
+
+          # Source the helper build script
+          source ${GITHUB_WORKSPACE}.github/workflows/scripts/configure_build_script.sh
+
+          ## BEGIN CONFIGURATION.H
+
+          # Set minimum extruder temperature when extruding
+          configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
+
+          # Set maximum length to extrude within a single extrusion
+          configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
+
+          # Set default/custom steps per unit, per axis
+          configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 93 }" Marlin/Configuration.h
+
+          # Set default/custom maximum feedrate (movement speed)
+          configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
+
+          # Set default/custom maximum acceleration
+          configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
+
+          # Set default/custom maximum acceleration while moving/traveling
+          configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+
+          # Enable S-Curve Acceleration
+          configEnable S_CURVE_ACCELERATION Marlin/Configuration.h
+
+          # Disable Z axis endstop switch support (we use BLTouch/CRTouch instead)
+          configDisable Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN Marlin/Configuration.h
+
+          # Enable Z homing using a probe
+          configEnable USE_PROBE_FOR_Z_HOMING Marlin/Configuration.h
+
+          # Enable BLTouch/CRTouch support
+          configEnable BLTOUCH Marlin/Configuration.h
+
+          # Set default/custom nozzle offsets
+          configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.h
+
+          # Increase the probing margin (for BLTouch/UBL)
+          configValue PROBING_MARGIN 20 Marlin/Configuration.h
+
+          # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL)
+          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+
+          # Set min/max probe offsets
+          configValue Z_PROBE_OFFSET_RANGE_MIN -20 Marlin/Configuration.h
+          configValue Z_PROBE_OFFSET_RANGE_MAX 20 Marlin/Configuration.h
+
+          ## TODO: This, and probably others, will also need to be separately enabled, right?
+          # Enable multiple probings (for BLTouch/UBL)
+          configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
+
+          # Enable Z probe testing (for BLTouch/UBL)
+          configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
+
+          # Require homing after steppers have deactivated/unlocked (and before trying to move)
+          configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
+          configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
+
+          # Increase bed size for probing (for BLTouch/UBL)
+          configValue X_BED_SIZE 235 Marlin/Configuration.h
+          configValue Y_BED_SIZE 235 Marlin/Configuration.h
+
+          # Extend maximum X position for better probe reach (for BLTouch/UBL)
+          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+
+          # Lower maximum Z position for better mechanical gantry calibration
+          configValue Z_MAX_POS 250 Marlin/Configuration.h
+
+          # Enable filament runout sensor
+          configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
+
+          # Set the default/custom runout sensor filament distance
+          configValue FILAMENT_RUNOUT_DISTANCE_MM 0 Marlin/Configuration.h
+
+          # Enable Universal Bed Leveling (UBL)
+          configEnable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
+
+          # Enable leveling after completion (for BLTouch/UBL)
+          ## NOTE: Only enable one of these, not both!
+          configEnable RESTORE_LEVELING_AFTER_G28 Marlin/Configuration.h
+
+          ## TODO: Reverting back to 10
+          # Set default fade height, which helps with warped beds and more uniform results (for BLTouch/UBL)
+          configValue DEFAULT_LEVELING_FADE_HEIGHT "10.0" Marlin/Configuration.h
+
+          # Enable leveling debugging
+          configEnable DEBUG_LEVELING_FEATURE Marlin/Configuration.h
+
+          # Set the leveling grid size for the current firmware configuration
+          configValue GRID_MAX_POINTS_X $GRID Marlin/Configuration.h
+
+          # Increase default mesh inset for UBL
+          configValue MESH_INSET 10 Marlin/Configuration.h
+
+          # Disable UBL automatic mesh saving
+          configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
+
+          # Enable safe homing on the Z axis
+          configEnable Z_SAFE_HOMING Marlin/Configuration.h
+
+          # Reduce homing feed rate (homing speed)
+          configValue HOMING_FEEDRATE_MM_M "{ \(20\*60\), \(20\*60\), \(4\*60\) }" Marlin/Configuration.h
+
+          # Enable EEPROM feedback
+          configEnable EEPROM_CHITCHAT Marlin/Configuration.h
+
+          # Clear EEPROM on startup after flashing a new firmware
+          configEnable EEPROM_INIT_NOW Marlin/Configuration.h
+
+          # Enable nozzle parking when idle
+          configEnable NOZZLE_PARK_FEATURE Marlin/Configuration.h
+
+          # Increase Z axis while nozzle parking
+          configValue NOZZLE_PARK_Z_RAISE_MIN 5 Marlin/Configuration.h
+
+          # Enable print counting statistics
+          configEnable PRINTCOUNTER Marlin/Configuration.h
+
+          # Enable software PWM fan control
+          configEnable FAN_SOFT_PWM Marlin/Configuration.h
+
+          # Adjust min/max temperatures
+          configValue HEATER_0_MINTEMP 5 Marlin/Configuration.h
+          configValue BED_MINTEMP 5 Marlin/Configuration.h
+          configValue BED_MAXTEMP 120 Marlin/Configuration.h
+
+          # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
+          configEnable THERMAL_PROTECTION_CHAMBER Marlin/Configuration.h
+
+          # Disable endstops interrupt compatibility
+          configDisable ENDSTOP_INTERRUPTS_FEATURE Marlin/Configuration.h
+
+          ## TODO: Should we disable this due to potential issues with Junction Deviation still?
+          # Disable classic jerk
+          configDisable CLASSIC_JERK Marlin/Configuration.h
+
+          # Disable extrapolating beyond the grid
+          configDisable EXTRAPOLATE_BEYOND_GRID Marlin/Configuration.h
+
+          # Enable bed level corner adjustments
+          configEnable LEVEL_BED_CORNERS Marlin/Configuration.h
+
+          # Enable mesh validation support
+          configEnable G26_MESH_VALIDATION Marlin/Configuration.h
+                  
+          # Turn off display after 5 minutes
+          configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
+
+          ## END OF CONFIGURATION.H
+
+
+
+          ## BEGIN CONFIGURATION_ADV.H
+
+          # Enable mainboard/controller fan control
+          configEnable USE_CONTROLLER_FAN Marlin/Configuration_adv.h
+          configValue CONTROLLER_FAN_PIN FAN2_PIN Marlin/Configuration_adv.h
+
+          # Enable automatic fan control for the extruder and parts cooler
+          configValue E0_AUTO_FAN_PIN FAN1_PIN Marlin/Configuration_adv.h
+          configValue COOLER_AUTO_FAN_PIN FAN_PIN Marlin/Configuration_adv.h
+
+          ## TODO: Why would we keep this disabled? It's quicker, what are the drawbacks?
+          # Disable quick homing
+          configDisable QUICK_HOME Marlin/Configuration_adv.h
+
+          # Disable power loss recovery
+          configDisable POWER_LOSS_RECOVERY Marlin/Configuration_adv.h
+
+          # Lower homing bump
+          configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
+
+          # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
+          if ($HIGH_SPEED); then
+            configValue BLTOUCH_HS_MODE true Marlin/Configuration_adv.h
+          else
+            configDisable BLTOUCH_HS_MODE Marlin/Configuration_adv.h
+          fi
+
+          ## TODO: This needs testing!
+          # Disable adaptive step smoothing
+          configDisable ADAPTIVE_STEP_SMOOTHING Marlin/Configuration_adv.h
+
+          # Adjust slowdown divisor when disabling adaptive step smoothing
+          configValue SLOWDOWN_DIVISOR 8 Marlin/Configuration_adv.h
+
+          # Enable DWIN display beep mute option
+          configEnable SOUND_MENU_ITEM Marlin/Configuration_adv.h
+
+          # Enable additional display features (some are useful when used with OctoPrint for example)
+          configEnable STATUS_MESSAGE_SCROLLING Marlin/Configuration_adv.h
+          configEnable LCD_SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
+
+          ## TODO: Why would BTT have this disabled?
+          # Disable dynamic memory allocation in SD card menus
+          configValue SDSORT_DYNAMIC_RAM false Marlin/Configuration_adv.h
+
+          # Set default SD card connection type
+          configValue SDCARD_CONNECTION ONBOARD Marlin/Configuration_adv.h
+
+          # Enable UTF filename support
+          configEnable UTF_FILENAME_SUPPORT Marlin/Configuration_adv.h
+
+          # Enable long filename support
+          configEnable LONG_FILENAME_HOST_SUPPORT Marlin/Configuration_adv.h
+
+          # Enable scrolling filenames
+          configEnable SCROLL_LONG_FILENAMES Marlin/Configuration_adv.h
+
+          # Enable automatic reporting of SD card status
+          configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
+
+          # Enable SD card host drive support
+          configDisable NO_SD_HOST_DRIVE Marlin/Configuration_adv.h
+                  
+          # Configure babystepping
+          configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
+          configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
+          configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
+          configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
+
+          # Enable emergency parser
+          configEnable EMERGENCY_PARSER Marlin/Configuration_adv.h
+
+          # Enable advanced pausing for filament change
+          configEnable ADVANCED_PAUSE_FEATURE Marlin/Configuration_adv.h
+
+          # Configure filament unload length
+          configValue FILAMENT_CHANGE_UNLOAD_LENGTH 400 Marlin/Configuration_adv.h
+
+          # Configure filament fast load length
+          configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 350 Marlin/Configuration_adv.h
+
+          # Configure filament fast load feed rate (speed)
+          configValue FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 6 Marlin/Configuration_adv.h
+
+          # Enable head parking during pause and filament change
+          configEnable PARK_HEAD_ON_PAUSE Marlin/Configuration_adv.h
+
+          # Run homing before changing filament
+          configEnable HOME_BEFORE_FILAMENT_CHANGE Marlin/Configuration_adv.h
+
+          # Enable display and g-code support for filament loading and unloading
+          configEnable FILAMENT_LOAD_UNLOAD_GCODES Marlin/Configuration_adv.h
+
+          # Configure hybrid threshold (still disabled by default)
+          configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h
+
+          # Configure sensorless homing (still disably by default)
+          configValue X_STALL_SENSITIVITY 72 Marlin/Configuration_adv.h
+          configValue Y_STALL_SENSITIVITY 72 Marlin/Configuration_adv.h
+          configValue Z_STALL_SENSITIVITY 10 Marlin/Configuration_adv.h
+          configEnable IMPROVE_HOMING_RELIABILITY Marlin/Configuration_adv.h
+
+          # Enable additional reporting etc. features
+          configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+          configEnable M114_DETAIL Marlin/Configuration_adv.h
+          configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
+          configEnable HOST_PAUSE_M76 Marlin/Configuration_adv.h
+
+          # Enable fan control options in LCD (might not work with DWIN?)
+          configEnable CONTROLLER_FAN_EDITABLE Marlin/Configuration_adv.h
+
+          # Enable showing remaining time (this probably only works with LCDs and not with DWIN?)
+          configEnable SHOW_REMAINING_TIME Marlin/Configuration_adv.h
+
+          # Configure the current multiplier when holding/locked
+          configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
+
+          # Configure stepper motor driver currents
+          configValue Z_CURRENT 1000 Marlin/Configuration_adv.h
+
+          # Enable stepper driver debugging
+          configEnable TMC_DEBUG Marlin/Configuration_adv.h
+
+          # Enable meatpack g-code compression
+          configEnable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
+
+          # Enable host actions commands
+          configEnable HOST_ACTION_COMMANDS Marlin/Configuration_adv.h
+
+          # Customize host action commands
+          configEnable HOST_PROMPT_SUPPORT Marlin/Configuration_adv.h
+
+          # Enable mechanical gantry calibration
+          configEnable MECHANICAL_GANTRY_CALIBRATION Marlin/Configuration_adv.h
+
+          # Configure additional options for mechanical gantry calibration
+          configValue GANTRY_CALIBRATION_CURRENT "Z_CURRENT \/ 3" Marlin/Configuration_adv.h
+          configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 10 Marlin/Configuration_adv.h
+          configValue GANTRY_CALIBRATION_FEEDRATE 500 Marlin/Configuration_adv.h
+          configValue GANTRY_CALIBRATION_COMMANDS_POST \"G28\" Marlin/Configuration_adv.h
+
+          # Lower the bootscreen timeout
+          configValue BOOTSCREEN_TIMEOUT 0 Marlin/Configuration_adv.h
+
+          # Increase buffers etc.
+          configEnable ADVANCED_OK Marlin/Configuration_adv.h
+          configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
+          configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
+          configValue BUFSIZE 32 Marlin/Configuration_adv.h
+          configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
+
+          # Set temperature watcher intervals
+          configValue WATCH_TEMP_PERIOD 20 Marlin/Configuration_adv.h
+          configValue THERMAL_PROTECTION_BED_PERIOD 20 Marlin/Configuration_adv.h
+          configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
+
+          # Turn off display after 30 seconds
+          configValue LCD_BACKLIGHT_TIMEOUT 30 Marlin/Configuration_adv.h
+
+          ## END OF CONFIGURATION_ADV.H
+        env:
+          GRID: ${{ matrix.grid }}
+          HIGH_SPEED: ${{ matrix.high-speed }}
+
+      - name: Compile Firmware (${{ env.TARGET_BRANCH }})
+        id: compile_firmware
+        run: |
+          # Generate a name for the firmware and export it as a step output
+          if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
+          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}-${BOARD}-${VERSION}"
+          echo "::set-output name=name::${FIRMWARE_NAME}"
+          echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
+
+          ## TODO: Get the board env name dynamically instead?
+          # Compile the firmware
+          pio run -e $BOARD
+
+          # Copy the firmware and configuration files to a named temporary folder
+          mkdir -p "temp/${FIRMWARE_NAME}"
+          ## TODO: Get the board env name dynamically instead?
+          cp .pio/build/$BOARD/firmware.bin "temp/${FIRMWARE_NAME}/firmware.bin"
+          cp Marlin/Configuration.h "temp/${FIRMWARE_NAME}/Configuration.h"
+          cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configuration_adv.h"
+
+          # Include the latest DWIN display firmware with all build artifacts
+          cp -R "Configurations/config/examples/Creality/Ender-3 V2/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
+        env:
+          BOARD: ${{ matrix.board }}
+          GRID: ${{ matrix.grid }}
+          HIGH_SPEED: ${{ matrix.high-speed }}
+          VERSION: ${{ env.RELEASE_VERSION }}
+
+      - name: Publish Artifacts (${{ env.TARGET_BRANCH }})
+        uses: actions/upload-artifact@v2
+        with:
+          # name: ${{ steps.compile_firmware.outputs.filename }}
+          # name: ${{ steps.compile_firmware.outputs.name }}.zip
+          name: ${{ steps.compile_firmware.outputs.name }}
+          # path: temp/build.bin
+          path: temp/
