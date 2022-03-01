@@ -312,10 +312,10 @@ jobs:
           configDisable NO_SD_HOST_DRIVE Marlin/Configuration_adv.h
                   
           # Configure babystepping
-          configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
-          configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
-          configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
-          configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
+          #configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
+          #configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
+          #configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
+          #configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
 
           # Enable emergency parser
           configEnable EMERGENCY_PARSER Marlin/Configuration_adv.h
@@ -407,6 +407,15 @@ jobs:
           # FIXME: #error "LCD_BACKLIGHT_TIMEOUT requires an LCD with encoder or keypad."
           # Turn off display after 30 seconds
           #configValue LCD_BACKLIGHT_TIMEOUT 30 Marlin/Configuration_adv.h
+
+          # TODO: This MAY just help with our babystepping issues!
+          # Enable integrated babystepping (experimental)
+          configEnable INTEGRATED_BABYSTEPPING Marlin/Configuration_adv.h
+
+          # Override default minimum steppper direction change delays (changes both post and pre dir delays)
+          # NOTE: Default value for TSMC2209 is 60, which SHOULD work when INTEGRATED_BABYSTEPPING is also enabled!
+          # https://github.com/MarlinFirmware/Marlin/issues/17323
+          configValue MINIMUM_STEPPER_POST_DIR_DELAY 100 Marlin/Configuration_adv.h
 
           ## END OF CONFIGURATION_ADV.H
         env:
