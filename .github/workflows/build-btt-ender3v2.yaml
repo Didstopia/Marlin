@@ -83,6 +83,7 @@ jobs:
         id: configure_build_script
         run: |-
           # Download the latest helper build script
+          mkdir -p .github/workflows/scripts
           wget \
             https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/scripts/configure_build_script.sh \
             -O .github/workflows/scripts/configure_build_script.sh
