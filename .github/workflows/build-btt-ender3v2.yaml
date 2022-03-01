@@ -91,12 +91,10 @@ jobs:
       - name: Configure Firmware (${{ env.TARGET_BRANCH }})
         id: configure_firmware
         run: |-
-          # Setup error handling
-          shopt -s extdebug
-          declare -F wttr
-
           # Source the helper build script
-          source ${GITHUB_WORKSPACE}.github/workflows/scripts/configure_build_script.sh
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh
+
+
 
           ## BEGIN CONFIGURATION.H
 
