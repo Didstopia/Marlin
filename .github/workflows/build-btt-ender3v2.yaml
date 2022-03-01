@@ -411,6 +411,7 @@ jobs:
         env:
           GRID: ${{ matrix.grid }}
           HIGH_SPEED: ${{ matrix.high-speed }}
+          TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
 
       - name: Compile Firmware (${{ env.TARGET_BRANCH }})
         id: compile_firmware

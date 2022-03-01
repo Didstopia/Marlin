@@ -34,6 +34,9 @@ cd $(realpath $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd
 # Detect if we're running in a CI environment
 CI=${CI:-false}
 
+# Figure out the target branch
+TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
+
 # Add GNU tools to path if we're on macOS
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
@@ -149,14 +152,7 @@ setupConfigs() {
 
   # Download the latest default configuration files for the current branch
   if [[ ! -d "Configurations" ]]; then
-    # If running in CI, use the branch from there, otherwise use the current branch
-    if [ "$CI" = true ]; then
-      local branch=${{ env.TARGET_BRANCH }}
-    else
-      # local branch=$(git rev-parse --abbrev-ref HEAD)
-      local branch="bugfix-2.0.x"
-    fi
-    git clone --quiet --branch ${branch} --depth 1 https://github.com/MarlinFirmware/Configurations.git Configurations
+    git clone --quiet --branch ${TARGET_BRANCH} --depth 1 https://github.com/MarlinFirmware/Configurations.git Configurations
   fi
 
   cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
