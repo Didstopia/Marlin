@@ -404,8 +404,9 @@ jobs:
           configValue THERMAL_PROTECTION_BED_PERIOD 20 Marlin/Configuration_adv.h
           configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
 
+          # FIXME: #error "LCD_BACKLIGHT_TIMEOUT requires an LCD with encoder or keypad."
           # Turn off display after 30 seconds
-          configValue LCD_BACKLIGHT_TIMEOUT 30 Marlin/Configuration_adv.h
+          #configValue LCD_BACKLIGHT_TIMEOUT 30 Marlin/Configuration_adv.h
 
           ## END OF CONFIGURATION_ADV.H
         env:
