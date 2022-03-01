@@ -91,6 +91,8 @@ jobs:
       - name: Configure Firmware (${{ env.TARGET_BRANCH }})
         id: configure_firmware
         run: |-
+          set -x
+
           # Source the helper build script
           source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh
 
