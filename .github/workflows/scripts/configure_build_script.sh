@@ -5,7 +5,7 @@
 
 # Setup error handling
 shopt -s extdebug
-declare -F wttr
+# declare -F wttr
 set -eE -o functrace
 failure() {
   local lineno=$1
