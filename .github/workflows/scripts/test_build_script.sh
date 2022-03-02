@@ -32,11 +32,12 @@ configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
 configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
 
 # Set default/custom steps per unit, per axis
-configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 93 }" Marlin/Configuration.h
+configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 98 }" Marlin/Configuration.h
 
 # Set default/custom maximum feedrate (movement speed)
 configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
 
+## FIXME: Maybe the max acceleration for the extruder is causing the varying sample sizes?
 # Set default/custom maximum acceleration
 configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
 
@@ -56,7 +57,7 @@ configEnable USE_PROBE_FOR_Z_HOMING Marlin/Configuration.h
 configEnable BLTOUCH Marlin/Configuration.h
 
 # Set default/custom nozzle offsets
-configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.h
+configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, -1.34 }" Marlin/Configuration.h
 
 # Increase the probing margin (for BLTouch/UBL)
 configValue PROBING_MARGIN 20 Marlin/Configuration.h
@@ -168,6 +169,17 @@ configEnable G26_MESH_VALIDATION Marlin/Configuration.h
         
 # Turn off display after 5 minutes
 configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
+
+## TODO: Implement this
+# Configure PID for the bed
+#configValue DEFAULT_bedKp 462.10 Marlin/Configuration.h
+#configValue DEFAULT_bedKi 85.47 Marlin/Configuration.h
+#configValue DEFAULT_bedKd 624.59 Marlin/Configuration.h
+
+# Configure PID for the hotend
+configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
+configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
+configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
 
 ## END OF CONFIGURATION.H
 

@@ -38,11 +38,15 @@ jobs:
     steps:
       - name: Prepare Target Branch
         run: |-
+          # Enable script debugging
+          set -x
+
           # Target branch defaults to base ref
           TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
+          echo "Target branch: $TARGET_BRANCH"
           
           # If our target branch is the build branch, use the "bugfix-2.0.x" branch instead
-          if [ "${TARGET_BRANCH}" = "skr-mini-e3-v3-0" ]; then
+          if [ "$TARGET_BRANCH" = "skr-mini-e3-v3-0" ]; then
             echo "Build branch detected, setting branch to 'bugfix-2.0.x'"
             TARGET_BRANCH=bugfix-2.0.x
           fi
@@ -50,6 +54,7 @@ jobs:
           # Allow overriding the target branch with manual builds
           OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
           if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
+            echo "Branch override detected, setting branch to: '${OVERRIDE_TARGET_BRANCH}'"
             TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
           fi
 
@@ -57,11 +62,13 @@ jobs:
           ## TODO: Implement
           REF_TYPE=${{ env.GITHUB_REF_TYPE }}
           REF_NAME=${{ env.GITHUB_REF_NAME }}
-          if [ "${REF_TYPE}" = "tag" ]; then
+          if [ "$REF_TYPE" = "tag" ]; then
             echo "Release tag detected, setting branch to '2.0.x'"
             echo "TARGET_TAG=${REF_NAME}" >> $GITHUB_ENV
             TARGET_BRANCH=2.0.x
           fi
+
+          echo "Final target branch: $TARGET_BRANCH"
 
           # Ensure that we have a target branch
           if [ -z "${TARGET_BRANCH}" ]; then
@@ -140,11 +147,12 @@ jobs:
           configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
 
           # Set default/custom steps per unit, per axis
-          configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 93 }" Marlin/Configuration.h
+          configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 98 }" Marlin/Configuration.h
 
           # Set default/custom maximum feedrate (movement speed)
           configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
 
+          # FIXME: Maybe the max acceleration for the extruder is causing the varying sample sizes?
           # Set default/custom maximum acceleration
           configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
 
@@ -164,7 +172,7 @@ jobs:
           configEnable BLTOUCH Marlin/Configuration.h
 
           # Set default/custom nozzle offsets
-          configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.h
+          configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, -1.34 }" Marlin/Configuration.h
 
           # Increase the probing margin (for BLTouch/UBL)
           configValue PROBING_MARGIN 20 Marlin/Configuration.h
@@ -449,6 +457,11 @@ jobs:
           # NOTE: Default value for TSMC2209 is 60, which SHOULD work when INTEGRATED_BABYSTEPPING is also enabled!
           # https://github.com/MarlinFirmware/Marlin/issues/17323
           configValue MINIMUM_STEPPER_POST_DIR_DELAY 100 Marlin/Configuration_adv.h
+
+          # Configure PID for the hotend
+          configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
+          configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
+          configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
 
           ## END OF CONFIGURATION_ADV.H
         env:
