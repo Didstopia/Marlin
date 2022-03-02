@@ -39,16 +39,16 @@ jobs:
       - name: Prepare Target Branch
         run: |-
           # Enable script debugging
-          set -x
-          printenv
+          #set -x
+          #printenv
 
           # Target branch defaults to base ref
           TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
           echo "Target branch: $TARGET_BRANCH"
           
-          # If our target branch is the build branch, use the "bugfix-2.0.x" branch instead
-          if [ "$TARGET_BRANCH" = "skr-mini-e3-v3-0" ]; then
-            echo "Build branch detected, setting branch to 'bugfix-2.0.x'"
+          # If our target branch is not set, default to the "bugfix-2.0.x" branch instead
+          if [ -z "${TARGET_BRANCH}" ]; then
+            echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
             TARGET_BRANCH=bugfix-2.0.x
           fi
 
