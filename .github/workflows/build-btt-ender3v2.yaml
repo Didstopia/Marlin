@@ -4,11 +4,19 @@
 name: Build BTT SKR Mini E3 V3.0 (Ender 3 V2)
 
 on:
-  # Trigger custom firmwares builds only on specific branches
+  # Trigger custom firmwares builds only in specific situations
   push:
+    ## TODO: How do we ensure that we always build the "bugfix-2.0.x" branch on updated to the "skr-mini-e3-v3-0" branch?
+    # When the following branches are pushed
     branches:
       - 2.0.x
       - bugfix-2.0.x
+      - skr-mini-e3-v3-0
+    
+    ## TODO: How do we ensure that we always build the "2.0.x" branch on new tags?
+    # When the following tags are pushed
+    tags:
+      - 2*
 
   # Allow manual builds with a configurable target branch
   workflow_dispatch:
@@ -29,14 +37,30 @@ jobs:
         high-speed: [true, false]
     steps:
       - name: Prepare Target Branch
-        run: |
+        run: |-
           # Target branch defaults to base ref
           TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
+          
+          # If our target branch is the build branch, use the "bugfix-2.0.x" branch instead
+          if [ "${TARGET_BRANCH}" = "skr-mini-e3-v3-0" ]; then
+            echo "Build branch detected, setting branch to 'bugfix-2.0.x'"
+            TARGET_BRANCH=bugfix-2.0.x
+          fi
 
           # Allow overriding the target branch with manual builds
           OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
           if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
             TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
+          fi
+
+          # If this is a tagged release, always use the "2.0.x" branch instead
+          ## TODO: Implement
+          REF_TYPE=${{ env.GITHUB_REF_TYPE }}
+          REF_NAME=${{ env.GITHUB_REF_NAME }}
+          if [ "${REF_TYPE}" = "tag" ]; then
+            echo "Release tag detected, setting branch to '2.0.x'"
+            echo "TARGET_TAG=${REF_NAME}" >> $GITHUB_ENV
+            TARGET_BRANCH=2.0.x
           fi
 
           # Ensure that we have a target branch
@@ -55,7 +79,15 @@ jobs:
           persist-credentials: false
 
       - name: Prepare Environment (${{ env.TARGET_BRANCH }})
-        run: echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+        run: |-
+          # Generate the version based on the branch and commit/tag
+          if [ -z "${TARGET_TAG}" ]; then
+            echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+          else
+            echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-${{ env.TARGET_TAG }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+          fi
+          # Print out the version
+          echo "::notice title=Version::${{ env.RELEASE_VERSION }}"
 
       - name: Cache pip
         uses: actions/cache@v2
@@ -91,7 +123,8 @@ jobs:
       - name: Configure Firmware (${{ env.TARGET_BRANCH }})
         id: configure_firmware
         run: |-
-          set -x
+          # Enable script debugging
+          #set -x
 
           # Source the helper build script
           source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh
@@ -425,7 +458,7 @@ jobs:
 
       - name: Compile Firmware (${{ env.TARGET_BRANCH }})
         id: compile_firmware
-        run: |
+        run: |-
           # Generate a name for the firmware and export it as a step output
           if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
           FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}-${BOARD}-${VERSION}"
