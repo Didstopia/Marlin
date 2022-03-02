@@ -40,6 +40,7 @@ jobs:
         run: |-
           # Enable script debugging
           set -x
+          printenv
 
           # Target branch defaults to base ref
           TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
