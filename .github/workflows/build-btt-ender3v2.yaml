@@ -150,15 +150,18 @@ jobs:
           # Set default/custom steps per unit, per axis
           configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 98 }" Marlin/Configuration.h
 
+          # TODO: Leaving this alone for now
           # Set default/custom maximum feedrate (movement speed)
-          configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
+          #configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
 
+          # TODO: Leaving this alone for now
           # FIXME: Maybe the max acceleration for the extruder is causing the varying sample sizes?
           # Set default/custom maximum acceleration
-          configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
+          #configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
 
+          # TODO: Leaving this alone for now
           # Set default/custom maximum acceleration while moving/traveling
-          configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+          #configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
 
           # Enable S-Curve Acceleration
           configEnable S_CURVE_ACCELERATION Marlin/Configuration.h
@@ -178,8 +181,9 @@ jobs:
           # Increase the probing margin (for BLTouch/UBL)
           configValue PROBING_MARGIN 20 Marlin/Configuration.h
 
+          # TODO: Leaving this alone for now
           # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL)
-          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          #configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
 
           # Set min/max probe offsets
           configValue Z_PROBE_OFFSET_RANGE_MIN -20 Marlin/Configuration.h
@@ -238,8 +242,9 @@ jobs:
           # Enable safe homing on the Z axis
           configEnable Z_SAFE_HOMING Marlin/Configuration.h
 
+          # TODO: Leaving this alone for now
           # Reduce homing feed rate (homing speed)
-          configValue HOMING_FEEDRATE_MM_M "{ \(20\*60\), \(20\*60\), \(4\*60\) }" Marlin/Configuration.h
+          #configValue HOMING_FEEDRATE_MM_M "{ \(20\*60\), \(20\*60\), \(4\*60\) }" Marlin/Configuration.h
 
           # Enable EEPROM feedback
           configEnable EEPROM_CHITCHAT Marlin/Configuration.h
@@ -270,9 +275,10 @@ jobs:
           # Disable endstops interrupt compatibility
           configDisable ENDSTOP_INTERRUPTS_FEATURE Marlin/Configuration.h
 
-          ## TODO: Should we disable this due to potential issues with Junction Deviation still?
+          # TODO: Leaving classic jerk alone for now
+          # TODO: Should we disable this due to potential issues with Junction Deviation still?
           # Disable classic jerk
-          configDisable CLASSIC_JERK Marlin/Configuration.h
+          #configDisable CLASSIC_JERK Marlin/Configuration.h
 
           # Disable extrapolating beyond the grid
           configDisable EXTRAPOLATE_BEYOND_GRID Marlin/Configuration.h
@@ -300,9 +306,10 @@ jobs:
           configValue E0_AUTO_FAN_PIN FAN1_PIN Marlin/Configuration_adv.h
           configValue COOLER_AUTO_FAN_PIN FAN_PIN Marlin/Configuration_adv.h
 
+          ## TODO: Leaving this alone for now
           ## TODO: Why would we keep this disabled? It's quicker, what are the drawbacks?
           # Disable quick homing
-          configDisable QUICK_HOME Marlin/Configuration_adv.h
+          #configDisable QUICK_HOME Marlin/Configuration_adv.h
 
           # Disable power loss recovery
           configDisable POWER_LOSS_RECOVERY Marlin/Configuration_adv.h

@@ -15,6 +15,11 @@ COLOR_GRAY="\033[37m"
 COLOR_DARK_GRAY="\033[90m"
 COLOR_WHITE="\033[97m"
 
+# Function for stripping terminal colors
+stripColors() {
+  echo "$@" | sed -r 's/\\033\[[0-9]{1,3}m//g'
+}
+
 # Setup error handling
 shopt -s extdebug
 # declare -F wttr
@@ -28,7 +33,8 @@ failure() {
   ##        eg. if it's this file or another file that calls/sources this file,
   ##        then log the file and line number in both CI and locally!
   if [ "$CI" = true ]; then
-    echo -e "::error line=$lineno::$msg"
+    msg=$(stripColors $msg)
+    echo "::error line=$lineno::$msg"
   else
     if [ "${msg}" != "false" ]; then
       echo -e "${COLOR_RED}^ $3() - line $lineno: $msg${COLOR_RESET}"
@@ -52,26 +58,21 @@ CI=${CI:-false}
 # Figure out the target branch
 TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
 
-# Add GNU tools to path if we're on macOS
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  ## FIXME: Ensure gnu-sed is installed?
-  # export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
-  PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
-fi
-
-# Function for logging "notice" messages
-notice() {
+# Function for logging "debug" messages
+debug() {
   if [ "$CI" = true ]; then
-    echo -e "::notice title=NOTICE::$@"
+    msg=$(stripColors $@)
+    echo "::debug title=DEBUG::$msg"
   else
-    echo -e " ${COLOR_DARK_GRAY}[NOTICE]${COLOR_RESET} $@"
+    echo -e "  ${COLOR_DARK_GRAY}[DEBUG]${COLOR_RESET} $@"
   fi
 }
 
 # Function for logging "warning" messages
 warning() {
   if [ "$CI" = true ]; then
-    echo -e "::warning title=WARNING::$@"
+    msg=$(stripColors $@)
+    echo "::warning title=WARNING::$msg"
   else
     echo -e "${COLOR_YELLOW}[WARNING]${COLOR_RESET} $@"
   fi
@@ -80,11 +81,22 @@ warning() {
 # Function for logging "error" messages
 error() {
   if [ "$CI" = true ]; then
-    echo -e "::error title=ERROR::$@"
+    msg=$(stripColors $@)
+    echo "::error title=ERROR::$msg"
   else
     echo -e "  ${COLOR_RED}[ERROR]${COLOR_RESET} $@"
   fi
 }
+
+# Add GNU tools to path if we're on macOS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
+  PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
+  if [ ! -f "$(brew --prefix)/opt/gnu-sed/libexec/gnubin/sed" ]; then
+    warning "GNU sed is missing! Attempting to install..."
+    brew install -q gnu-sed || false
+  fi
+fi
 
 # Functions for enabling an option
 #
@@ -95,7 +107,7 @@ configEnable() {
   local option=$1
   local config=$2
 
-  notice "Enabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
+  debug "Enabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "$option" ]; then
@@ -120,7 +132,7 @@ configDisable() {
   local option=$1
   local config=$2
 
-  notice "Disabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
+  debug "Disabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "${option}" ]; then
@@ -152,7 +164,7 @@ configValue() {
   local value=$2
   local config=$3
 
-  notice "Setting ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_YELLOW}${value}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
+  debug "Setting ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_YELLOW}${value}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "${key}" ]; then
@@ -191,7 +203,7 @@ configValue() {
 # Function for setting up the configuration files
 setupConfigs() {
   # Copy the latest default Ender 3 V2 config files in place
-  notice "Applying default configuration files"
+  debug "Applying default configuration files"
 
   # Download the latest default configuration files for the current branch
   if [[ ! -d "Configurations" ]]; then
@@ -204,7 +216,7 @@ setupConfigs() {
 
 # Function for patching the build details
 patchBuildDetails() {
-  notice "Patching build details"
+  debug "Patching build details"
 
   # Patch build date
   local DIST_DATE=$( date +"%Y-%m-%d" )
@@ -223,7 +235,7 @@ patchBuildDetails() {
 patchDWIN() {
   # Check if the error is already disabled
   if ! grep -Eiq "[\/]+(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h; then
-    notice "Patching DWIN support"
+    debug "Patching DWIN support"
 
     # Disable the error about requiring a custom cable for the DWIN display
     sed -i -E "s/([^ ]*)(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
@@ -240,7 +252,7 @@ patchDWIN() {
 
 # Function for patching sane configuration defaults
 patchDefaults() {
-  notice "Patching sane configuration defaults"
+  debug "Patching sane configuration defaults"
 
   # Set the author
   configValue STRING_CONFIG_H_AUTHOR \"\(Didstopia,\ BTT-SKR-Mini-E3-V3.0\)\" Marlin/Configuration.h
