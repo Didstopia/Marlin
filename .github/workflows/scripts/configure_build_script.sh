@@ -3,6 +3,17 @@
 ## TODO
 # - Use more modern configuration files as a base?
 
+# Define some colors for the terminal
+COLOR_RESET="\033[0m"
+COLOR_RED="\033[31m"
+COLOR_GREEN="\033[32m"
+COLOR_YELLOW="\033[33m"
+COLOR_BLUE="\033[34m"
+COLOR_PURPLE="\033[35m"
+COLOR_CYAN="\033[36m"
+COLOR_GRAY="\033[37m"
+COLOR_WHITE="\033[97m"
+
 # Setup error handling
 shopt -s extdebug
 # declare -F wttr
@@ -12,6 +23,9 @@ failure() {
   local code=$2
   local func=$3
   local msg=$4
+  ## FIXME: Somehow figure out the source file of the error,
+  ##        eg. if it's this file or another file that calls/sources this file,
+  ##        then log the file and line number in both CI and locally!
   if [ "$CI" = true ]; then
     echo "::error line=$lineno::$msg"
   else
@@ -39,9 +53,19 @@ TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
 
 # Add GNU tools to path if we're on macOS
 if [[ "$OSTYPE" == "darwin"* ]]; then
+  ## FIXME: Ensure gnu-sed is installed?
   # export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
   PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
 fi
+
+# Function for logging "notice" messages
+notice() {
+  if [ "$CI" = true ]; then
+    echo "::notice title=NOTICE::$@"
+  else
+    echo "${COLOR_YELLOW}[NOTICE] $@${COLOR_RESET}"
+  fi
+}
 
 # Functions for enabling an option
 #
@@ -52,17 +76,17 @@ configEnable() {
   local option=$1
   local config=$2
 
-  echo "Enabling ${option} in ${config}"
+  notice "Enabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "$option" ]; then
-    echo "configEnable: option is required"
+    notice "configEnable: option is required"
     return 1
   fi
 
   sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\2\3/g w /tmp/marlin_patch.log" ${config}
   if [ ! -s /tmp/marlin_patch.log ]; then
-    echo "Failed to enable ${option} in ${config}"
+    notice "Failed to enable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
     # return 1
     false
   fi
@@ -77,23 +101,23 @@ configDisable() {
   local option=$1
   local config=$2
 
-  echo "Disabling ${option} in ${config}"
+  notice "Disabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "${option}" ]; then
-    echo "configDisable: option is required"
+    notice "configDisable: option is required"
     # return 1
     false
   fi
   if [ -z "${config}" ]; then
-    echo "configDisable: config is required"
+    notice "configDisable: config is required"
     # return 1
     false
   fi
 
   sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\1\/\/\2\3/g w /tmp/marlin_patch.log" ${config}
   if [ ! -s /tmp/marlin_patch.log ]; then
-    echo "Failed to disable ${option} in ${config}"
+    notice "Failed to disable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
     # return 1
     false
   fi
@@ -109,21 +133,21 @@ configValue() {
   local value=$2
   local config=$3
 
-  echo "Setting ${key} to ${value} in ${config}"
+  notice "Setting ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_GREEN}${value}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "${key}" ]; then
-    echo "configValue: key is required"
+    notice "configValue: key is required"
     # return 1
     false
   fi
   if [ -z "${value}" ]; then
-    echo "configValue: value is required"
+    notice "configValue: value is required"
     # return 1
     false
   fi
   if [ -z "${config}" ]; then
-    echo "configValue: config is required"
+    notice "configValue: config is required"
     # return 1
     false
   fi
@@ -131,7 +155,7 @@ configValue() {
   sed -E -i "s/([^ \n]?)(#define ${key}[ ]+)(\".*\"|\(.*\)|\{.*\}|[-0-9a-zA-Z_.]*)+?([ ]?.*)/\1\2${value}\4/g w /tmp/marlin_patch.log" ${config}
   # set -x
   if [ ! -s /tmp/marlin_patch.log ]; then
-    echo "Failed to set ${key} to ${value} in ${config}"
+    notice "Failed to set ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_GREEN}${value}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
     # return 1
     false
   fi
@@ -140,7 +164,7 @@ configValue() {
   # Check if the option is already enabled
   if grep -Eiq "[\/]+#define ${key}( +)" ${config}; then
     # Forcibly enable the option
-    echo "> NOTICE: ${key} in ${config} is disabled, forcibly enabling"
+    notice "${COLOR_GREEN}${key}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET} is disabled, forcibly enabling"
     configEnable ${key} ${config}
   fi
 }
@@ -148,7 +172,7 @@ configValue() {
 # Function for setting up the configuration files
 setupConfigs() {
   # Copy the latest default Ender 3 V2 config files in place
-  echo "Applying default configuration files"
+  notice "Applying default configuration files"
 
   # Download the latest default configuration files for the current branch
   if [[ ! -d "Configurations" ]]; then
@@ -161,7 +185,7 @@ setupConfigs() {
 
 # Function for patching the build details
 patchBuildDetails() {
-  echo "Patching build details"
+  notice "Patching build details"
 
   # Patch build date
   local DIST_DATE=$( date +"%Y-%m-%d" )
@@ -180,12 +204,12 @@ patchBuildDetails() {
 patchDWIN() {
   # Check if the error is already disabled
   if ! grep -Eiq "[\/]+(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h; then
-    echo "Patching DWIN support"
+    notice "Patching DWIN support"
 
     # Disable the error about requiring a custom cable for the DWIN display
     sed -i -E "s/([^ ]*)(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
     if [ ! -s /tmp/marlin_patch.log ]; then
-      echo "Failed to patch DWIN support"
+      notice "Failed to patch DWIN support"
       # return 1
       false
     fi
@@ -197,7 +221,7 @@ patchDWIN() {
 
 # Function for patching sane configuration defaults
 patchDefaults() {
-  echo "Patching sane configuration defaults"
+  notice "Patching sane configuration defaults"
 
   # Set the author
   configValue STRING_CONFIG_H_AUTHOR \"\(Didstopia,\ BTT-SKR-Mini-E3-V3.0\)\" Marlin/Configuration.h
