@@ -57,7 +57,7 @@ jobs:
           --url https://api.github.com/repos/Didstopia/Marlin/actions/workflows/build-btt-ender3v2.yaml/dispatches \
           --header 'Content-Type: application/json' \
           --header 'Accept: application/vnd.github.v3+json' \
-          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'Authorization: Bearer ${{ secrets.GH_API_WORKFLOWS_TOKEN }}' \
           --data '{
               "ref": "skr-mini-e3-v3-0",
               "inputs": {
@@ -122,7 +122,7 @@ jobs:
           --url https://api.github.com/repos/Didstopia/Marlin/actions/workflows/build-btt-ender3v2.yaml/dispatches \
           --header 'Content-Type: application/json' \
           --header 'Accept: application/vnd.github.v3+json' \
-          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'Authorization: Bearer ${{ secrets.GH_API_WORKFLOWS_TOKEN }}' \
           --data '{
               "ref": "skr-mini-e3-v3-0",
               "inputs": {
