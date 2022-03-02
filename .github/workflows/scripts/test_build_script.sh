@@ -32,7 +32,7 @@ configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
 configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
 
 # Set default/custom steps per unit, per axis
-configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 98 }" Marlin/Configuration.h
+configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 95.1 }" Marlin/Configuration.h
 
 ## TODO: Leaving this alone for now
 # Set default/custom maximum feedrate (movement speed)
