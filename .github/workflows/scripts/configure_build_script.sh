@@ -12,6 +12,7 @@ COLOR_BLUE="\033[34m"
 COLOR_PURPLE="\033[35m"
 COLOR_CYAN="\033[36m"
 COLOR_GRAY="\033[37m"
+COLOR_DARK_GRAY="\033[90m"
 COLOR_WHITE="\033[97m"
 
 # Setup error handling
@@ -27,12 +28,12 @@ failure() {
   ##        eg. if it's this file or another file that calls/sources this file,
   ##        then log the file and line number in both CI and locally!
   if [ "$CI" = true ]; then
-    echo "::error line=$lineno::$msg"
+    echo -e "::error line=$lineno::$msg"
   else
     if [ "${msg}" != "false" ]; then
-      echo "^ $3() - line $lineno: $msg"
+      echo -e "${COLOR_RED}^ $3() - line $lineno: $msg${COLOR_RESET}"
     else
-      echo "^ $3() - line $lineno"
+      echo -e "${COLOR_RED}^ $3() - line $lineno${COLOR_RESET}"
     fi
   fi
 }
@@ -61,9 +62,27 @@ fi
 # Function for logging "notice" messages
 notice() {
   if [ "$CI" = true ]; then
-    echo "::notice title=NOTICE::$@"
+    echo -e "::notice title=NOTICE::$@"
   else
-    echo "${COLOR_YELLOW}[NOTICE] $@${COLOR_RESET}"
+    echo -e " ${COLOR_DARK_GRAY}[NOTICE]${COLOR_RESET} $@"
+  fi
+}
+
+# Function for logging "warning" messages
+warning() {
+  if [ "$CI" = true ]; then
+    echo -e "::warning title=WARNING::$@"
+  else
+    echo -e "${COLOR_YELLOW}[WARNING]${COLOR_RESET} $@"
+  fi
+}
+
+# Function for logging "error" messages
+error() {
+  if [ "$CI" = true ]; then
+    echo -e "::error title=ERROR::$@"
+  else
+    echo -e "  ${COLOR_RED}[ERROR]${COLOR_RESET} $@"
   fi
 }
 
@@ -76,17 +95,17 @@ configEnable() {
   local option=$1
   local config=$2
 
-  notice "Enabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
+  notice "Enabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "$option" ]; then
-    notice "configEnable: option is required"
+    error "configEnable: option is required"
     return 1
   fi
 
   sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\2\3/g w /tmp/marlin_patch.log" ${config}
   if [ ! -s /tmp/marlin_patch.log ]; then
-    notice "Failed to enable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
+    error "Failed to enable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
     # return 1
     false
   fi
@@ -101,23 +120,23 @@ configDisable() {
   local option=$1
   local config=$2
 
-  notice "Disabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
+  notice "Disabling ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "${option}" ]; then
-    notice "configDisable: option is required"
+    error "configDisable: option is required"
     # return 1
     false
   fi
   if [ -z "${config}" ]; then
-    notice "configDisable: config is required"
+    error "configDisable: config is required"
     # return 1
     false
   fi
 
   sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\1\/\/\2\3/g w /tmp/marlin_patch.log" ${config}
   if [ ! -s /tmp/marlin_patch.log ]; then
-    notice "Failed to disable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
+    error "Failed to disable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
     # return 1
     false
   fi
@@ -133,21 +152,21 @@ configValue() {
   local value=$2
   local config=$3
 
-  notice "Setting ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_GREEN}${value}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
+  notice "Setting ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_YELLOW}${value}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
 
   # Validate function arguments
   if [ -z "${key}" ]; then
-    notice "configValue: key is required"
+    error "configValue: key is required"
     # return 1
     false
   fi
   if [ -z "${value}" ]; then
-    notice "configValue: value is required"
+    error "configValue: value is required"
     # return 1
     false
   fi
   if [ -z "${config}" ]; then
-    notice "configValue: config is required"
+    error "configValue: config is required"
     # return 1
     false
   fi
@@ -155,7 +174,7 @@ configValue() {
   sed -E -i "s/([^ \n]?)(#define ${key}[ ]+)(\".*\"|\(.*\)|\{.*\}|[-0-9a-zA-Z_.]*)+?([ ]?.*)/\1\2${value}\4/g w /tmp/marlin_patch.log" ${config}
   # set -x
   if [ ! -s /tmp/marlin_patch.log ]; then
-    notice "Failed to set ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_GREEN}${value}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET}"
+    error "Failed to set ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_YELLOW}${value}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
     # return 1
     false
   fi
@@ -164,7 +183,7 @@ configValue() {
   # Check if the option is already enabled
   if grep -Eiq "[\/]+#define ${key}( +)" ${config}; then
     # Forcibly enable the option
-    notice "${COLOR_GREEN}${key}${COLOR_RESET} in ${COLOR_GREEN}${config}${COLOR_RESET} is disabled, forcibly enabling"
+    warning "Option ${COLOR_GREEN}${key}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET} is disabled, forcibly enabling"
     configEnable ${key} ${config}
   fi
 }
@@ -209,7 +228,7 @@ patchDWIN() {
     # Disable the error about requiring a custom cable for the DWIN display
     sed -i -E "s/([^ ]*)(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
     if [ ! -s /tmp/marlin_patch.log ]; then
-      notice "Failed to patch DWIN support"
+      error "Failed to patch DWIN support"
       # return 1
       false
     fi
