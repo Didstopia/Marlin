@@ -351,4 +351,7 @@ configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
 # Turn off display after 30 seconds
 configValue LCD_BACKLIGHT_TIMEOUT 30 Marlin/Configuration_adv.h
 
+## TODO: Research "firmware retraction" thoroughly and then enable/configure/test this!
+# configEnable FWRETRACT Marlin/Configuration_adv.h
+
 ## END OF CONFIGURATION_ADV.H

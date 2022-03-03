@@ -471,6 +471,13 @@ jobs:
           configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
           configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
 
+          # TODO: Research "firmware retraction" thoroughly and then enable/configure/test this!
+          # https://marlinfw.org/docs/gcode/G010.html
+          # https://marlinfw.org/docs/features/fwretract.html
+          # https://blog.prusaprinters.org/slic3r-and-marlin-configuration-for-reprap-firmware-retraction-2_3686/
+          # https://damsteen.nl/blog/2021/05/06/adjustable-retractions-during-printing-with-marlin-firmware-retractions
+          #configEnable FWRETRACT Marlin/Configuration_adv.h
+
           ## END OF CONFIGURATION_ADV.H
         env:
           GRID: ${{ matrix.grid }}
