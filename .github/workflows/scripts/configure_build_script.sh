@@ -63,9 +63,11 @@ debug() {
   if [ "$CI" = true ]; then
     msg=$(stripColors $@)
     echo "::debug title=DEBUG::$msg"
-  else
-    echo -e "  ${COLOR_DARK_GRAY}[DEBUG]${COLOR_RESET} $@"
+  # else
+  #   echo -e "  ${COLOR_DARK_GRAY}[DEBUG]${COLOR_RESET} $@"
   fi
+  # Always print colored debug messages
+  echo -e "  ${COLOR_DARK_GRAY}[DEBUG]${COLOR_RESET} $@"
 }
 
 # Function for logging "warning" messages

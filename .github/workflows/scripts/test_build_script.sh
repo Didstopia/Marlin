@@ -352,6 +352,10 @@ configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
 configValue LCD_BACKLIGHT_TIMEOUT 30 Marlin/Configuration_adv.h
 
 ## TODO: Research "firmware retraction" thoroughly and then enable/configure/test this!
+## https://marlinfw.org/docs/gcode/G010.html
+## https://marlinfw.org/docs/features/fwretract.html
+## https://blog.prusaprinters.org/slic3r-and-marlin-configuration-for-reprap-firmware-retraction-2_3686/
+## https://damsteen.nl/blog/2021/05/06/adjustable-retractions-during-printing-with-marlin-firmware-retractions
 # configEnable FWRETRACT Marlin/Configuration_adv.h
 
 ## END OF CONFIGURATION_ADV.H

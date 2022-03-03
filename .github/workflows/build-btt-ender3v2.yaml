@@ -118,6 +118,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade platformio
+          platformio platform update
 
       - name: Prepare Build Script
         id: configure_build_script
@@ -132,7 +133,10 @@ jobs:
         id: configure_firmware
         run: |-
           # Enable script debugging
-          #set -x
+          set -x
+
+          # Ensure we're always in the project root
+          cd ${GITHUB_WORKSPACE}
 
           # Source the helper build script
           source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh
@@ -505,7 +509,7 @@ jobs:
           cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configuration_adv.h"
 
           # Include the latest DWIN display firmware with all build artifacts
-          cp -R "Configurations/config/examples/Creality/Ender-3 V2/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
+          cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
         env:
           BOARD: ${{ matrix.board }}
           GRID: ${{ matrix.grid }}
