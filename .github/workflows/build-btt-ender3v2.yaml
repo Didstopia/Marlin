@@ -208,7 +208,7 @@ jobs:
           configValue X_BED_SIZE 235 Marlin/Configuration.h
           configValue Y_BED_SIZE 235 Marlin/Configuration.h
 
-          # Extend maximum X position for better probe reach (for BLTouch/UBL)
+          # Extend maximum X position for better probe reachability (for BLTouch/UBL)
           configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
 
           # Lower maximum Z position for better mechanical gantry calibration
