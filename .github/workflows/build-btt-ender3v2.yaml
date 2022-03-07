@@ -298,9 +298,9 @@ jobs:
           configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
 
           # Configure direct drive specific options
-          if ($DIRECT_DRIVE); then
-            # TODO: Configure direct drive specific options
-          fi
+          #if ($DIRECT_DRIVE); then
+          #  # TODO: Configure direct drive specific options
+          #fi
 
           ## END OF CONFIGURATION.H
 
