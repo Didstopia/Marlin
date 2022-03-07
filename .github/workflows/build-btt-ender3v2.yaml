@@ -477,7 +477,7 @@ jobs:
 
           # TODO: This isn't compatible with UBL, I think?
           # Retry bed leveling after a failed attempt
-          configEnable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
+          #configEnable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
 
           # Override default minimum steppper direction change delays (changes both post and pre dir delays)
           # NOTE: Default value for TSMC2209 is 60, which SHOULD work when INTEGRATED_BABYSTEPPING is also enabled!
