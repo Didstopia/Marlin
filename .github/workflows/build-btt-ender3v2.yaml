@@ -499,8 +499,8 @@ jobs:
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
             # Set both to the full height of the nozzle (8.2mm)
-            configValue FILAMENT_CHANGE_UNLOAD_LENGTH 8.22 Marlin/Configuration_adv.h
-            configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 8.22 Marlin/Configuration_adv.h
+            configValue FILAMENT_CHANGE_UNLOAD_LENGTH 8 Marlin/Configuration_adv.h
+            configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 8 Marlin/Configuration_adv.h
 
             # TODO: This will likely need more tweaking, specific to the Bondtech extruder motor!
             # Lower extruder current to roughly a third of the default (650 / 3 = 216)
