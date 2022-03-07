@@ -35,6 +35,7 @@ jobs:
         board: [STM32G0B1RE_btt]
         grid: [3, 5, 10, 15]
         high-speed: [true, false]
+        direct-drive: [true, false]
     steps:
       - name: Prepare Target Branch
         run: |-
@@ -133,7 +134,7 @@ jobs:
         id: configure_firmware
         run: |-
           # Enable script debugging
-          set -x
+          #set -x
 
           # Ensure we're always in the project root
           cd ${GITHUB_WORKSPACE}
@@ -296,6 +297,11 @@ jobs:
           # Turn off display after 5 minutes
           configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
 
+          # Configure direct drive specific options
+          if ($DIRECT_DRIVE); then
+            # TODO: Configure direct drive specific options
+          fi
+
           ## END OF CONFIGURATION.H
 
 
@@ -416,10 +422,11 @@ jobs:
           configEnable SHOW_REMAINING_TIME Marlin/Configuration_adv.h
 
           # Configure the current multiplier when holding/locked
-          configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
+          #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
 
+          # TODO: This might be too high, but it's exactly 2 x 580
           # Configure stepper motor driver currents
-          configValue Z_CURRENT 1000 Marlin/Configuration_adv.h
+          configValue Z_CURRENT 1160 Marlin/Configuration_adv.h
 
           # Enable stepper driver debugging
           configEnable TMC_DEBUG Marlin/Configuration_adv.h
@@ -465,6 +472,13 @@ jobs:
           # Enable integrated babystepping (experimental)
           configEnable INTEGRATED_BABYSTEPPING Marlin/Configuration_adv.h
 
+          # Combine babystepping with the initial Z probe height
+          configEnable BABYSTEP_ZPROBE_OFFSET Marlin/Configuration_adv.h
+
+          # TODO: This isn't compatible with UBL, I think?
+          # Retry bed leveling after a failed attempt
+          configEnable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
+
           # Override default minimum steppper direction change delays (changes both post and pre dir delays)
           # NOTE: Default value for TSMC2209 is 60, which SHOULD work when INTEGRATED_BABYSTEPPING is also enabled!
           # https://github.com/MarlinFirmware/Marlin/issues/17323
@@ -482,10 +496,35 @@ jobs:
           # https://damsteen.nl/blog/2021/05/06/adjustable-retractions-during-printing-with-marlin-firmware-retractions
           #configEnable FWRETRACT Marlin/Configuration_adv.h
 
+          # Configure direct drive specific options
+          if ($DIRECT_DRIVE); then
+            # Set both to the full height of the nozzle (8.2mm)
+            configValue FILAMENT_CHANGE_UNLOAD_LENGTH 8.22 Marlin/Configuration_adv.h
+            configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 8.22 Marlin/Configuration_adv.h
+
+            # TODO: This will likely need more tweaking, specific to the Bondtech extruder motor!
+            # Lower extruder current to roughly a third of the default (650 / 3 = 216)
+            configValue E0_CURRENT 220 Marlin/Configuration_adv.h
+
+            # TODO: Not specific to direct drive, but using this for debugging right now!
+            # Enable monitor driver status monitoring
+            configEnable MONITOR_DRIVER_STATUS Marlin/Configuration_adv.h
+
+            # TODO: Not specific to direct drive, but using this for debugging right now!
+            # Use millimeters instead of micro-steps for babystepping multiplicator
+            configEnable BABYSTEP_MILLIMETER_UNITS Marlin/Configuration_adv.h
+
+            # Enable linear advance
+            configEnable LIN_ADVANCE Marlin/Configuration_adv.h
+            configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+            configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
+          fi
+
           ## END OF CONFIGURATION_ADV.H
         env:
           GRID: ${{ matrix.grid }}
           HIGH_SPEED: ${{ matrix.high-speed }}
+          DIRECT_DRIVE: ${{ matrix.direct-drive }}
           TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
 
       - name: Compile Firmware (${{ env.TARGET_BRANCH }})
@@ -493,7 +532,8 @@ jobs:
         run: |-
           # Generate a name for the firmware and export it as a step output
           if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
-          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}-${BOARD}-${VERSION}"
+          if ($DIRECT_DRIVE); then DD_LABEL=-DD; else DD_LABEL=; fi;
+          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}-${BOARD}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -514,6 +554,7 @@ jobs:
           BOARD: ${{ matrix.board }}
           GRID: ${{ matrix.grid }}
           HIGH_SPEED: ${{ matrix.high-speed }}
+          DIRECT_DRIVE: ${{ matrix.direct-drive }}
           VERSION: ${{ env.RELEASE_VERSION }}
 
       - name: Publish Artifacts (${{ env.TARGET_BRANCH }})

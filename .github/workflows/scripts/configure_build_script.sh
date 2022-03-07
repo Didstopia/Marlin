@@ -212,6 +212,9 @@ setupConfigs() {
   # Copy the latest default Ender 3 V2 config files in place
   debug "Applying default configuration files"
 
+  ## TODO: Actually check for updates to the configuration branch instead of just flat out deleting it and redownloading
+  rm -rf Configurations
+
   # Download the latest default configuration files for the current branch
   if [[ ! -d "Configurations" ]]; then
     git clone --quiet --branch ${TARGET_BRANCH} --depth 1 https://github.com/MarlinFirmware/Configurations.git Configurations
