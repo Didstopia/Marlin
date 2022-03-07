@@ -55,9 +55,6 @@ cd $(realpath $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd
 # Detect if we're running in a CI environment
 CI=${CI:-false}
 
-# Figure out the target branch
-TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
-
 # Function for logging "debug" messages
 debug() {
   if [ "$CI" = true ]; then
@@ -89,6 +86,14 @@ error() {
     echo -e "  ${COLOR_RED}[ERROR]${COLOR_RESET} $@"
   fi
 }
+
+# Figure out the target branch
+# (mainly used for default configuration files)
+TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
+if [ "$TARGET_BRANCH" = "2.0.x" ]; then
+  warning "Target branch is 2.0.x, but this was renamed to import-2.0.x in Marlin configuration repository, so we'll use that instead!"
+  TARGET_BRANCH="import-2.0.x"
+fi
 
 # Add GNU tools to path if we're on macOS
 if [[ "$OSTYPE" == "darwin"* ]]; then
