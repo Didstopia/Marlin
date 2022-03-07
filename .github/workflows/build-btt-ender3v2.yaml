@@ -503,8 +503,8 @@ jobs:
             configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 8 Marlin/Configuration_adv.h
 
             # TODO: This will likely need more tweaking, specific to the Bondtech extruder motor!
-            # Lower extruder current to roughly a third of the default (650 / 3 = 216)
-            configValue E0_CURRENT 220 Marlin/Configuration_adv.h
+            # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
+            configValue E0_CURRENT 300 Marlin/Configuration_adv.h
 
             # TODO: Not specific to direct drive, but using this for debugging right now!
             # Enable monitor driver status monitoring
@@ -513,6 +513,8 @@ jobs:
             # TODO: Not specific to direct drive, but using this for debugging right now!
             # Use millimeters instead of micro-steps for babystepping multiplicator
             configEnable BABYSTEP_MILLIMETER_UNITS Marlin/Configuration_adv.h
+            configValue BABYSTEP_MULTIPLICATOR_Z 0.1 Marlin/Configuration_adv.h
+            configValue BABYSTEP_MULTIPLICATOR_XY 0.1 Marlin/Configuration_adv.h
 
             # Enable linear advance
             configEnable LIN_ADVANCE Marlin/Configuration_adv.h
