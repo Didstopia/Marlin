@@ -541,9 +541,10 @@ jobs:
           # Enable integrated babystepping (experimental)
           #configEnable INTEGRATED_BABYSTEPPING Marlin/Configuration_adv.h
 
+          # FIXME: Turns out we need this in order to adjust the Z probe offset at runtime!?
           # TODO: Leaving this alone for now (disabled by default)
           # Combine babystepping with the initial Z probe height
-          #configEnable BABYSTEP_ZPROBE_OFFSET Marlin/Configuration_adv.h
+          configEnable BABYSTEP_ZPROBE_OFFSET Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now, especially with INTEGRATED_BABYSTEPPING now disabled
           # Override default minimum steppper direction change delays (changes both post and pre dir delays)
