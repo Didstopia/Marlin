@@ -250,14 +250,29 @@ patchDWIN() {
     # Disable the error about requiring a custom cable for the DWIN display
     sed -i -E "s/([^ ]*)(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
     if [ ! -s /tmp/marlin_patch.log ]; then
-      error "Failed to patch DWIN support"
+      error "Failed to remove DWIN custom cable error"
       # return 1
       false
     fi
   fi
 
+  ## FIXME: This can be removed once the following PR is merged to both bugfix-2.0.x and 2.0.x branches!
+  ##        https://github.com/MarlinFirmware/Marlin/pull/23879
+  # Fix Ender 3 V2 DWIN display bug, where it incorrectly shows the progress bar on startup
+  sed -i -E "s/(.+, IS_DWIN_MARLINUI, EXTENSIBLE_UI)(\))(.*|$)/\1, HAS_DWIN_E3V2\2\3/g" Marlin/src/inc/Conditionals_post.h
+  if [ ! -s /tmp/marlin_patch.log ]; then
+    error "Failed to patch DWIN progress bar bug"
+    # return 1
+    false
+  fi
+
   # Fix the DWIN LCD check to take into account Jyers UI
   sed -E -i "s/#if EITHER\(DWIN_CREALITY_LCD, IS_DWIN_MARLINUI\)/#if HAS_DWIN_E3V2 \|\| IS_DWIN_MARLINUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
+  if [ ! -s /tmp/marlin_patch.log ]; then
+      error "Failed to patch DWIN Jyers UI support"
+    # return 1
+    false
+  fi
 }
 
 # Function for patching sane configuration defaults
