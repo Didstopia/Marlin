@@ -489,6 +489,7 @@ jobs:
           #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
 
           # FIXME: This might be too high, but it's exactly at 2 x 580 right now..
+          #        https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3/issues/515
           # Configure stepper motor driver currents
           configValue Z_CURRENT 1160 Marlin/Configuration_adv.h
 
@@ -566,7 +567,7 @@ jobs:
 
           # FIXME: This is a very experimental change to see if this helps at all!
           # Disable stealthchopping for the Z axis
-          configDisable #define STEALTHCHOP_Z Marlin/Configuration_adv.h
+          configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
 
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
