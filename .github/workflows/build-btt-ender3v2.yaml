@@ -565,9 +565,15 @@ jobs:
           # https://damsteen.nl/blog/2021/05/06/adjustable-retractions-during-printing-with-marlin-firmware-retractions
           #configEnable FWRETRACT Marlin/Configuration_adv.h
 
+          # TODO: UPDATE: This makes much more noise and is faster/more aggressive,
+          #               however it MAY have helped keep the Z axis motors in sync!
           # FIXME: This is a very experimental change to see if this helps at all!
           # Disable stealthchopping for the Z axis
-          configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
+          #configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
+
+          # TODO: Testing this again, just in case
+          # Disable Z axis idling when inactive
+          configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
 
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
