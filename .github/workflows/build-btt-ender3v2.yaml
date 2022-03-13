@@ -33,9 +33,12 @@ jobs:
     strategy:
       matrix:
         board: [STM32G0B1RE_btt]
-        grid: [3, 5, 10, 15]
-        high-speed: [true, false]
-        direct-drive: [true, false]
+        #grid: [3, 5, 10, 15]
+        grid: [5]
+        #high-speed: [true, false]
+        high-speed: [false]
+        #direct-drive: [true, false]
+        direct-drive: [true]
         ubl: [true, false]
     steps:
       - name: Prepare Target Branch
