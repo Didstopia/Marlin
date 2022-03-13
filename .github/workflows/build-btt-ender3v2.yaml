@@ -306,6 +306,16 @@ jobs:
           # Turn off display after 5 minutes
           configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
 
+          # Configure PID for the bed
+          configValue DEFAULT_bedKp 129.98 Marlin/Configuration.h
+          configValue DEFAULT_bedKi 25.00 Marlin/Configuration.h
+          configValue DEFAULT_bedKd 450.59 Marlin/Configuration.h
+
+          # Configure PID for the hotend
+          configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
+          configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
+          configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
+
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
             # TODO: These are currently set to the defaults, so may need to be adjusted?
@@ -321,12 +331,12 @@ jobs:
 
             # FIXME: The offsets are not reliable and might be flat out wrong
             # Adjust offsets for direct drive
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 4.0, 0 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 4.0, -2.85 }" Marlin/Configuration.h
 
             # Configure PID for the hotend
-            configValue DEFAULT_Kp 21.68 Marlin/Configuration.h
-            configValue DEFAULT_Ki 1.68 Marlin/Configuration.h
-            configValue DEFAULT_Kd 70.03 Marlin/Configuration.h
+            configValue DEFAULT_Kp 23.62 Marlin/Configuration.h
+            configValue DEFAULT_Ki 1.94 Marlin/Configuration.h
+            configValue DEFAULT_Kd 72.03 Marlin/Configuration.h
 
             # FIXME: Adjust home offsets for direct drive, since they're now wrong?!
             #        But how/where? HOTEND_OFFSET_X/Y/Z?
@@ -552,11 +562,6 @@ jobs:
           # NOTE: Default value for TSMC2209 is 60, which SHOULD work when INTEGRATED_BABYSTEPPING is also enabled!
           # https://github.com/MarlinFirmware/Marlin/issues/17323
           #configValue MINIMUM_STEPPER_POST_DIR_DELAY 100 Marlin/Configuration_adv.h
-
-          # Configure PID for the hotend
-          configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
-          configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
-          configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
 
           # TODO: Research "firmware retraction" thoroughly and then enable/configure/test this!
           # https://marlinfw.org/docs/gcode/G010.html

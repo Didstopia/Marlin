@@ -14,10 +14,12 @@ declare -F wttr
 # Ensure we are always at the root of the repository
 cd $(realpath $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/../../../)
 
-source .github/workflows/scripts/configure_build_script.sh
-
+# Set the target branch etc.
+# TARGET_BRANCH="2.0.x"
 GRID=10
 HIGH_SPEED=true
+
+source .github/workflows/scripts/configure_build_script.sh
 
 ## FIXME: The following are wrong:
 ## - NOZZLE_TO_PROBE_OFFSET (Configuration.h) - NOTE: This also modifies examples, which should NOT happen!
