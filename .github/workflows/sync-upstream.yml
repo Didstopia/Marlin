@@ -35,7 +35,8 @@ jobs:
         # Target branch in this repository
         target_sync_branch: 2.0.x
         # REQUIRED 'target_repo_token' exactly like this!
-        target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+        # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+        target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
         # Upstream branch in another repository
         upstream_sync_branch: 2.0.x
         upstream_sync_repo: MarlinFirmware/Marlin
@@ -100,7 +101,8 @@ jobs:
         # Target branch in this repository
         target_sync_branch: bugfix-2.0.x
         # REQUIRED 'target_repo_token' exactly like this!
-        target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+        # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+        target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
         # Upstream branch in another repository
         upstream_sync_branch: bugfix-2.0.x
         upstream_sync_repo: MarlinFirmware/Marlin
