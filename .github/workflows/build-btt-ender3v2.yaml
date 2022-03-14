@@ -323,7 +323,7 @@ jobs:
           if ($DIRECT_DRIVE); then
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust e-steps for direct drive
-            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 465 }" Marlin/Configuration.h
+            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 440.1 }" Marlin/Configuration.h
 
             # FIXME: Adjust max feedrate for direct drive
             configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
@@ -334,7 +334,7 @@ jobs:
 
             # FIXME: The offsets are not reliable and might be flat out wrong
             # Adjust offsets for direct drive
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 4.0, -2.85 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
 
             # TODO: This needs testing, keeping disabled for now, but try enabling!
             # Increase extruder jerk for linear advance + direct drive
