@@ -334,7 +334,8 @@ jobs:
 
             # FIXME: The offsets are not reliable and might be flat out wrong
             # Adjust offsets for direct drive
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
+            #configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, 0.0 }" Marlin/Configuration.h
 
             # TODO: This needs testing, keeping disabled for now, but try enabling!
             # Increase extruder jerk for linear advance + direct drive
@@ -613,12 +614,12 @@ jobs:
             #configValue BABYSTEP_MULTIPLICATOR_Z 0.1 Marlin/Configuration_adv.h
             #configValue BABYSTEP_MULTIPLICATOR_XY 0.1 Marlin/Configuration_adv.h
 
-            # TODO: Disabling linear advance for now
+            # TODO: Disabling linear advance for now (quality was trash, at least with this K value)
             # Enable linear advance for direct drive
-            configEnable LIN_ADVANCE Marlin/Configuration_adv.h
-            configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
-            configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
-            configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
+            #configEnable LIN_ADVANCE Marlin/Configuration_adv.h
+            #configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+            #configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+            #configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
           fi
 
           # Configure UBL/ABL specific options
