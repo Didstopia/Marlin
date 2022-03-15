@@ -323,7 +323,8 @@ jobs:
           if ($DIRECT_DRIVE); then
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust e-steps for direct drive
-            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 440.1 }" Marlin/Configuration.h
+            #configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 440.1 }" Marlin/Configuration.h
+            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415 }" Marlin/Configuration.h
 
             # FIXME: Adjust max feedrate for direct drive
             configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
@@ -598,9 +599,9 @@ jobs:
             # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
             #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
             # TODO: Increasing extruder current, just to test it out
-            #configValue E0_CURRENT 500 Marlin/Configuration_adv.h
+            configValue E0_CURRENT 450 Marlin/Configuration_adv.h
             # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
-            configValue E0_CURRENT 650 Marlin/Configuration_adv.h
+            #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
 
             # TODO: Disabling for now
             # TODO: Not specific to direct drive, but using this for debugging right now!
@@ -616,10 +617,10 @@ jobs:
 
             # TODO: Disabling linear advance for now (quality was trash, at least with this K value)
             # Enable linear advance for direct drive
-            #configEnable LIN_ADVANCE Marlin/Configuration_adv.h
-            #configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
-            #configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
-            #configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
+            configEnable LIN_ADVANCE Marlin/Configuration_adv.h
+            configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+            configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+            configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
           fi
 
           # Configure UBL/ABL specific options
