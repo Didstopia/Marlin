@@ -40,6 +40,7 @@ jobs:
         #direct-drive: [true, false]
         direct-drive: [true]
         ubl: [true, false]
+        touch-screen: [true, false]
     steps:
       - name: Prepare Target Branch
         run: |-
@@ -373,6 +374,19 @@ jobs:
             # Enable Automatic Bed Leveling (ABL)
             configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
           fi
+          
+          # Configure DWIN touch screen support
+          if ($TOUCH_SCREEN); then
+            # Enable the touch screen support
+            configEnable TOUCH_SCREEN Marlin/Configuration.h
+            
+            # TODO: Configure the rest of the DWIN touch screen support,
+            #       as well as use a custom DWIN_SET firmware for the display
+            #       (see Marlin/Configuration.h, search for "DGUS Touch")
+            # FIXME: This is just temporary and no idea if this would work:
+            #        https://github.com/Desuuuu/DGUS-reloaded/releases/tag/1.0.2
+            configEnable DGUS_LCD_UI_RELOADED Marlin/Configuration.h
+          fi
 
           ## END OF CONFIGURATION.H
 
@@ -653,6 +667,7 @@ jobs:
           DIRECT_DRIVE: ${{ matrix.direct-drive }}
           TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
           UBL: ${{ matrix.ubl }}
+          TOUCH_SCREEN: ${{ matrix.touch-screen }}
 
       - name: Compile Firmware (${{ env.TARGET_BRANCH }})
         id: compile_firmware
@@ -661,7 +676,8 @@ jobs:
           if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
           if ($DIRECT_DRIVE); then DD_LABEL=-DD; else DD_LABEL=; fi;
           if ($UBL); then UBL_LABEL=-UBL; else UBL_LABEL=-ABL; fi;
-          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}-${BOARD}-${VERSION}"
+          if ($TOUCH_SCREEN); then TOUCH_SCREEN_LABEL=-TOUCH; else TOUCH_SCREEN_LABEL=; fi;
+          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${TOUCH_SCREEN_LABEL}-${BOARD}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -685,6 +701,7 @@ jobs:
           DIRECT_DRIVE: ${{ matrix.direct-drive }}
           VERSION: ${{ env.RELEASE_VERSION }}
           UBL: ${{ matrix.ubl }}
+          TOUCH_SCREEN: ${{ matrix.touch-screen }}
 
       - name: Publish Artifacts (${{ env.TARGET_BRANCH }})
         uses: actions/upload-artifact@v2
