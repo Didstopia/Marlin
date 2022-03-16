@@ -519,9 +519,9 @@ jobs:
           # FIXME: This might be too high, but it's exactly at 2 x 580 right now..
           #        https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3/issues/515
           # Configure stepper motor driver currents
-          #configValue Z_CURRENT 1160 Marlin/Configuration_adv.
+          configValue Z_CURRENT 1160 Marlin/Configuration_adv.
           # TODO: Testing lower currents with DD
-          configValue Z_CURRENT 850 Marlin/Configuration_adv.h
+          #configValue Z_CURRENT 850 Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now
           # Enable stepper driver debugging
@@ -610,9 +610,10 @@ jobs:
             # FIXME: This will likely need more tweaking, specific to the Bondtech extruder motor!
             # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
             #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
-            # TODO: Decreasing extruder current, just to test it out
-            #configValue E0_CURRENT 450 Marlin/Configuration_adv.h
-            configValue E0_CURRENT 400 Marlin/Configuration_adv.h
+            # TODO: Since 400 works well enough, trying with 450 again
+            configValue E0_CURRENT 450 Marlin/Configuration_adv.h
+            # TODO: UPDATE: 400 works pretty well, I feel like!
+            #configValue E0_CURRENT 400 Marlin/Configuration_adv.h
             # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
             #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
 
