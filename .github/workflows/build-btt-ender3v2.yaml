@@ -326,8 +326,8 @@ jobs:
           if ($DIRECT_DRIVE); then
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust e-steps for direct drive
-            #configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 440.1 }" Marlin/Configuration.h
-            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415 }" Marlin/Configuration.h
+            #configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415 }" Marlin/Configuration.h
+            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 432.7 }" Marlin/Configuration.h
 
             # FIXME: Adjust max feedrate for direct drive
             configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
