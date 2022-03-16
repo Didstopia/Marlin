@@ -519,7 +519,7 @@ jobs:
           # FIXME: This might be too high, but it's exactly at 2 x 580 right now..
           #        https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3/issues/515
           # Configure stepper motor driver currents
-          configValue Z_CURRENT 1160 Marlin/Configuration_adv.
+          configValue Z_CURRENT 1160 Marlin/Configuration_adv.h
           # TODO: Testing lower currents with DD
           #configValue Z_CURRENT 850 Marlin/Configuration_adv.h
 
