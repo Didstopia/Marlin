@@ -230,6 +230,9 @@ jobs:
 
           # Enable filament runout sensor
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
+          
+          # TODO: Should we keep it disabled by default?
+          configValue FIL_RUNOUT_ENABLED_DEFAULT false Marlin/Configuration.h
 
           # TODO: This needs to be configured correctly
           # Set the default/custom runout sensor filament distance
@@ -336,16 +339,21 @@ jobs:
             # FIXME: The offsets are not reliable and might be flat out wrong
             # Adjust offsets for direct drive
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, 0.0 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
 
             # TODO: This needs testing, keeping disabled for now, but try enabling!
             # Increase extruder jerk for linear advance + direct drive
             #configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+            
+            # Configure PID for the bed (60C)
+            configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
+            configValue DEFAULT_bedKi 15.95 Marlin/Configuration.h
+            configValue DEFAULT_bedKd 287.61 Marlin/Configuration.h
 
-            # Configure PID for the hotend
-            configValue DEFAULT_Kp 23.62 Marlin/Configuration.h
-            configValue DEFAULT_Ki 1.94 Marlin/Configuration.h
-            configValue DEFAULT_Kd 72.03 Marlin/Configuration.h
+            # Configure PID for the hotend (205C)
+            configValue DEFAULT_Kp 20.40 Marlin/Configuration.h
+            configValue DEFAULT_Ki 1.59 Marlin/Configuration.h
+            configValue DEFAULT_Kd 65.29 Marlin/Configuration.h
 
             # FIXME: Adjust home offsets for direct drive, since they're now wrong?!
             #        But how/where? HOTEND_OFFSET_X/Y/Z?
@@ -507,10 +515,13 @@ jobs:
           # Configure the current multiplier when holding/locked (default is 0.5)
           #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
 
+          # TODO: The motors definitely run a bit hot now, but with the DD, it might just need all the power it can get?
           # FIXME: This might be too high, but it's exactly at 2 x 580 right now..
           #        https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3/issues/515
           # Configure stepper motor driver currents
-          configValue Z_CURRENT 1160 Marlin/Configuration_adv.h
+          #configValue Z_CURRENT 1160 Marlin/Configuration_adv.
+          # TODO: Testing lower currents with DD
+          configValue Z_CURRENT 850 Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now
           # Enable stepper driver debugging
@@ -585,9 +596,10 @@ jobs:
           # Disable stealthchopping for the Z axis
           #configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
 
+          # TODO: UPDATE: Nope, I still don't think this is worth it, plus it keeps the fans on 24/7
           # TODO: Testing this again, just in case
           # Disable Z axis idling when inactive
-          configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
+          #configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
 
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
@@ -598,8 +610,9 @@ jobs:
             # FIXME: This will likely need more tweaking, specific to the Bondtech extruder motor!
             # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
             #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
-            # TODO: Increasing extruder current, just to test it out
-            configValue E0_CURRENT 450 Marlin/Configuration_adv.h
+            # TODO: Decreasing extruder current, just to test it out
+            #configValue E0_CURRENT 450 Marlin/Configuration_adv.h
+            configValue E0_CURRENT 400 Marlin/Configuration_adv.h
             # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
             #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
 
