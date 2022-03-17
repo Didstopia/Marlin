@@ -40,7 +40,10 @@ jobs:
         #direct-drive: [true, false]
         direct-drive: [true]
         ubl: [true, false]
-        touch-screen: [true, false]
+        # touch-screen: [true, false]
+        ## FIXME: Enabling touch screen support requires a bit more work and effort,
+        ##        so disabling for now until we have the time to properly implement it.
+        touch-screen: [false]
     steps:
       - name: Prepare Target Branch
         run: |-
