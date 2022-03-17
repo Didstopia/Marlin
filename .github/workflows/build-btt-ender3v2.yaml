@@ -486,10 +486,10 @@ jobs:
           #configDisable NO_SD_HOST_DRIVE Marlin/Configuration_adv.h
                   
           # Configure babystepping
-          #configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
-          #configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
-          #configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
-          #configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
+          configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
+          configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
+          configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
+          configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
 
           # Enable emergency parser
           configEnable EMERGENCY_PARSER Marlin/Configuration_adv.h
