@@ -331,11 +331,24 @@ jobs:
             configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 432.7 }" Marlin/Configuration.h
 
             # FIXME: Adjust max feedrate for direct drive
-            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+            #configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+            # TODO: Trying to drastically bump up maximum values
+            configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 100}" Marlin/Configuration.h
 
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust max acceleration for direct drive
-            configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
+            #configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
+            # TODO: Trying to drastically bump up maximum values
+            configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
+
+            # TODO: Trying to drastically bump up maximum values
+            configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
+            configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
+            configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
+
+            # TODO: Trying to see if enabling Junction Deviation AND Linear Advance will cause issues or not
+            # Enable junction deviation by disabling classic jerk handling
+            configDisable CLASSIC_JERK Marlin/Configuration.h
 
             # FIXME: The offsets are not reliable and might be flat out wrong
             # Adjust offsets for direct drive
@@ -344,7 +357,7 @@ jobs:
 
             # TODO: This needs testing, keeping disabled for now, but try enabling!
             # Increase extruder jerk for linear advance + direct drive
-            #configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+            configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
             
             # Configure PID for the bed (60C)
             configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -565,11 +578,11 @@ jobs:
 
           # TODO: Leaving these alone for now (all defaults seem fine/same, these would just be unnecessarily high)
           # Increase buffers etc.
-          #configEnable ADVANCED_OK Marlin/Configuration_adv.h
-          #configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
-          #configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
-          #configValue BUFSIZE 32 Marlin/Configuration_adv.h
-          #configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
+          configEnable ADVANCED_OK Marlin/Configuration_adv.h
+          configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
+          configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
+          configValue BUFSIZE 32 Marlin/Configuration_adv.h
+          configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
@@ -646,7 +659,9 @@ jobs:
             # TODO: Disabling linear advance for now (quality was trash, at least with this K value)
             # Enable linear advance for direct drive
             configEnable LIN_ADVANCE Marlin/Configuration_adv.h
-            configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+            #configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+            # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
+            configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
             configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
             configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
           fi
