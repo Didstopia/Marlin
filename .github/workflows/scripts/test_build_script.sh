@@ -231,6 +231,9 @@ configValue SLOWDOWN_DIVISOR 8 Marlin/Configuration_adv.h
 # Enable DWIN display beep mute option
 configEnable SOUND_MENU_ITEM Marlin/Configuration_adv.h
 
+# Disable the DWIN display beeper/buzzer
+configEnable DISABLE_BUZZER Marlin/Configuration_adv.h
+
 # Enable additional display features (some are useful when used with OctoPrint for example)
 configEnable STATUS_MESSAGE_SCROLLING Marlin/Configuration_adv.h
 configEnable LCD_SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h

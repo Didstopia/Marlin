@@ -281,10 +281,19 @@ patchBuzzer() {
 
   # Add the ability to disable the buzzer on the LCD
   sed -i -E "s/^([ ]{2})??(TERN_\(SOUND_MENU_ITEM, ui\.buzzer_enabled = )(true)(\);.*)$/\1#ifdef DISABLE_BUZZER\n\1\1\2false\4\n\1#else\n\1\1\2true\4\n\1#endif/" Marlin/src/module/settings.cpp
+  if [ ! -s /tmp/marlin_patch.log ]; then
+    error "Failed to patch DWIN buzzer disabling support"
+    # return 1
+    false
+  fi
 
   # Add the DISABLE_BUZZER definition to the Marlin configuration
-  if [ ! grep -Eiwq "#define DISABLE_BUZZER" Marlin/src/module/settings.cpp ]; then
-    sed -i -E "s/([ ]*)[^ ]*(#define SOUND_MENU_ITEM.*)/\0\n\1\/\/#define DISABLE_BUZZER    \/\/ Disable the buzzer by default/" Marlin/Configuration_adv.h
+  grep -Eiwq "#define DISABLE_BUZZER" Marlin/src/module/settings.cpp || \
+  sed -i -E "s/([ ]*)[^ ]*(#define SOUND_MENU_ITEM.*)/\0\n\1\/\/#define DISABLE_BUZZER    \/\/ Disable the buzzer by default/" Marlin/Configuration_adv.h
+  if [ ! -s /tmp/marlin_patch.log ]; then
+    error "Failed to add DISABLE_BUZZER definition"
+    # return 1
+    false
   fi
 }
 
