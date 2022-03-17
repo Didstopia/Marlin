@@ -275,6 +275,19 @@ patchDWIN() {
   fi
 }
 
+# Function for adding the ability to disable the buzzer on the LCD
+patchBuzzer() {
+  debug "Patching Marlin to allow disabling the buzzer on the LCD"
+
+  # Add the ability to disable the buzzer on the LCD
+  sed -i -E "s/^([ ]{2})??(TERN_\(SOUND_MENU_ITEM, ui\.buzzer_enabled = )(true)(\);.*)$/\1#ifdef DISABLE_BUZZER\n\1\1\2false\4\n\1#else\n\1\1\2true\4\n\1#endif/" Marlin/src/module/settings.cpp
+
+  # Add the DISABLE_BUZZER definition to the Marlin configuration
+  if [ ! grep -Eiwq "#define DISABLE_BUZZER" Marlin/src/module/settings.cpp ]; then
+    sed -i -E "s/([ ]*)[^ ]*(#define SOUND_MENU_ITEM.*)/\0\n\1\/\/#define DISABLE_BUZZER    \/\/ Disable the buzzer by default/" Marlin/Configuration_adv.h
+  fi
+}
+
 # Function for patching sane configuration defaults
 patchDefaults() {
   debug "Patching sane configuration defaults"
@@ -331,4 +344,5 @@ setupConfigs
 # Apply sane defaults on startup
 patchBuildDetails
 patchDWIN
+patchBuzzer
 patchDefaults
