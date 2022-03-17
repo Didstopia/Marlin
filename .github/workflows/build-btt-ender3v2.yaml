@@ -392,13 +392,20 @@ jobs:
           if ($TOUCH_SCREEN); then
             # Enable the touch screen support
             configEnable TOUCH_SCREEN Marlin/Configuration.h
-            
+
+            # Ensure Creality and Jyers UI DWIN displays are not enabled
+            configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
+            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+
             # TODO: Configure the rest of the DWIN touch screen support,
             #       as well as use a custom DWIN_SET firmware for the display
             #       (see Marlin/Configuration.h, search for "DGUS Touch")
             # FIXME: This is just temporary and no idea if this would work:
             #        https://github.com/Desuuuu/DGUS-reloaded/releases/tag/1.0.2
             configEnable DGUS_LCD_UI_RELOADED Marlin/Configuration.h
+
+            # DGUS_LCD_UI_RELOADED requires LEVEL_BED_CORNERS
+            configEnable LEVEL_BED_CORNERS Marlin/Configuration.h
           fi
 
           ## END OF CONFIGURATION.H
