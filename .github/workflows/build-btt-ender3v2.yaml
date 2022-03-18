@@ -362,7 +362,7 @@ jobs:
             # TODO: Increased Z homing from 4mm/s to 25mm/s
             # Increase homing feed rates (homing speeds)
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(25\*60\) }" Marlin/Configuration.h
-            configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(15\*60\) }" Marlin/Configuration.h
+            configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
 
             # FIXME: If 25mm/s isn't too fast, try that instead of 15mm/s?
             #        But DO remember that Z_PROBE_FEEDRATE_SLOW is set to
@@ -372,7 +372,7 @@ jobs:
             # Increase probing speed for the first approach when double-probing (MULTIPLE_PROBING is set to 2)
             #configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
             # TODO: Nozzle was hitting the bed, so trying to go a little bit slower here
-            configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
+            #configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
 
             # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
