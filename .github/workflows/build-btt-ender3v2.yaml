@@ -34,7 +34,7 @@ jobs:
       matrix:
         board: [STM32G0B1RE_btt]
         #grid: [3, 5, 10, 15]
-        grid: [5]
+        grid: [5, 10]
         #high-speed: [true, false]
         high-speed: [false]
         #direct-drive: [true, false]
@@ -44,6 +44,8 @@ jobs:
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
         touch-screen: [false]
+        linear-advance: [true, false]
+        junction-deviation: [true, false]
     steps:
       - name: Prepare Target Branch
         run: |-
@@ -349,14 +351,14 @@ jobs:
             configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
             configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
 
-            # TODO: Trying to see if enabling Junction Deviation AND Linear Advance will cause issues or not
-            # Enable junction deviation by disabling classic jerk handling
-            configDisable CLASSIC_JERK Marlin/Configuration.h
-
-            # FIXME: The offsets are not reliable and might be flat out wrong
+            # FIXME: Our Z offset still keeps changing, but this might be from Z going out of sync?
+            #        Needs further testing regardless, so will update as things progress.. (btw, bed was loose, eccentric nuts especially)
             # Adjust offsets for direct drive
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
+            #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
+
+            # FIXME: !!! Create separate builds for Classic Jerk vs. Junction Deviation (+ Linear Advance vs. No Linear Advance?) !!!
 
             # TODO: This needs testing, keeping disabled for now, but try enabling!
             # Increase extruder jerk for linear advance + direct drive
@@ -409,6 +411,15 @@ jobs:
 
             # DGUS_LCD_UI_RELOADED requires LEVEL_BED_CORNERS
             configEnable LEVEL_BED_CORNERS Marlin/Configuration.h
+          fi
+
+          if ($JUNCTION_DEVIATION); then
+            # TODO: Trying to see if enabling Junction Deviation AND Linear Advance will cause issues or not
+            # Enable junction deviation by disabling classic jerk handling
+            configDisable CLASSIC_JERK Marlin/Configuration.h
+          else
+            # Disable junction deviation by enabling classic jerk handling
+            configEnable CLASSIC_JERK Marlin/Configuration.h
           fi
 
           ## END OF CONFIGURATION.H
@@ -669,14 +680,15 @@ jobs:
             #configValue BABYSTEP_MULTIPLICATOR_Z 0.1 Marlin/Configuration_adv.h
             #configValue BABYSTEP_MULTIPLICATOR_XY 0.1 Marlin/Configuration_adv.h
 
-            # TODO: Disabling linear advance for now (quality was trash, at least with this K value)
-            # Enable linear advance for direct drive
-            configEnable LIN_ADVANCE Marlin/Configuration_adv.h
-            #configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
-            # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
-            configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
-            configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
-            configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
+            if ($LINEAR_ADVANCE); then
+              # Enable linear advance for direct drive
+              configEnable LIN_ADVANCE Marlin/Configuration_adv.h
+              #configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+              # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
+              configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
+              configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+              configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
+            fi
           fi
 
           # Configure UBL/ABL specific options
@@ -696,6 +708,8 @@ jobs:
           TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
           UBL: ${{ matrix.ubl }}
           TOUCH_SCREEN: ${{ matrix.touch-screen }}
+          LINEAR_ADVANCE: ${{ matrix.linear-advance }}
+          JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
 
       - name: Compile Firmware (${{ env.TARGET_BRANCH }})
         id: compile_firmware
@@ -704,8 +718,10 @@ jobs:
           if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
           if ($DIRECT_DRIVE); then DD_LABEL=-DD; else DD_LABEL=; fi;
           if ($UBL); then UBL_LABEL=-UBL; else UBL_LABEL=-ABL; fi;
+          if ($LINEAR_ADVANCE); then LINEAR_ADVANCE_LABEL=-LIN; else LINEAR_ADVANCE_LABEL=; fi;
+          if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=; fi;
           if ($TOUCH_SCREEN); then TOUCH_SCREEN_LABEL=-TOUCH; else TOUCH_SCREEN_LABEL=; fi;
-          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${TOUCH_SCREEN_LABEL}-${BOARD}-${VERSION}"
+          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${TOUCH_SCREEN_LABEL}-${BOARD}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -730,6 +746,8 @@ jobs:
           VERSION: ${{ env.RELEASE_VERSION }}
           UBL: ${{ matrix.ubl }}
           TOUCH_SCREEN: ${{ matrix.touch-screen }}
+          LINEAR_ADVANCE: ${{ matrix.linear-advance }}
+          JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
 
       - name: Publish Artifacts (${{ env.TARGET_BRANCH }})
         uses: actions/upload-artifact@v2
