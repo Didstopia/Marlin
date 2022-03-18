@@ -475,6 +475,14 @@ jobs:
             configDisable BLTOUCH_HS_MODE Marlin/Configuration_adv.h
           fi
 
+          # Decreate probing delay for BLTouch
+          # WARNING: Requires a BLTouch 3.0 or later
+          configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
+
+          # Enable 5V mode for BLTouch
+          # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
+          configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
+
           # TODO: This needs testing and supposedly fixes high CPU issues with this specific board, causing skipped steps etc.
           # Disable adaptive step smoothing
           configDisable ADAPTIVE_STEP_SMOOTHING Marlin/Configuration_adv.h
@@ -500,7 +508,7 @@ jobs:
 
           # TODO: Leaving this alone for now, pretty sure it'll default to the board values anyway
           # Set default SD card connection type
-          #configValue SDCARD_CONNECTION ONBOARD Marlin/Configuration_adv.h
+          configValue SDCARD_CONNECTION ONBOARD Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (disabled by default)
           # Enable UTF filename support
@@ -524,7 +532,7 @@ jobs:
           # Configure babystepping
           configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
           configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
-          configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
+          #configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
           configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
 
           # Enable emergency parser
@@ -704,23 +712,30 @@ jobs:
             # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
             #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
 
-            # TODO: Disabling for now
-            # TODO: Not specific to direct drive, but using this for debugging right now!
-            # Enable monitor driver status monitoring
-            #configEnable MONITOR_DRIVER_STATUS Marlin/Configuration_adv.h
+            # Enable stepper motor driver status monitoring
+            # NOTE: This will monitor the TMC2209 drivers, drop the current
+            #       and eventually stop if something goes wrong!
+            configEnable MONITOR_DRIVER_STATUS Marlin/Configuration_adv.h
 
             # TODO: Disabling babystepping customizations for now
             # TODO: Not specific to direct drive, but using this for debugging right now!
             # Use millimeters instead of micro-steps for babystepping multiplicator
             #configEnable BABYSTEP_MILLIMETER_UNITS Marlin/Configuration_adv.h
-            #configValue BABYSTEP_MULTIPLICATOR_Z 0.1 Marlin/Configuration_adv.h
-            #configValue BABYSTEP_MULTIPLICATOR_XY 0.1 Marlin/Configuration_adv.h
+            #configValue BABYSTEP_MULTIPLICATOR_Z 0.01 Marlin/Configuration_adv.h
+            #configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
 
             # Increase the babystepping amount from 0.0025mm to 0.01mm
-            configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
+            #configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
+
+            # Set the X and Y axis babystepping to equal the Z axis
+            configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
 
             # Increase fine manual move amount from 0.025mm to 0.005mm
             configValue FINE_MANUAL_MOVE 0.005 Marlin/Configuration_adv.h
+
+            # TODO: This needs HEAVY testing, as it may be too aggressive!
+            # Disable stealthschop for the extruder
+            configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
 
             if ($LINEAR_ADVANCE); then
               # Enable linear advance for direct drive
