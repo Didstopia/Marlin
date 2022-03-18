@@ -200,7 +200,10 @@ jobs:
           configValue PROBING_MARGIN 20 Marlin/Configuration.h
 
           # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
-          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          #configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          # TODO: Lowered from 133mm/s to 100mm/s, however some say the BLTouch is more reliable at 60mm/s!
+          #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
 
           # FIXME: Ensure the defaults are set to -10 and 10!
           # TODO: Leaving these alone for now
@@ -263,7 +266,7 @@ jobs:
           configEnable Z_SAFE_HOMING Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (defaults are higher)
-          # Reduce homing feed rate (homing speed)
+          # Reduce homing feed rates (homing speeds)
           #configValue HOMING_FEEDRATE_MM_M "{ \(20\*60\), \(20\*60\), \(4\*60\) }" Marlin/Configuration.h
 
           # Enable EEPROM feedback (disabled by default, enabled in Jyers)
@@ -351,18 +354,25 @@ jobs:
             configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
             configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
 
+            # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
+            # TODO: Increased Z homing from 4mm/s to 25mm/s
+            # Increase homing feed rates (homing speeds)
+            configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(25\*60\) }" Marlin/Configuration.h
+
+            # FIXME: If 25mm/s isn't too fast, try that instead of 15mm/s?
+            #        But DO remember that Z_PROBE_FEEDRATE_SLOW is set to
+            #        exactly HALF of Z_PROBE_FEEDRATE_FAST, which means that
+            #        the higher the first approach probe, the higher the slow probes are!
+            # TODO: Increased from 4mm/s to 15mm/s
+            # Increase probing speed for the first approach when double-probing (MULTIPLE_PROBING is set to 2)
+            configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)"
+
             # FIXME: Our Z offset still keeps changing, but this might be from Z going out of sync?
             #        Needs further testing regardless, so will update as things progress.. (btw, bed was loose, eccentric nuts especially)
             # Adjust offsets for direct drive
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
             configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
-
-            # FIXME: !!! Create separate builds for Classic Jerk vs. Junction Deviation (+ Linear Advance vs. No Linear Advance?) !!!
-
-            # TODO: This needs testing, keeping disabled for now, but try enabling!
-            # Increase extruder jerk for linear advance + direct drive
-            configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
             
             # Configure PID for the bed (60C)
             configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -420,6 +430,15 @@ jobs:
           else
             # Disable junction deviation by enabling classic jerk handling
             configEnable CLASSIC_JERK Marlin/Configuration.h
+          fi
+
+          if ($LINEAR_ADVANCE); then
+            # TODO: This needs testing, keeping disabled for now, but try enabling!
+            # Increase extruder jerk for linear advance + direct drive
+            configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+          else
+            # Set default extruder jerk
+            configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
           fi
 
           ## END OF CONFIGURATION.H
@@ -652,6 +671,23 @@ jobs:
           # Disable Z axis idling when inactive
           #configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
 
+          # Enable assisted tramming
+          configEnable ASSISTED_TRAMMING Marlin/Configuration_adv.h
+
+          # FIXME: Calculate/calibrate this for our specific printer?!
+          # Set assisted tramming probing positions
+          #configValue TRAMMING_POINT_XY "{ {  20, 20 }, { 180,  20 }, { 180, 180 }, { 20, 180 } }" Marlin/Configuration_adv.h
+          
+          # Enable the assisted tramming wizard (likely not usable without an LCD)
+          configEnable ASSISTED_TRAMMING_WIZARD Marlin/Configuration_adv.h
+
+          # Enable moving the nozzle out of the way for adjusting when assisted tramming is enabled
+          configEnable ASSISTED_TRAMMING_WAIT_POSITION Marlin/Configuration_adv.h
+
+          # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
+          # Set the bed screw thread size (M3, M4, M5 etc.)
+          #configValue TRAMMING_SCREW_THREAD 40 Marlin/Configuration_adv.h
+
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
             # Set both to the full height of the nozzle (8.2mm)
@@ -679,6 +715,12 @@ jobs:
             #configEnable BABYSTEP_MILLIMETER_UNITS Marlin/Configuration_adv.h
             #configValue BABYSTEP_MULTIPLICATOR_Z 0.1 Marlin/Configuration_adv.h
             #configValue BABYSTEP_MULTIPLICATOR_XY 0.1 Marlin/Configuration_adv.h
+
+            # Increase the babystepping amount from 0.0025mm to 0.01mm
+            configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
+
+            # Increase fine manual move amount from 0.025mm to 0.005mm
+            configValue FINE_MANUAL_MOVE 0.005 Marlin/Configuration_adv.h
 
             if ($LINEAR_ADVANCE); then
               # Enable linear advance for direct drive
