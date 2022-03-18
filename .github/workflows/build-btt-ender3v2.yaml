@@ -34,12 +34,15 @@ jobs:
       matrix:
         board: [STM32G0B1RE_btt]
         #grid: [3, 5, 10, 15]
-        grid: [5, 10]
+        #grid: [5, 10]
+        grid: [10]
         #high-speed: [true, false]
-        high-speed: [false]
+        #high-speed: [false]
+        high-speed: [true]
         #direct-drive: [true, false]
         direct-drive: [true]
-        ubl: [true, false]
+        #ubl: [true, false]
+        ubl: [true]
         # touch-screen: [true, false]
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
