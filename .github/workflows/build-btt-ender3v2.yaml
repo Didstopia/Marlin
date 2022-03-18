@@ -362,7 +362,11 @@ jobs:
             # TODO: Increased Z homing from 4mm/s to 25mm/s
             # Increase homing feed rates (homing speeds)
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(25\*60\) }" Marlin/Configuration.h
-            configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
+            #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
+            configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
+
+            # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
+            #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
 
             # FIXME: If 25mm/s isn't too fast, try that instead of 15mm/s?
             #        But DO remember that Z_PROBE_FEEDRATE_SLOW is set to
@@ -460,6 +464,7 @@ jobs:
           # Enable mainboard/controller fan control
           configEnable USE_CONTROLLER_FAN Marlin/Configuration_adv.h
           configValue CONTROLLER_FAN_PIN FAN2_PIN Marlin/Configuration_adv.h
+          configValue CONTROLLERFAN_IDLE_TIME 10 Marlin/Configuration_adv.h
 
           # Enable automatic fan control for the extruder and parts cooler
           configValue E0_AUTO_FAN_PIN FAN1_PIN Marlin/Configuration_adv.h
