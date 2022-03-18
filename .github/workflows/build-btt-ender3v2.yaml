@@ -365,7 +365,7 @@ jobs:
             #        the higher the first approach probe, the higher the slow probes are!
             # TODO: Increased from 4mm/s to 15mm/s
             # Increase probing speed for the first approach when double-probing (MULTIPLE_PROBING is set to 2)
-            configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)"
+            configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
 
             # FIXME: Our Z offset still keeps changing, but this might be from Z going out of sync?
             #        Needs further testing regardless, so will update as things progress.. (btw, bed was loose, eccentric nuts especially)
