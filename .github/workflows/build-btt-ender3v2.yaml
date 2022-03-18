@@ -344,7 +344,8 @@ jobs:
             # FIXME: Adjust max feedrate for direct drive
             #configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
             # TODO: Trying to drastically bump up maximum values
-            configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 100}" Marlin/Configuration.h
+            #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 100}" Marlin/Configuration.h
+            configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 25, 100}" Marlin/Configuration.h
 
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust max acceleration for direct drive
@@ -368,7 +369,12 @@ jobs:
             #        the higher the first approach probe, the higher the slow probes are!
             # TODO: Increased from 4mm/s to 15mm/s
             # Increase probing speed for the first approach when double-probing (MULTIPLE_PROBING is set to 2)
-            configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
+            #configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
+            # TODO: Nozzle was hitting the bed, so trying to go a little bit slower here
+            configValue Z_PROBE_FEEDRATE_FAST "\(10\*60\)" Marlin/Configuration.h
+
+            # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
+            #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
 
             # FIXME: Our Z offset still keeps changing, but this might be from Z going out of sync?
             #        Needs further testing regardless, so will update as things progress.. (btw, bed was loose, eccentric nuts especially)
@@ -728,7 +734,7 @@ jobs:
             #configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
 
             # Increase the babystepping amount from 0.0025mm to 0.01mm
-            #configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
+            configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
 
             # Set the X and Y axis babystepping to equal the Z axis
             configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
@@ -736,6 +742,7 @@ jobs:
             # Increase fine manual move amount from 0.025mm to 0.005mm
             configValue FINE_MANUAL_MOVE 0.005 Marlin/Configuration_adv.h
 
+            # TODO: Disable just to see if it reduces the sounds?!
             # TODO: This needs HEAVY testing, as it may be too aggressive!
             # Disable stealthschop for the extruder
             configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
