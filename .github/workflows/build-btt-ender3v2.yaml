@@ -514,7 +514,6 @@ jobs:
 
           # Enable additional display features (some are useful when used with OctoPrint for example)
           configEnable STATUS_MESSAGE_SCROLLING Marlin/Configuration_adv.h
-          configEnable LCD_SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (enabled by default)
           # TODO: Why would BTT have this disabled?
@@ -603,7 +602,9 @@ jobs:
           #configEnable CONTROLLER_FAN_EDITABLE Marlin/Configuration_adv.h
 
           # Enable showing remaining time (disabled by default, enabled in Jyers)
+          configEnable LCD_SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
           configEnable SHOW_REMAINING_TIME Marlin/Configuration_adv.h
+          configEnable USE_M73_REMAINING_TIME Marlin/Configuration_adv.h
 
           # Configure the current multiplier when holding/locked (default is 0.5)
           #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
@@ -758,6 +759,8 @@ jobs:
               configEnable LIN_ADVANCE Marlin/Configuration_adv.h
               #configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
               # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
+              #configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
+              # TODO: Re-calibrated and 0.15 now looks the best!
               configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
               configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
