@@ -297,6 +297,19 @@ patchBuzzer() {
   fi
 }
 
+# Function for patching the advance pause prompt so it doesn't hang in the UI
+patchAdvancedPausePrompt() {
+  debug "Patching advanced pause prompt UI hanging"
+
+  # Fix the advanced pause prompt UI hanging
+  sed -i -E 's/(.*[ ]*case PAUSE_MESSAGE_OPTION:[ ]*)(CrealityDWIN\.Popup_Handler\(PurgeMore\);)([ ]*)(break;)/\1pause_menu_response = PAUSE_RESPONSE_WAIT_FOR;\3\2\3\4/' Marlin/src/lcd/e3v2/jyersui/dwin.cpp
+  if [ ! -s /tmp/marlin_patch.log ]; then
+      error "Failed to patch advanced pause prompt UI hanging"
+    # return 1
+    false
+  fi
+}
+
 # Function for patching sane configuration defaults
 patchDefaults() {
   debug "Patching sane configuration defaults"
@@ -354,4 +367,5 @@ setupConfigs
 patchBuildDetails
 patchDWIN
 patchBuzzer
+patchAdvancedPausePrompt
 patchDefaults

@@ -345,18 +345,21 @@ jobs:
             #configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
             # TODO: Trying to drastically bump up maximum values
             #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 100}" Marlin/Configuration.h
-            configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 25, 100}" Marlin/Configuration.h
+            #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 25, 100}" Marlin/Configuration.h
+            # TODO: Trying with default feedrates for now
 
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust max acceleration for direct drive
             #configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
             # TODO: Trying to drastically bump up maximum values
-            configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
+            #configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
+            # TODO: Trying with default accelerations for now
 
             # TODO: Trying to drastically bump up maximum values
-            configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
-            configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
-            configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
+            #configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
+            #configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
+            #configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
+            # TODO: Trying with default accelerations for now
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
@@ -449,7 +452,9 @@ jobs:
           if ($LINEAR_ADVANCE); then
             # TODO: This needs testing, keeping disabled for now, but try enabling!
             # Increase extruder jerk for linear advance + direct drive
-            configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+            #configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+            # TODO: Trying with default extruder jerk for now
+            configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
           else
             # Set default extruder jerk
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
