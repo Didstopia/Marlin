@@ -389,7 +389,7 @@ jobs:
             # Adjust offsets for direct drive
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
             
             # Configure PID for the bed (60C)
             configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -757,7 +757,7 @@ jobs:
             # TODO: Disable just to see if it reduces the sounds?!
             # TODO: This needs HEAVY testing, as it may be too aggressive!
             # Disable stealthschop for the extruder
-            configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
+            #configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
 
             if ($LINEAR_ADVANCE); then
               # Enable linear advance for direct drive
