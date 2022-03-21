@@ -766,7 +766,7 @@ jobs:
               # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
               #configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
               # TODO: Re-calibrated and 0.15 now looks the best!
-              configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
+              configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
               configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi
