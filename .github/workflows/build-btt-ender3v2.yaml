@@ -170,8 +170,8 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v2
-        with:
-          cache: ${{ !env.ACT && 'false' || '' }}
+        # with:
+        #   cache: ${{ !env.ACT && 'pip' || '' }}
 
       - name: Install PlatformIO
         run: |-
