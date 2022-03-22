@@ -27,6 +27,7 @@ on:
         default: "bugfix-2.0.x"
 
 jobs:
+
   build-firmwares:
     name: Build Firmwares
     runs-on: ubuntu-latest
@@ -50,11 +51,41 @@ jobs:
         linear-advance: [true, false]
         junction-deviation: [true, false]
     steps:
+
+      - name: Checkout Repository
+        if: env.ACT == 'true'
+        uses: actions/checkout@v2
+
+      - name: Prepare Test Environment
+        if: env.ACT == 'true'
+        run: |-
+
+          # Copy the current scripts to a temporary folder
+          if [ ${{ env.ACT }} == 'true' ]; then
+            cp -fr .github/workflows/scripts /tmp
+            ls -lah /tmp
+          fi
+
+          # Fix tool cache paths when running locally
+          if [ ${{ env.ACT }} == 'true' ]; then
+            echo "RUN_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
+            echo "RUNNER_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
+            echo "AGENT_TOOLSDIRECTORY=/toolcache" >> $GITHUB_ENV
+          fi
+
+          # Fix python package caching when running locally
+          if [ ${{ env.ACT }} == 'true' ]; then
+            echo "PIP_USER=true" >> $GITHUB_ENV
+            mkdir -p /toolcache/pythonuserbase
+            echo "PYTHONUSERBASE=/toolcache/pythonuserbase" >> $GITHUB_ENV
+            echo "PATH=/toolcache/pythonuserbase/bin:${PATH}" >> $GITHUB_ENV
+          fi
+
       - name: Prepare Target Branch
         run: |-
+
           # Enable script debugging
-          #set -x
-          #printenv
+          # set -x
 
           # Target branch defaults to base ref
           TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
@@ -94,14 +125,24 @@ jobs:
             echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
           fi
 
-      - name: Checkout Repository (${{ env.TARGET_BRANCH }})
+      - name: Checkout Repository
         uses: actions/checkout@v2
         with:
           ref: ${{ env.TARGET_BRANCH }}
           persist-credentials: false
 
-      - name: Prepare Environment (${{ env.TARGET_BRANCH }})
+      - name: Prepare Environment
         run: |-
+
+          # Enable script debugging
+          # set -x
+
+          # Copy the scripts back into place when testing locally
+          if [ ${{ env.ACT }} == 'true' ]; then
+            cp -fr /tmp/scripts .github/workflows
+            ls -lah .github/workflows .github/workflows/scripts
+          fi
+
           # Generate the version based on the branch and commit/tag
           if [ -z "${TARGET_TAG}" ]; then
             echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
@@ -112,6 +153,7 @@ jobs:
           echo "::notice title=Version::${{ env.RELEASE_VERSION }}"
 
       - name: Cache pip
+        if: env.ACT != 'true'
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
@@ -120,6 +162,7 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Cache PlatformIO
+        if: env.ACT != 'true'
         uses: actions/cache@v2
         with:
           path: ~/.platformio
@@ -127,27 +170,39 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v2
+        with:
+          cache: ${{ !env.ACT && 'true' || '' }}
 
       - name: Install PlatformIO
-        run: |
+        run: |-
+
+          # Enable script debugging
+          # set -x
+
           python -m pip install --upgrade pip
           pip install --upgrade platformio
           platformio platform update
 
       - name: Prepare Build Script
+        if: env.ACT != 'true'
         id: configure_build_script
         run: |-
+
+          # Enable script debugging
+          # set -x
+
           # Download the latest helper build script
           mkdir -p .github/workflows/scripts
           wget \
             https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/scripts/configure_build_script.sh \
             -O .github/workflows/scripts/configure_build_script.sh
 
-      - name: Configure Firmware (${{ env.TARGET_BRANCH }})
+      - name: Configure Firmware
         id: configure_firmware
         run: |-
+
           # Enable script debugging
-          #set -x
+          # set -x
 
           # Ensure we're always in the project root
           cd ${GITHUB_WORKSPACE}
@@ -759,6 +814,9 @@ jobs:
             # Disable stealthschop for the extruder
             #configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
 
+            # Enable firmware retraction
+            configEnable FWRETRACT Marlin/Configuration_adv.h
+
             if ($LINEAR_ADVANCE); then
               # Enable linear advance for direct drive
               configEnable LIN_ADVANCE Marlin/Configuration_adv.h
@@ -792,7 +850,7 @@ jobs:
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
 
-      - name: Compile Firmware (${{ env.TARGET_BRANCH }})
+      - name: Compile Firmware
         id: compile_firmware
         run: |-
           # Generate a name for the firmware and export it as a step output
@@ -830,7 +888,7 @@ jobs:
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
 
-      - name: Publish Artifacts (${{ env.TARGET_BRANCH }})
+      - name: Publish Artifacts
         uses: actions/upload-artifact@v2
         with:
           # name: ${{ steps.compile_firmware.outputs.filename }}

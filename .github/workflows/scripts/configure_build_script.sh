@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# set -x
+
 ## TODO
 # - Use more modern configuration files as a base?
 
@@ -86,6 +88,12 @@ error() {
     echo -e "  ${COLOR_RED}[ERROR]${COLOR_RESET} $@"
   fi
 }
+
+# Fix environment variables when running locally
+if [ ! -z "${ACT}" ]; then
+  TARGET_BRANCH=$(cat $GITHUB_ENV | grep TARGET_BRANCH | cut -d '=' -f2)
+  echo "ACT detected, setting TARGET_BRANCH to $TARGET_BRANCH"
+fi
 
 # Figure out the target branch
 # (mainly used for default configuration files)

@@ -19,6 +19,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+# Environment variables and secrets
+.env
+.env.*
+.secrets
+.secrets.*
+
+# GitHub Actions (includes local testing with `act`)
+.artifacts/
+
 # Generated files
 _Version.h
 bdf2u8g
