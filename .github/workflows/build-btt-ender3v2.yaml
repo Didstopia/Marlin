@@ -76,7 +76,7 @@ jobs:
           # Fix python package caching when running locally
           if [ ${{ env.ACT }} == 'true' ]; then
             echo "PIP_USER=true" >> $GITHUB_ENV
-            mkdir -p /toolcache/pythonuserbase
+            mkdir -p /toolcache/pythonuserbase/bin
             echo "PYTHONUSERBASE=/toolcache/pythonuserbase" >> $GITHUB_ENV
             echo "PATH=/toolcache/pythonuserbase/bin:${PATH}" >> $GITHUB_ENV
           fi
@@ -889,6 +889,8 @@ jobs:
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
 
       - name: Publish Artifacts
+        ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
+        if: env.ACT != 'true'
         uses: actions/upload-artifact@v2
         with:
           # name: ${{ steps.compile_firmware.outputs.filename }}

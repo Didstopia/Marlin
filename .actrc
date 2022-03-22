@@ -1,1 +1,1 @@
---actor Dids --artifact-server-path ./.artifacts --artifact-server-port 34567 --rm --defaultbranch bugfix-2.0.x push
+--actor Dids --artifact-server-path artifacts --artifact-server-port 34567 --rm --reuse --defaultbranch bugfix-2.0.x push
