@@ -402,6 +402,15 @@ jobs:
             #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 100}" Marlin/Configuration.h
             #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 25, 100}" Marlin/Configuration.h
             # TODO: Trying with default feedrates for now
+            # TODO: Trying with doubled feedrates now, just to test it out
+            configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 500}" Marlin/Configuration.h
+
+            # TODO: Testing lowering Z travel acceleration from 1000 to 500,
+            #       in case this would not cause as much Z sync issues?
+            configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+
+            # Increase Z jerk from 0.3 to 0.4
+            configValue DEFAULT_ZJERK 0.4 Marlin/Configuration.h
 
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust max acceleration for direct drive
@@ -505,11 +514,11 @@ jobs:
           fi
 
           if ($LINEAR_ADVANCE); then
-            # TODO: This needs testing, keeping disabled for now, but try enabling!
+            # TODO: Trying with a higher e-jerk again, just for good measure!
             # Increase extruder jerk for linear advance + direct drive
-            #configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+            configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
             # TODO: Trying with default extruder jerk for now
-            configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
+            #configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
           else
             # Set default extruder jerk
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
