@@ -823,12 +823,15 @@ jobs:
             # Disable stealthschop for the extruder
             #configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
 
+            # FIXME: Disabling firmware retraction for now, as it almost seems
+            #        like we're unable to disable it with g-code, as our stringing
+            #        issues are identical, no matter how much we adjust retraction!?
             # Enable and configure firmware retraction
-            configEnable FWRETRACT Marlin/Configuration_adv.h
-            configValue MAX_AUTORETRACT 2.0 Marlin/Configuration_adv.h
-            # FIXME: Adjust retract length and feedrate to match known good values for the Bondtech extruder!
-            configValue RETRACT_LENGTH 1 Marlin/Configuration_adv.h
-            configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
+            # configEnable FWRETRACT Marlin/Configuration_adv.h
+            # configValue MAX_AUTORETRACT 2.0 Marlin/Configuration_adv.h
+            # # FIXME: Adjust retract length and feedrate to match known good values for the Bondtech extruder!
+            # configValue RETRACT_LENGTH 1 Marlin/Configuration_adv.h
+            # configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
 
             if ($LINEAR_ADVANCE); then
               # Enable linear advance for direct drive
