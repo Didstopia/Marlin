@@ -54,7 +54,7 @@ jobs:
 
       - name: Checkout Repository
         if: env.ACT == 'true'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Prepare Test Environment
         if: env.ACT == 'true'
@@ -126,7 +126,7 @@ jobs:
           fi
 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ env.TARGET_BRANCH }}
           persist-credentials: false
@@ -154,7 +154,7 @@ jobs:
 
       - name: Cache pip
         if: env.ACT != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -163,13 +163,13 @@ jobs:
 
       - name: Cache PlatformIO
         if: env.ACT != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.platformio
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         # with:
         #   cache: ${{ !env.ACT && 'pip' || '' }}
 
@@ -909,7 +909,7 @@ jobs:
       - name: Publish Artifacts
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
         if: env.ACT != 'true'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           # name: ${{ steps.compile_firmware.outputs.filename }}
           # name: ${{ steps.compile_firmware.outputs.name }}.zip
