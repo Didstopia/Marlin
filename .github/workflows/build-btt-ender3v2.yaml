@@ -608,7 +608,7 @@ jobs:
 
           # TODO: Leaving this alone for now (disabled by default)
           # Enable automatic reporting of SD card status
-          #configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
+          configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (enabled by default)
           # Enable SD card host drive support
@@ -663,9 +663,10 @@ jobs:
 
           # TODO: Leaving these alone for now
           # Enable additional reporting etc. features
-          #configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
-          #configEnable M114_DETAIL Marlin/Configuration_adv.h
-          #configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
+          configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+          configEnable M114_DETAIL Marlin/Configuration_adv.h
+          configEnable M114_REALTIME Marlin/Configuration_adv.h
+          configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
           #configEnable HOST_PAUSE_M76 Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now, probably requires an LCD anyway
@@ -676,6 +677,7 @@ jobs:
           configEnable LCD_SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
           configEnable SHOW_REMAINING_TIME Marlin/Configuration_adv.h
           configEnable USE_M73_REMAINING_TIME Marlin/Configuration_adv.h
+          configEnable ROTATE_PROGRESS_DISPLAY Marlin/Configuration_adv.h
 
           # Configure the current multiplier when holding/locked (default is 0.5)
           #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
@@ -695,11 +697,14 @@ jobs:
           # Enable meatpack g-code compression (disabled by default, enabled in Jyers)
           configEnable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
 
+          configEnable GCODE_CASE_INSENSITIVE Marlin/Configuration_adv.h
+
           # Enable host actions commands (disabled by default, enabled in Jyers)
           configEnable HOST_ACTION_COMMANDS Marlin/Configuration_adv.h
 
           # Customize host action commands (disabled by default, enabled in Jyers)
           configEnable HOST_PROMPT_SUPPORT Marlin/Configuration_adv.h
+          configEnable HOST_START_MENU_ITEM Marlin/Configuration_adv.h
 
           # Enable mechanical gantry calibration
           configEnable MECHANICAL_GANTRY_CALIBRATION Marlin/Configuration_adv.h
@@ -718,9 +723,10 @@ jobs:
           # Increase buffers etc.
           configEnable ADVANCED_OK Marlin/Configuration_adv.h
           configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
-          configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
+          # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
           configValue BUFSIZE 32 Marlin/Configuration_adv.h
           configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
+          configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)

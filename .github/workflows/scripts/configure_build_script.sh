@@ -335,7 +335,7 @@ patchDefaults() {
   configValue BAUDRATE 250000 Marlin/Configuration.h
   
   # Set a custom machine name
-  configValue CUSTOM_MACHINE_NAME \"Ender-3\ V2\ \(BTT\ SKR\ Mini\ E3\)\" Marlin/Configuration.h
+  configValue CUSTOM_MACHINE_NAME \"Rasputin\" Marlin/Configuration.h
 
   # Change the motor drivers
   configValue X_DRIVER_TYPE TMC2209 Marlin/Configuration.h
