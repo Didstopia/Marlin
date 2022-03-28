@@ -412,7 +412,7 @@ jobs:
             configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
 
             # Increase Z jerk from 0.3 to 0.4
-            configValue DEFAULT_ZJERK 0.4 Marlin/Configuration.h
+            #configValue DEFAULT_ZJERK 0.4 Marlin/Configuration.h
 
             # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust max acceleration for direct drive
@@ -455,17 +455,27 @@ jobs:
             # Adjust offsets for direct drive
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, 0 }" Marlin/Configuration.h
             
-            # Configure PID for the bed (60C)
-            configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
-            configValue DEFAULT_bedKi 15.95 Marlin/Configuration.h
-            configValue DEFAULT_bedKd 287.61 Marlin/Configuration.h
+            # # Configure PID for the bed (60C)
+            # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
+            # configValue DEFAULT_bedKi 15.95 Marlin/Configuration.h
+            # configValue DEFAULT_bedKd 287.61 Marlin/Configuration.h
 
-            # Configure PID for the hotend (205C)
-            configValue DEFAULT_Kp 20.40 Marlin/Configuration.h
-            configValue DEFAULT_Ki 1.59 Marlin/Configuration.h
-            configValue DEFAULT_Kd 65.29 Marlin/Configuration.h
+            # Configure PID for the PEI bed (60C)
+            configValue DEFAULT_bedKp 97.05 Marlin/Configuration.h
+            configValue DEFAULT_bedKi 17.58 Marlin/Configuration.h
+            configValue DEFAULT_bedKd 357.15 Marlin/Configuration.h
+
+            # # Configure PID for the hotend (205C)
+            # configValue DEFAULT_Kp 20.40 Marlin/Configuration.h
+            # configValue DEFAULT_Ki 1.59 Marlin/Configuration.h
+            # configValue DEFAULT_Kd 65.29 Marlin/Configuration.h
+
+            # Configure PID for the hotend (200C)
+            configValue DEFAULT_Kp 23.18 Marlin/Configuration.h
+            configValue DEFAULT_Ki 1.82 Marlin/Configuration.h
+            configValue DEFAULT_Kd 73.70 Marlin/Configuration.h
 
             # FIXME: Adjust home offsets for direct drive, since they're now wrong?!
             #        But how/where? HOTEND_OFFSET_X/Y/Z?
@@ -683,13 +693,16 @@ jobs:
           # Configure the current multiplier when holding/locked (default is 0.5)
           #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
 
+          # FIXME: Our Y runs very hot, so maybe we need to bring down its current?
+          #        X also runs quite hot and Z isn't exactly cool either..
+
           # TODO: The motors definitely run a bit hot now, but with the DD, it might just need all the power it can get?
           # FIXME: This might be too high, but it's exactly at 2 x 580 right now..
           #        https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3/issues/515
           # Configure stepper motor driver currents
-          configValue Z_CURRENT 1160 Marlin/Configuration_adv.h
+          # configValue Z_CURRENT 1160 Marlin/Configuration_adv.h
           # TODO: Testing lower currents with DD
-          #configValue Z_CURRENT 850 Marlin/Configuration_adv.h
+          configValue Z_CURRENT 850 Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now
           # Enable stepper driver debugging
