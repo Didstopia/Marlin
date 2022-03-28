@@ -405,7 +405,7 @@ jobs:
             #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 25, 100}" Marlin/Configuration.h
             # TODO: Trying with default feedrates for now
             # TODO: Trying with doubled feedrates now, just to test it out
-            configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 50}" Marlin/Configuration.h
+            # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 50}" Marlin/Configuration.h
 
             # TODO: Testing lowering Z travel acceleration from 1000 to 500,
             #       in case this would not cause as much Z sync issues?
