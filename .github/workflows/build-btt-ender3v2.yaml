@@ -518,9 +518,10 @@ jobs:
           if ($LINEAR_ADVANCE); then
             # TODO: Trying with a higher e-jerk again, just for good measure!
             # Increase extruder jerk for linear advance + direct drive
-            configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
-            # TODO: Trying with default extruder jerk for now
-            #configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
+            #configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+            # FIXME: I'm pretty sure jerk is a big part of our problem,
+            #        so keep trying and perhaps even try without linear advance and/or junction deviation?
+            configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
           else
             # Set default extruder jerk
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
