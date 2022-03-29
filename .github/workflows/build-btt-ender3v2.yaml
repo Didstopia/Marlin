@@ -406,6 +406,8 @@ jobs:
             # TODO: Trying with default feedrates for now
             # TODO: Trying with doubled feedrates now, just to test it out
             # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 50}" Marlin/Configuration.h
+            # TODO: Increasing maximum extruder feedrates for direct drive
+            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
 
             # TODO: Testing lowering Z travel acceleration from 1000 to 500,
             #       in case this would not cause as much Z sync issues?
@@ -678,7 +680,9 @@ jobs:
           configEnable M114_DETAIL Marlin/Configuration_adv.h
           configEnable M114_REALTIME Marlin/Configuration_adv.h
           configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
-          #configEnable HOST_PAUSE_M76 Marlin/Configuration_adv.h
+
+          # Enable telling the host to pause on M76 (pause print job)
+          configEnable HOST_PAUSE_M76 Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now, probably requires an LCD anyway
           # Enable fan control options in LCD (might not work with DWIN?)
@@ -757,8 +761,6 @@ jobs:
           # Enable integrated babystepping (experimental)
           #configEnable INTEGRATED_BABYSTEPPING Marlin/Configuration_adv.h
 
-          # FIXME: Turns out we need this in order to adjust the Z probe offset at runtime!?
-          # TODO: Leaving this alone for now (disabled by default)
           # Combine babystepping with the initial Z probe height
           configEnable BABYSTEP_ZPROBE_OFFSET Marlin/Configuration_adv.h
 
