@@ -8,8 +8,10 @@ on:
 jobs:
 
   sync_main_branch:
-    runs-on: ubuntu-latest
     name: Sync latest commits from upstream (main branch)
+    # FIXME: Not sure if this even works for skipping jobs, but fix/implement proper local testing of this at some point
+    if: env.ACT != 'true'
+    runs-on: ubuntu-latest
 
     steps:
     # REQUIRED step

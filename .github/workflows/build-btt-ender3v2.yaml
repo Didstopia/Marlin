@@ -32,6 +32,13 @@ jobs:
     name: Build Firmwares
     runs-on: ubuntu-latest
     strategy:
+      # Fail early when possible (only applies to matrix jobs)
+      fail-fast: true
+      # FIXME: Somehow only set this when running locally?
+      #        The issue when running locally seems to be multiple
+      #        containers trying to access/install the tool cache,
+      #        so not entirely sure what else to do, than to limit this?
+      # max-parallel: 1
       matrix:
         board: [STM32G0B1RE_btt]
         #grid: [3, 5, 10, 15]
@@ -57,31 +64,60 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Prepare Test Environment
-        if: env.ACT == 'true'
+        if: success() && env.ACT == 'true'
         run: |-
 
           # Copy the current scripts to a temporary folder
           if [ ${{ env.ACT }} == 'true' ]; then
             cp -fr .github/workflows/scripts /tmp
-            ls -lah /tmp
+            # ls -lah /tmp
           fi
 
           # Fix tool cache paths when running locally
-          if [ ${{ env.ACT }} == 'true' ]; then
-            echo "RUN_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
-            echo "RUNNER_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
-            echo "AGENT_TOOLSDIRECTORY=/toolcache" >> $GITHUB_ENV
-          fi
+          # if [ ${{ env.ACT }} == 'true' ]; then
+          #   echo "RUN_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
+          #   echo "RUNNER_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
+          #   echo "AGENT_TOOLSDIRECTORY=/toolcache" >> $GITHUB_ENV
+          # fi
+          # if [ ${{ env.ACT }} == 'true' ]; then
+          #   echo "RUN_TOOL_CACHE=/opt/hostedtoolcache" >> $GITHUB_ENV
+          #   echo "RUNNER_TOOL_CACHE=/opt/hostedtoolcache" >> $GITHUB_ENV
+          #   echo "AGENT_TOOLSDIRECTORY=/opt/hostedtoolcache" >> $GITHUB_ENV
+          # fi
+          # TODO: If this alone isn't enough, check if we need to move or copy /opt/toolcache/* to /toolcache first?
+          # TODO: UPDATE: Removing the toolcache might be a bad move, but we'll see if it works..
+          # set -x
+          # ls -lah /opt
+          # ls -lah /opt/hostedtoolcache || true
+          # ls -lah /toolcache
+          \cp -fa /opt/hostedtoolcache/. /toolcache/
+          rm -fr /opt/hostedtoolcache
+          ln -sf /toolcache /opt/hostedtoolcache
+          # ls -lah /opt
+          # ls -lah /opt/hostedtoolcache || true
+          # ls -lah /toolcache
+          # set +x
+          # exit 1
 
+          # FIXME: This currently throws multiple errors with actions/setup-python,
+          #        at least when running for the first time?
+          # TODO: UPDATE: Looks like we're still getting errors, even without this, so the issue is something else entirely!?
           # Fix python package caching when running locally
+          # if [ ${{ env.ACT }} == 'true' ]; then
+          #   echo "PIP_USER=true" >> $GITHUB_ENV
+          #   mkdir -p /toolcache/pythonuserbase/bin
+          #   echo "PYTHONUSERBASE=/toolcache/pythonuserbase" >> $GITHUB_ENV
+          #   echo "PATH=/toolcache/pythonuserbase/bin:${PATH}" >> $GITHUB_ENV
+          # fi
           if [ ${{ env.ACT }} == 'true' ]; then
             echo "PIP_USER=true" >> $GITHUB_ENV
-            mkdir -p /toolcache/pythonuserbase/bin
-            echo "PYTHONUSERBASE=/toolcache/pythonuserbase" >> $GITHUB_ENV
-            echo "PATH=/toolcache/pythonuserbase/bin:${PATH}" >> $GITHUB_ENV
+            mkdir -p /opt/hostedtoolcache/pythonuserbase/bin
+            echo "PYTHONUSERBASE=/opt/hostedtoolcache/pythonuserbase" >> $GITHUB_ENV
+            echo "PATH=/opt/hostedtoolcache/pythonuserbase/bin:${PATH}" >> $GITHUB_ENV
           fi
 
       - name: Prepare Target Branch
+        if: success() # Ensure we only run this step if the previous one succeeded
         run: |-
 
           # Enable script debugging
@@ -105,7 +141,6 @@ jobs:
           fi
 
           # If this is a tagged release, always use the "2.0.x" branch instead
-          ## TODO: Implement
           REF_TYPE=${{ env.GITHUB_REF_TYPE }}
           REF_NAME=${{ env.GITHUB_REF_NAME }}
           if [ "$REF_TYPE" = "tag" ]; then
@@ -114,7 +149,8 @@ jobs:
             TARGET_BRANCH=2.0.x
           fi
 
-          echo "Final target branch: $TARGET_BRANCH"
+          # echo "Final target branch: $TARGET_BRANCH"
+          echo "::warning title=Final target branch::$TARGET_BRANCH"
 
           # Ensure that we have a target branch
           if [ -z "${TARGET_BRANCH}" ]; then
@@ -125,13 +161,17 @@ jobs:
             echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
           fi
 
+          # exit 1
+
       - name: Checkout Repository
+        if: success() # Ensure we only run this step if the previous one succeeded
         uses: actions/checkout@v3
         with:
           ref: ${{ env.TARGET_BRANCH }}
           persist-credentials: false
 
       - name: Prepare Environment
+        if: success() # Ensure we only run this step if the previous one succeeded
         run: |-
 
           # Enable script debugging
@@ -140,7 +180,7 @@ jobs:
           # Copy the scripts back into place when testing locally
           if [ ${{ env.ACT }} == 'true' ]; then
             cp -fr /tmp/scripts .github/workflows
-            ls -lah .github/workflows .github/workflows/scripts
+            # ls -lah .github/workflows .github/workflows/scripts
           fi
 
           # Generate the version based on the branch and commit/tag
@@ -149,11 +189,12 @@ jobs:
           else
             echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-${{ env.TARGET_TAG }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
           fi
+
           # Print out the version
           echo "::notice title=Version::${{ env.RELEASE_VERSION }}"
 
       - name: Cache pip
-        if: env.ACT != 'true'
+        if: success() && env.ACT != 'true'
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -162,18 +203,22 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Cache PlatformIO
-        if: env.ACT != 'true'
+        if: success() && env.ACT != 'true'
         uses: actions/cache@v3
         with:
           path: ~/.platformio
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
+      # WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager.
+      #          It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
       - name: Setup Python
+        if: success() # Ensure we only run this step if the previous one succeeded
         uses: actions/setup-python@v3
         # with:
         #   cache: ${{ !env.ACT && 'pip' || '' }}
 
       - name: Install PlatformIO
+        if: success() # Ensure we only run this step if the previous one succeeded
         run: |-
 
           # Enable script debugging
@@ -184,7 +229,7 @@ jobs:
           platformio platform update
 
       - name: Prepare Build Script
-        if: env.ACT != 'true'
+        if: success() && env.ACT != 'true'
         id: configure_build_script
         run: |-
 
@@ -198,6 +243,7 @@ jobs:
             -O .github/workflows/scripts/configure_build_script.sh
 
       - name: Configure Firmware
+        if: success() # Ensure we only run this step if the previous one succeeded
         id: configure_firmware
         run: |-
 
@@ -694,6 +740,9 @@ jobs:
           configEnable USE_M73_REMAINING_TIME Marlin/Configuration_adv.h
           configEnable ROTATE_PROGRESS_DISPLAY Marlin/Configuration_adv.h
 
+          # Further display/status info customizations
+          configEnable STATUS_HEAT_PERCENT Marlin/Configuration_adv.h # Show heating in a progress bar
+
           # Configure the current multiplier when holding/locked (default is 0.5)
           #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
 
@@ -891,6 +940,7 @@ jobs:
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
 
       - name: Compile Firmware
+        if: success() # Ensure we only run this step if the previous one succeeded
         id: compile_firmware
         run: |-
           # Generate a name for the firmware and export it as a step output
@@ -930,7 +980,8 @@ jobs:
 
       - name: Publish Artifacts
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
-        if: env.ACT != 'true'
+        # if: env.ACT != 'true'
+        if: success() # Ensure we only run this step if the previous one succeeded
         uses: actions/upload-artifact@v3
         with:
           # name: ${{ steps.compile_firmware.outputs.filename }}

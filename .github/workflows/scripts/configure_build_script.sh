@@ -89,11 +89,17 @@ error() {
   fi
 }
 
+## FIXME: This stopped working for whatever reason, so needs fixing
 # Fix environment variables when running locally
-if [ ! -z "${ACT}" ]; then
-  TARGET_BRANCH=$(cat $GITHUB_ENV | grep TARGET_BRANCH | cut -d '=' -f2)
-  echo "ACT detected, setting TARGET_BRANCH to $TARGET_BRANCH"
-fi
+# if [ ! -z "${ACT}" ]; then
+#   set -x
+#   printenv
+#   echo "GITHUB_ENV=${GITHUB_ENV}"
+#   cat $GITHUB_ENV
+#   TARGET_BRANCH=$(cat $GITHUB_ENV | grep TARGET_BRANCH | cut -d '=' -f2)
+#   echo "ACT detected, setting TARGET_BRANCH to $TARGET_BRANCH"
+#   set +x
+# fi
 
 # Figure out the target branch
 # (mainly used for default configuration files)
