@@ -1,16 +1,25 @@
 name: Sync Upstream
 
 on:
+  # Trigger upstream sync on push
+  push:
+    # Only when the following branches are pushed to
+    branches:
+      - 2.0.x
+      - bugfix-2.0.x
+      - skr-mini-e3-v3-0
+  # Trigger upstream sync on a schedule
   schedule:
     - cron: '0 8 * * *' # Once a day at 08:00
-  workflow_dispatch: # Can also be triggered manually
+  # Trigger upstream sync manually
+  workflow_dispatch:
 
 jobs:
 
   sync_main_branch:
     name: Sync latest commits from upstream (main branch)
     # FIXME: Not sure if this even works for skipping jobs, but fix/implement proper local testing of this at some point
-    if: env.ACT != 'true'
+    if: ${{ env.ACT }} != 'true'
     runs-on: ubuntu-latest
 
     steps:
