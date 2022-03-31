@@ -1,13 +1,14 @@
 name: Sync Upstream
 
 on:
-  # Trigger upstream sync on push
-  push:
-    # Only when the following branches are pushed to
-    branches:
-      - 2.0.x
-      - bugfix-2.0.x
-      - skr-mini-e3-v3-0
+  # FIXME: Running on push wouldn't make sense, would it?
+  # # Trigger upstream sync on push
+  # push:
+  #   # Only when the following branches are pushed to
+  #   branches:
+  #     - 2.0.x
+  #     - bugfix-2.0.x
+  #     - skr-mini-e3-v3-0
   # Trigger upstream sync on a schedule
   schedule:
     - cron: '0 8 * * *' # Once a day at 08:00
@@ -18,8 +19,9 @@ jobs:
 
   sync_main_branch:
     name: Sync latest commits from upstream (main branch)
-    # FIXME: Not sure if this even works for skipping jobs, but fix/implement proper local testing of this at some point
-    if: ${{ env.ACT }} != 'true'
+    # FIXME: "env" is not available for job context
+    #        https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
+    # if: ${{ env.ACT }} != 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -56,12 +58,13 @@ jobs:
         # Rebase instead of merge
         git_config_pull_rebase: true
 
+        # FIXME: Override test_mode when running locally with ACL
         # Set test_mode true to run tests instead of the true action!!
         test_mode: false
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
     - name: Build Trigger
-      if: steps.sync.outputs.has_new_commits == 'true'
+      if: steps.sync.outputs.has_new_commits == 'true' && env.ACT != 'true'
       run: |
         echo "New commits were found and synced, triggering a new firmware build"
         [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
@@ -122,12 +125,13 @@ jobs:
         # Rebase instead of merge
         git_config_pull_rebase: true
 
+        # FIXME: Override test_mode when running locally with ACL
         # Set test_mode true to run tests instead of the true action!!
         test_mode: false
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
     - name: Build Trigger
-      if: steps.sync.outputs.has_new_commits == 'true'
+      if: steps.sync.outputs.has_new_commits == 'true' && env.ACT != 'true'
       run: |
         echo "New commits were found and synced, triggering a new firmware build"
         [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
