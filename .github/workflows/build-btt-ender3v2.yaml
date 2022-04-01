@@ -589,12 +589,12 @@ jobs:
           # NOTE: MPC is still HIGHLY experimental, proceed with caution!
           if ($MPC); then
             # Disable PID and enable MPC
-            configDisable PIDTEMP
-            configEnable MPCTEMP
+            configDisable PIDTEMP Marlin/Configuration.h
+            configEnable MPCTEMP Marlin/Configuration.h
           else
             # Enable PID and disable MPC
-            configEnable PIDTEMP
-            configDisable MPCTEMP
+            configEnable PIDTEMP Marlin/Configuration.h
+            configDisable MPCTEMP Marlin/Configuration.h
           fi
 
           ## END OF CONFIGURATION.H
