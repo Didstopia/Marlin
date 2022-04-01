@@ -57,6 +57,7 @@ jobs:
         touch-screen: [false]
         linear-advance: [true, false]
         junction-deviation: [true, false]
+        mpc: [true, false]
     steps:
 
       - name: Checkout Repository
@@ -585,6 +586,17 @@ jobs:
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
           fi
 
+          # NOTE: MPC is still HIGHLY experimental, proceed with caution!
+          if ($MPC); then
+            # Disable PID and enable MPC
+            configDisable PIDTEMP
+            configEnable MPCTEMP
+          else
+            # Enable PID and disable MPC
+            configEnable PIDTEMP
+            configDisable MPCTEMP
+          fi
+
           ## END OF CONFIGURATION.H
 
 
@@ -938,6 +950,7 @@ jobs:
           TOUCH_SCREEN: ${{ matrix.touch-screen }}
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
+          MPC: ${{ matrix.mpc }}
 
       - name: Compile Firmware
         if: success() # Ensure we only run this step if the previous one succeeded
@@ -950,7 +963,8 @@ jobs:
           if ($LINEAR_ADVANCE); then LINEAR_ADVANCE_LABEL=-LIN; else LINEAR_ADVANCE_LABEL=; fi;
           if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=; fi;
           if ($TOUCH_SCREEN); then TOUCH_SCREEN_LABEL=-TOUCH; else TOUCH_SCREEN_LABEL=; fi;
-          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${TOUCH_SCREEN_LABEL}-${BOARD}-${VERSION}"
+          if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=; fi;
+          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${MPC_LABEL}${TOUCH_SCREEN_LABEL}-${BOARD}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -977,6 +991,7 @@ jobs:
           TOUCH_SCREEN: ${{ matrix.touch-screen }}
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
+          MPC: ${{ matrix.mpc }}
 
       - name: Publish Artifacts
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now

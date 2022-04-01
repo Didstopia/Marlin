@@ -10,7 +10,9 @@ _None._
 
 ## High
 
-- [ ] Implement automatic patch file generation for the entire repository (Didstopia/Marlin#3)
+- [ ] Implement [automatic patch file generation](https://stackoverflow.com/questions/9980186/how-to-create-a-patch-for-a-whole-directory-to-update-it) for the entire repository (Didstopia/Marlin#3)
+
+- [ ] Research/implement MPC builds (Didstopia/Marlin#4)
 
 ## Medium
 
