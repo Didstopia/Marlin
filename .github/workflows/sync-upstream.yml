@@ -11,7 +11,7 @@ on:
   #     - skr-mini-e3-v3-0
   # Trigger upstream sync on a schedule
   schedule:
-    - cron: '0 8 * * *' # Once a day at 08:00
+    - cron: '0 6 * * *' # Once a day at 06:00
   # Trigger upstream sync manually
   workflow_dispatch:
 
