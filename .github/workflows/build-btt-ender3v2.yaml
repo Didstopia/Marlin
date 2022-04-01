@@ -57,7 +57,8 @@ jobs:
         touch-screen: [false]
         linear-advance: [true, false]
         junction-deviation: [true, false]
-        mpc: [true, false]
+        #mpc: [true, false]
+        mpc: [false]
     steps:
 
       - name: Checkout Repository
