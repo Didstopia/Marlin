@@ -504,8 +504,9 @@ jobs:
             #        Needs further testing regardless, so will update as things progress.. (btw, bed was loose, eccentric nuts especially)
             # Adjust offsets for direct drive
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -28.5, 6.0, -2.95 }" Marlin/Configuration.h
+            #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, 0 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, 0 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
