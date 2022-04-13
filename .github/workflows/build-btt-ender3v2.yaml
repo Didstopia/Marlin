@@ -885,6 +885,9 @@ jobs:
           # Enable moving the nozzle out of the way for adjusting when assisted tramming is enabled
           configEnable ASSISTED_TRAMMING_WAIT_POSITION Marlin/Configuration_adv.h
 
+          # Enable Marlin binary file transfer support (marlinbft)
+          configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
+
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
           #configValue TRAMMING_SCREW_THREAD 40 Marlin/Configuration_adv.h
