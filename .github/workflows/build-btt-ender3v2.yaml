@@ -826,8 +826,8 @@ jobs:
 
           # Configure additional options for mechanical gantry calibration
           configValue GANTRY_CALIBRATION_CURRENT "Z_CURRENT \/ 3" Marlin/Configuration_adv.h
-          # configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 10 Marlin/Configuration_adv.h
-          configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 5 Marlin/Configuration_adv.h
+          configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 10 Marlin/Configuration_adv.h
+          # configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 5 Marlin/Configuration_adv.h
           configValue GANTRY_CALIBRATION_FEEDRATE 500 Marlin/Configuration_adv.h
           configValue GANTRY_CALIBRATION_COMMANDS_POST \"G28\;G28\ Z\" Marlin/Configuration_adv.h
 
