@@ -517,10 +517,10 @@ jobs:
             # configValue DEFAULT_bedKi 15.95 Marlin/Configuration.h
             # configValue DEFAULT_bedKd 287.61 Marlin/Configuration.h
 
-            # Configure PID for the PEI bed (60C)
-            configValue DEFAULT_bedKp 97.05 Marlin/Configuration.h
-            configValue DEFAULT_bedKi 17.58 Marlin/Configuration.h
-            configValue DEFAULT_bedKd 357.15 Marlin/Configuration.h
+            # Configure PID for the PEI bed (60C + Creality Smooth PEI)
+            configValue DEFAULT_bedKp 112.39 Marlin/Configuration.h
+            configValue DEFAULT_bedKi 21.61 Marlin/Configuration.h
+            configValue DEFAULT_bedKd 389.63 Marlin/Configuration.h
 
             # # Configure PID for the hotend (205C)
             # configValue DEFAULT_Kp 20.40 Marlin/Configuration.h
@@ -528,9 +528,9 @@ jobs:
             # configValue DEFAULT_Kd 65.29 Marlin/Configuration.h
 
             # Configure PID for the hotend (200C)
-            configValue DEFAULT_Kp 23.18 Marlin/Configuration.h
-            configValue DEFAULT_Ki 1.82 Marlin/Configuration.h
-            configValue DEFAULT_Kd 73.70 Marlin/Configuration.h
+            configValue DEFAULT_Kp 23.63 Marlin/Configuration.h
+            configValue DEFAULT_Ki 1.86 Marlin/Configuration.h
+            configValue DEFAULT_Kd 75.13 Marlin/Configuration.h
 
             # FIXME: Adjust home offsets for direct drive, since they're now wrong?!
             #        But how/where? HOTEND_OFFSET_X/Y/Z?
