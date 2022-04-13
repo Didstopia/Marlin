@@ -59,7 +59,8 @@ jobs:
         junction-deviation: [true, false]
         #mpc: [true, false]
         mpc: [false]
-        ui: ["JyersUI", "MarlinUI"]
+        #ui: ["JyersUI", "MarlinUI"]
+        # ui: ["JyersUI"]
     steps:
 
       - name: Checkout Repository
@@ -612,16 +613,20 @@ jobs:
           fi
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
-          configValue X_BED_SIZE 235 Marlin/Configuration.h
-          configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          configValue X_MIN_POS 0 Marlin/Configuration.h
-          configValue Y_MIN_POS 0 Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
-          configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+          # configValue X_BED_SIZE 235 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 235 Marlin/Configuration.h
+          # configValue X_MIN_POS 0 Marlin/Configuration.h
+          # configValue Y_MIN_POS 0 Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
+          # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
 
           # Calibrated bed and position values
-          configValue X_BED_SIZE "235 - 3" Marlin/Configuration.h
+          configValue X_BED_SIZE "235 - 2" Marlin/Configuration.h
           configValue Y_BED_SIZE "235 - 5" Marlin/Configuration.h
+          configValue X_MIN_POS 0 Marlin/Configuration.h
+          configValue Y_MIN_POS 0 Marlin/Configuration.h
+          configValue X_MAX_POS "245 - 5" Marlin/Configuration.h
+          configValue Y_MAX_POS "235 - 5" Marlin/Configuration.h
 
           ## END OF CONFIGURATION.H
 
