@@ -796,9 +796,10 @@ jobs:
           # Enable stepper driver debugging
           configEnable TMC_DEBUG Marlin/Configuration_adv.h
 
-          # FIXME: Meatpack and Binary File Transfer can NOT be enabled at the same time!
+          ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
+          #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
           # Enable meatpack g-code compression (disabled by default, enabled in Jyers)
-          # configEnable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
+          configEnable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
 
           configEnable GCODE_CASE_INSENSITIVE Marlin/Configuration_adv.h
 
@@ -887,7 +888,8 @@ jobs:
           # Enable moving the nozzle out of the way for adjusting when assisted tramming is enabled
           configEnable ASSISTED_TRAMMING_WAIT_POSITION Marlin/Configuration_adv.h
 
-          # FIXME: Meatpack and Binary File Transfer can NOT be enabled at the same time!
+          ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
+          #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
           # Enable Marlin binary file transfer support (marlinbft)
           configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
 
