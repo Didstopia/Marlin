@@ -59,6 +59,7 @@ jobs:
         junction-deviation: [true, false]
         #mpc: [true, false]
         mpc: [false]
+        ui: ["JyersUI", "MarlinUI"]
     steps:
 
       - name: Checkout Repository
@@ -341,7 +342,8 @@ jobs:
 
           # TODO: This will need adjusting if we end up utilizing mechanical gantry calibration
           # Lower maximum Z position for better mechanical gantry calibration
-          #configValue Z_MAX_POS 250 Marlin/Configuration.h
+          # NOTE: We can't go higher than 250 without breaking something!
+          configValue Z_MAX_POS 245 Marlin/Configuration.h # Default is 250
 
           # Enable filament runout sensor
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
@@ -599,6 +601,23 @@ jobs:
             configDisable MPCTEMP Marlin/Configuration.h
           fi
 
+          # Switch between the different UI options
+          if [ $UI == "MarlinUI" ]; then
+            # Enable the Marlin UI
+            configEnable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+
+            # Disable Jyers UI
+            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+          fi
+
+          ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
+          configValue X_BED_SIZE 235 Marlin/Configuration.h
+          configValue Y_BED_SIZE 235 Marlin/Configuration.h
+          configValue X_MIN_POS 0 Marlin/Configuration.h
+          configValue Y_MIN_POS 0 Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
+          configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+
           ## END OF CONFIGURATION.H
 
 
@@ -772,8 +791,9 @@ jobs:
           configValue Z_CURRENT 850 Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now
+          # TODO: UPDATE: Apparently this is "required" by MONITOR_DRIVER_STATUS?
           # Enable stepper driver debugging
-          #configEnable TMC_DEBUG Marlin/Configuration_adv.h
+          configEnable TMC_DEBUG Marlin/Configuration_adv.h
 
           # Enable meatpack g-code compression (disabled by default, enabled in Jyers)
           configEnable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
@@ -792,9 +812,10 @@ jobs:
 
           # Configure additional options for mechanical gantry calibration
           configValue GANTRY_CALIBRATION_CURRENT "Z_CURRENT \/ 3" Marlin/Configuration_adv.h
-          configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 10 Marlin/Configuration_adv.h
+          # configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 10 Marlin/Configuration_adv.h
+          configValue GANTRY_CALIBRATION_EXTRA_HEIGHT 5 Marlin/Configuration_adv.h
           configValue GANTRY_CALIBRATION_FEEDRATE 500 Marlin/Configuration_adv.h
-          configValue GANTRY_CALIBRATION_COMMANDS_POST \"G28\" Marlin/Configuration_adv.h
+          configValue GANTRY_CALIBRATION_COMMANDS_POST \"G28;G28 Z\" Marlin/Configuration_adv.h
 
           # TODO: I think this only affects LCDs, not DWIN displays, so might be redundant?
           # Lower the bootscreen timeout
@@ -867,6 +888,12 @@ jobs:
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
           #configValue TRAMMING_SCREW_THREAD 40 Marlin/Configuration_adv.h
+
+          # TODO: This will likely cause A LOT of noise, but potentially benefits quality?
+          # Enable and configure Hybrid Threshold
+          configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
+          configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
+          configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in creality and BTT
 
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
@@ -953,6 +980,7 @@ jobs:
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
           MPC: ${{ matrix.mpc }}
+          UI: ${{ matrix.ui }}
 
       - name: Compile Firmware
         if: success() # Ensure we only run this step if the previous one succeeded
@@ -966,7 +994,8 @@ jobs:
           if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=; fi;
           if ($TOUCH_SCREEN); then TOUCH_SCREEN_LABEL=-TOUCH; else TOUCH_SCREEN_LABEL=; fi;
           if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=; fi;
-          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${MPC_LABEL}${TOUCH_SCREEN_LABEL}-${BOARD}-${VERSION}"
+          if ($UI); then UI_LABEL=-$UI; else UI_LABEL=; fi;
+          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${MPC_LABEL}${TOUCH_SCREEN_LABEL}${UI_LABEL}-${BOARD}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -981,6 +1010,8 @@ jobs:
           cp Marlin/Configuration.h "temp/${FIRMWARE_NAME}/Configuration.h"
           cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configuration_adv.h"
 
+          ## TODO: !!! Add DWIN customizations here !!!
+
           # Include the latest DWIN display firmware with all build artifacts
           cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
         env:
@@ -994,6 +1025,7 @@ jobs:
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
           MPC: ${{ matrix.mpc }}
+          UI: ${{ matrix.ui }}
 
       - name: Publish Artifacts
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
