@@ -1002,7 +1002,7 @@ jobs:
           if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=; fi;
           if ($TOUCH_SCREEN); then TOUCH_SCREEN_LABEL=-TOUCH; else TOUCH_SCREEN_LABEL=; fi;
           if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=; fi;
-          if ($UI); then UI_LABEL=-$UI; else UI_LABEL=; fi;
+          if [ ! -z "$UI" ]; then UI_LABEL=-$UI; else UI_LABEL=; fi;
           FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${MPC_LABEL}${TOUCH_SCREEN_LABEL}${UI_LABEL}-${BOARD}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
