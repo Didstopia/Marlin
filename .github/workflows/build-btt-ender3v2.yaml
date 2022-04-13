@@ -663,10 +663,12 @@ jobs:
             configDisable BLTOUCH_HS_MODE Marlin/Configuration_adv.h
           fi
 
+          # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
           # Decreate probing delay for BLTouch
           # WARNING: Requires a BLTouch 3.0 or later
           configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
 
+          # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
           # Enable 5V mode for BLTouch
           # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
           configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
