@@ -881,10 +881,9 @@ jobs:
           # Disable stealthchopping for the Z axis
           #configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
 
-          # TODO: UPDATE: Nope, I still don't think this is worth it, plus it keeps the fans on 24/7
-          # TODO: Testing this again, just in case
-          # Disable Z axis idling when inactive
-          #configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
+          # Disable Z axis idling when inactive, while still allowing for fans to be disabled
+          configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
+          configEnable CONTROLLER_FAN_IGNORE_Z Marlin/Configuration_adv.h
 
           # Enable assisted tramming
           configEnable ASSISTED_TRAMMING Marlin/Configuration_adv.h
