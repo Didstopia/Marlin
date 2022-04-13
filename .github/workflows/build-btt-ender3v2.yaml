@@ -891,7 +891,7 @@ jobs:
           ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
           #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
           # Enable Marlin binary file transfer support (marlinbft)
-          configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
+          # configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
 
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
