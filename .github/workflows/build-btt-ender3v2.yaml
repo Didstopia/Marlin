@@ -57,6 +57,8 @@ jobs:
         touch-screen: [false]
         linear-advance: [true, false]
         junction-deviation: [true, false]
+        #hybrid-threshold: [true, false]
+        hybrid-threshold: [false]
         #mpc: [true, false]
         mpc: [false]
         #ui: ["JyersUI", "MarlinUI"]
@@ -909,9 +911,11 @@ jobs:
 
           # TODO: This will likely cause A LOT of noise, but potentially benefits quality?
           # Enable and configure Hybrid Threshold
-          configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
-          configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
-          configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in creality and BTT
+          if ($HYBRID_THRESHOLD); then
+            configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
+            configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
+            configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in creality and BTT
+          fi
 
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
@@ -997,6 +1001,7 @@ jobs:
           TOUCH_SCREEN: ${{ matrix.touch-screen }}
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
+          HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
           MPC: ${{ matrix.mpc }}
           UI: ${{ matrix.ui }}
 
@@ -1010,10 +1015,11 @@ jobs:
           if ($UBL); then UBL_LABEL=-UBL; else UBL_LABEL=-ABL; fi;
           if ($LINEAR_ADVANCE); then LINEAR_ADVANCE_LABEL=-LIN; else LINEAR_ADVANCE_LABEL=; fi;
           if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=; fi;
+          if ($HYBRID_THRESHOLD); then HYBRID_THRESHOLD_LABEL=-HT; else HYBRID_THRESHOLD_LABEL=; fi;
           if ($TOUCH_SCREEN); then TOUCH_SCREEN_LABEL=-TOUCH; else TOUCH_SCREEN_LABEL=; fi;
           if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=; fi;
           if [ ! -z "$UI" ]; then UI_LABEL=-$UI; else UI_LABEL=; fi;
-          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${MPC_LABEL}${TOUCH_SCREEN_LABEL}${UI_LABEL}-${BOARD}-${VERSION}"
+          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}${TOUCH_SCREEN_LABEL}${UI_LABEL}-${BOARD}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -1042,6 +1048,7 @@ jobs:
           TOUCH_SCREEN: ${{ matrix.touch-screen }}
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
+          HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
           MPC: ${{ matrix.mpc }}
           UI: ${{ matrix.ui }}
 
