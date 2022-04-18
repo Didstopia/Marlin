@@ -55,14 +55,16 @@ jobs:
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
         touch-screen: [false]
-        linear-advance: [true, false]
+        # linear-advance: [true, false]
+        linear-advance: [false]
         junction-deviation: [true, false]
         #hybrid-threshold: [true, false]
         hybrid-threshold: [false]
         #mpc: [true, false]
         mpc: [false]
         #ui: ["JyersUI", "MarlinUI"]
-        # ui: ["JyersUI"]
+        # TODO: Enable this once we have time to test out the BTT's TFT35 display
+        # ui: ["JyersUI", "TFT35"]
     steps:
 
       - name: Checkout Repository
@@ -279,17 +281,20 @@ jobs:
           configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 95.1 }" Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (defaults are higher)
+          # TODO: UPDATE: Lowering feedrates again as per BTT config (and increasing acceleration)
           # Set default/custom maximum feedrate (movement speed)
-          #configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
+          configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (defaults are lower)
           # FIXME: Maybe the max acceleration for the extruder is causing the varying sample sizes?
+          # TODO: UPDATE: Increasing acceleration again as per BTT config (and lowering feedrates)
           # Set default/custom maximum acceleration
-          #configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
+          configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (default is 1000)
+          # TODO: UPDATE: Increasing travel acceleration again as per BTT config (and lowering feedrates)
           # Set default/custom maximum acceleration while moving/traveling
-          #configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+          configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
 
           # Enable S-Curve Acceleration (default is disabled)
           configEnable S_CURVE_ACCELERATION Marlin/Configuration.h
@@ -315,7 +320,6 @@ jobs:
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
 
-          # FIXME: Ensure the defaults are set to -10 and 10!
           # TODO: Leaving these alone for now
           # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
           #configValue Z_PROBE_OFFSET_RANGE_MIN -20 Marlin/Configuration.h
@@ -352,7 +356,8 @@ jobs:
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
           
           # TODO: Should we keep it disabled by default?
-          configValue FIL_RUNOUT_ENABLED_DEFAULT false Marlin/Configuration.h
+          # configValue FIL_RUNOUT_ENABLED_DEFAULT false Marlin/Configuration.h
+          configValue FIL_RUNOUT_ENABLED_DEFAULT true Marlin/Configuration.h
 
           # TODO: This needs to be configured correctly
           # Set the default/custom runout sensor filament distance
@@ -444,11 +449,7 @@ jobs:
 
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
-            # TODO: These are currently set to the defaults, so may need to be adjusted?
             # Adjust e-steps for direct drive
-            #configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415 }" Marlin/Configuration.h
-            #configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 432.7 }" Marlin/Configuration.h
-            # TODO: Restore the original e-steps, as we may have calibrated them incorrectly!
             configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415 }" Marlin/Configuration.h
 
             # FIXME: Adjust max feedrate for direct drive
@@ -460,11 +461,13 @@ jobs:
             # TODO: Trying with doubled feedrates now, just to test it out
             # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 50}" Marlin/Configuration.h
             # TODO: Increasing maximum extruder feedrates for direct drive
-            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
+            # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
+            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
 
             # TODO: Testing lowering Z travel acceleration from 1000 to 500,
             #       in case this would not cause as much Z sync issues?
-            configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
 
             # Increase Z jerk from 0.3 to 0.4
             #configValue DEFAULT_ZJERK 0.4 Marlin/Configuration.h
@@ -475,12 +478,14 @@ jobs:
             # TODO: Trying to drastically bump up maximum values
             #configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
             # TODO: Trying with default accelerations for now
+            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
 
             # TODO: Trying to drastically bump up maximum values
             #configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
             #configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
             #configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
             # TODO: Trying with default accelerations for now
+            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
@@ -488,6 +493,7 @@ jobs:
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(25\*60\) }" Marlin/Configuration.h
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
             configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
+            # TODO: Should we default back to BTT's homing speeds instead
 
             # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
             #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
@@ -612,6 +618,18 @@ jobs:
 
             # Disable Jyers UI
             configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+          elif [ $UI == "JyersUI" ]; then
+            # Enable the Jyers UI
+            configEnable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+
+            # Disable Marlin UI
+            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+          elif [ $UI == "TFT35" ]; then
+            # TODO: Implement BTT TFT35 support here
+
+            # Disable other UIs
+            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
           fi
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
@@ -713,8 +731,9 @@ jobs:
           #configEnable SCROLL_LONG_FILENAMES Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (disabled by default)
+          # TODO: UPDATE: We don't really need this, so disabling it for now
           # Enable automatic reporting of SD card status
-          configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
+          # configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (enabled by default)
           # Enable SD card host drive support
@@ -768,11 +787,13 @@ jobs:
           #configEnable IMPROVE_HOMING_RELIABILITY Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
+          # TODO: UPDATE: Disabled the first 3 to fallback to polling,
+          #               and not sure if fan change was ever even being utilized
           # Enable additional reporting etc. features
-          configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
-          configEnable M114_DETAIL Marlin/Configuration_adv.h
-          configEnable M114_REALTIME Marlin/Configuration_adv.h
-          configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
+          # configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+          # configEnable M114_DETAIL Marlin/Configuration_adv.h
+          # configEnable M114_REALTIME Marlin/Configuration_adv.h
+          # configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
 
           # Enable telling the host to pause on M76 (pause print job)
           configEnable HOST_PAUSE_M76 Marlin/Configuration_adv.h
@@ -787,8 +808,10 @@ jobs:
           configEnable USE_M73_REMAINING_TIME Marlin/Configuration_adv.h
           configEnable ROTATE_PROGRESS_DISPLAY Marlin/Configuration_adv.h
 
+          # TODO: Not sure if this only applies to MarlinUI or something?
+          #       Either way, keeping it disabled for now
           # Further display/status info customizations
-          configEnable STATUS_HEAT_PERCENT Marlin/Configuration_adv.h # Show heating in a progress bar
+          # configEnable STATUS_HEAT_PERCENT Marlin/Configuration_adv.h # Show heating in a progress bar
 
           # Configure the current multiplier when holding/locked (default is 0.5)
           #configValue HOLD_MULTIPLIER "0.3" Marlin/Configuration_adv.h
@@ -840,6 +863,8 @@ jobs:
           # TODO: Leaving these alone for now (all defaults seem fine/same, these would just be unnecessarily high)
           # Increase buffers etc.
           configEnable ADVANCED_OK Marlin/Configuration_adv.h
+          # TODO: UPDATE: All of the values below seem unnecessary?
+          #               May even want to bring our baud rates back to 115200?
           configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
           # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
           configValue BUFSIZE 32 Marlin/Configuration_adv.h
@@ -887,18 +912,22 @@ jobs:
           configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
           configEnable CONTROLLER_FAN_IGNORE_Z Marlin/Configuration_adv.h
 
+          # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # Enable assisted tramming
-          configEnable ASSISTED_TRAMMING Marlin/Configuration_adv.h
+          # configEnable ASSISTED_TRAMMING Marlin/Configuration_adv.h
 
+          # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # FIXME: Calculate/calibrate this for our specific printer?!
           # Set assisted tramming probing positions
           #configValue TRAMMING_POINT_XY "{ {  20, 20 }, { 180,  20 }, { 180, 180 }, { 20, 180 } }" Marlin/Configuration_adv.h
           
+          # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # Enable the assisted tramming wizard (likely not usable without an LCD)
-          configEnable ASSISTED_TRAMMING_WIZARD Marlin/Configuration_adv.h
+          # configEnable ASSISTED_TRAMMING_WIZARD Marlin/Configuration_adv.h
 
+          # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # Enable moving the nozzle out of the way for adjusting when assisted tramming is enabled
-          configEnable ASSISTED_TRAMMING_WAIT_POSITION Marlin/Configuration_adv.h
+          # configEnable ASSISTED_TRAMMING_WAIT_POSITION Marlin/Configuration_adv.h
 
           ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
           #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
@@ -914,7 +943,7 @@ jobs:
           if ($HYBRID_THRESHOLD); then
             configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
             configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
-            configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in creality and BTT
+            configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in Creality and BTT
           fi
 
           # Configure direct drive specific options
