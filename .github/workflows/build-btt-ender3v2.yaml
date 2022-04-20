@@ -12,6 +12,7 @@ on:
       - 2.0.x
       - bugfix-2.0.x
       - skr-mini-e3-v3-0
+      - feature/disable_buzzer
     
     ## TODO: How do we ensure that we always build the "2.0.x" branch on new tags?
     # When the following tags are pushed
@@ -437,6 +438,9 @@ jobs:
           # Turn off display after 5 minutes
           configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
 
+          # Disable the speaker by default
+          configEnable DISABLE_BUZZER_DEFAULT Marlin/Configuration.h
+
           # Configure PID for the bed
           configValue DEFAULT_bedKp 129.98 Marlin/Configuration.h
           configValue DEFAULT_bedKi 25.00 Marlin/Configuration.h
@@ -707,7 +711,7 @@ jobs:
           configEnable SOUND_MENU_ITEM Marlin/Configuration_adv.h
 
           # Disable the DWIN display beeper/buzzer
-          configEnable DISABLE_BUZZER Marlin/Configuration_adv.h
+          # configEnable DISABLE_BUZZER_DEFAULT Marlin/Configuration_adv.h
 
           # Enable additional display features (some are useful when used with OctoPrint for example)
           configEnable STATUS_MESSAGE_SCROLLING Marlin/Configuration_adv.h
