@@ -143,7 +143,9 @@ jobs:
           # If our target branch is not set, default to the "bugfix-2.0.x" branch instead
           if [ -z "${TARGET_BRANCH}" ]; then
             echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
-            TARGET_BRANCH=bugfix-2.0.x
+            # FIXME: Revert this logic once we've tested the feature branch
+            # TARGET_BRANCH=bugfix-2.0.x
+            TARGET_BRANCH=feature/disable_buzzer
           fi
 
           # Allow overriding the target branch with manual builds
