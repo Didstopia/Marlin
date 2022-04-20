@@ -145,7 +145,7 @@ jobs:
             echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
             # FIXME: Revert this logic once we've tested the feature branch
             # TARGET_BRANCH=bugfix-2.0.x
-            TARGET_BRANCH=feature/disable_buzzer
+            TARGET_BRANCH=disablebuzzer
           fi
 
           # Allow overriding the target branch with manual builds
