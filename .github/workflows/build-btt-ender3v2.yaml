@@ -27,6 +27,10 @@ on:
         required: true
         default: "bugfix-2.0.x"
 
+## TODO: Disable/remove this at some point if we still want to use act locally!
+env:
+  ACT: false
+
 jobs:
 
   build-firmwares:
