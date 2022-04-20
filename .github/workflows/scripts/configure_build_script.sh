@@ -107,6 +107,9 @@ TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
 if [ "$TARGET_BRANCH" = "2.0.x" ]; then
   warning "Target branch is 2.0.x, but this was renamed to import-2.0.x in Marlin configuration repository, so we'll use that instead!"
   TARGET_BRANCH="import-2.0.x"
+elif [ "$TARGET_BRANCH" = "bugfix-2.0.x" ]; then
+  warning "Unsupported branch detected: '$TARGET_BRANCH', defaulting to bugfix-2.0.x!"
+  TARGET_BRANCH="bugfix-2.0.x"
 fi
 
 # Add GNU tools to path if we're on macOS
