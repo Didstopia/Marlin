@@ -312,6 +312,9 @@ jobs:
           # Enable Z homing using a probe (default is disabled)
           configEnable USE_PROBE_FOR_Z_HOMING Marlin/Configuration.h
 
+          # Ensure manual probing is always disabled when using BLTouch/CRTouch
+          configDisable PROBE_MANUALLY Marlin/Configuration.h
+
           # Enable BLTouch/CRTouch support
           configEnable BLTOUCH Marlin/Configuration.h
 
@@ -712,9 +715,6 @@ jobs:
           # configValue X_MAX_POS "245 - 5" Marlin/Configuration.h
           # configValue Y_MAX_POS "235 - 5" Marlin/Configuration.h
 
-          # ALWAYS disable manual probing (this is likely what's causing our probe issues, right?)
-          configDisable PROBE_MANUALLY Marlin/Configuration.h
-
           ## END OF CONFIGURATION.H
 
 
@@ -762,10 +762,12 @@ jobs:
           # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
           # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
 
+          ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail?!
+          ##        https://github.com/MarlinFirmware/Marlin/issues/23958
           ## TODO: I'm still not 100% convinced on this, and wondering if this is actually _causing_ skipped steps, instead of fixing them?
           # TODO: This needs testing and supposedly fixes high CPU issues with this specific board, causing skipped steps etc.
           # Disable adaptive step smoothing
-          # configDisable ADAPTIVE_STEP_SMOOTHING Marlin/Configuration_adv.h
+          configDisable ADAPTIVE_STEP_SMOOTHING Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (TODO: Needs testing, as supposedly related to disabling the above?)
           # Adjust slowdown divisor when disabling adaptive step smoothing (default is 2)
