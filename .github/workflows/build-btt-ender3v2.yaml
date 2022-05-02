@@ -327,7 +327,7 @@ jobs:
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
           # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
-          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
           # TODO: Lowered from 133mm/s to 100mm/s, however some say the BLTouch is more reliable at 60mm/s!
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
@@ -348,26 +348,27 @@ jobs:
 
           # TODO: Do we want these enabled or not? Because sometimes they just get in the way..
           # Require homing after steppers have deactivated/unlocked (and before trying to move)
-          configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
-          configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
+          # configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
+          # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
           #configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          configValue X_BED_SIZE 230 Marlin/Configuration.h
-          configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          # configValue X_BED_SIZE 220 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 220 Marlin/Configuration.h
+          # configValue X_BED_SIZE 230 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          configValue X_BED_SIZE 220 Marlin/Configuration.h
+          configValue Y_BED_SIZE 220 Marlin/Configuration.h
 
           # Extend maximum X position for better probe reachability (for BLTouch/UBL/ABL, default is X_BED_SIZE, Jyers uses X_BED_SIZE + 15)
-          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
           ## TODO: Bed size is now -10, so added 15 + 10 = +25 to adjust the max X pos accordingly
-          # configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
 
           # TODO: This will need adjusting if we end up utilizing mechanical gantry calibration
           # Lower maximum Z position for better mechanical gantry calibration
           # NOTE: We can't go higher than 250 without breaking something!
-          # configValue Z_MAX_POS 245 Marlin/Configuration.h # Default is 250
+          ## TODO: 235 is pretty much close to comfort already, with the timing belt setup anyway..
+          configValue Z_MAX_POS 235 Marlin/Configuration.h # Default is 250
 
           # Enable filament runout sensor
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
@@ -434,7 +435,7 @@ jobs:
           ## FIXME: Our print head is crashing into our bed when probing, was this being enabled the cause?!
           ## TODO: This is enabled in Marlin's example firmware, so we could try using this again?
           # Disable endstops interrupt compatibility (required to be disabled for BTT boards, however enabled by default in most configs)
-          configDisable ENDSTOP_INTERRUPTS_FEATURE Marlin/Configuration.h
+          # configDisable ENDSTOP_INTERRUPTS_FEATURE Marlin/Configuration.h
 
           # TODO: Leaving classic jerk alone for now
           # TODO: Should we disable this due to potential issues with Junction Deviation still?
@@ -598,7 +599,7 @@ jobs:
 
             ## FIXME: Can this cause our print head crashing into the bed when probing?!
             ## TODO: Not sure if we can use this or not? And what it actually does?
-            # configEnable UBL_MESH_WIZARD Marlin/Configuration.h
+            configEnable UBL_MESH_WIZARD Marlin/Configuration.h
           else
             # Enable Automatic Bed Leveling (ABL)
             configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
@@ -945,11 +946,11 @@ jobs:
           configEnable ADVANCED_OK Marlin/Configuration_adv.h
           # TODO: UPDATE: All of the values below seem unnecessary?
           #               May even want to bring our baud rates back to 115200?
-          configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
-          # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
-          configValue BUFSIZE 32 Marlin/Configuration_adv.h
-          configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
-          configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h
+          # configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
+          # # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
+          # configValue BUFSIZE 32 Marlin/Configuration_adv.h
+          # configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
+          # configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
