@@ -544,7 +544,7 @@ jobs:
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.42 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.32 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.58 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
