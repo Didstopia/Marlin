@@ -6,8 +6,6 @@ See [here](https://code.visualstudio.com/blogs/2020/05/06/github-issues-integrat
 
 ## Critical
 
-- [ ] Try enabling `POWER_MONITOR_CURRENT` and `POWER_MONITOR_VOLTAGE`
-
 - [ ] Try disabling `SDCARD_CONNECTION`, since this should cause the board itself to figure out the correct SD card connection
 
 - [ ] Try lowering `ENCODER_PULSES_PER_STEP` from `4` to `3` or `2`, as the stock Creality DWIN display's rotary encoder seems to not register when changing direction and a single step is produced, requiring an additional step to register (must be a bug, but not sure where/why or if it's actually a hardware fault or not)
@@ -38,15 +36,15 @@ See [here](https://code.visualstudio.com/blogs/2020/05/06/github-issues-integrat
 
 ## High
 
-_None._
+- [ ] Research/implement MPC builds (Didstopia/Marlin#4)
+
+- [ ] Research/implement `DIRECT_STEPPING`
 
 ## Medium
 
-_None._
+- [ ] Try a different language, especially with the BTT TFT (eg. `LCD_LANGUAGE` set to `fi` instead of `en`)
 
 ## Low
-
-- [ ] Try a different language, especially with the BTT TFT (eg. `LCD_LANGUAGE` set to `fi` instead of `en`)
 
 - [ ] Test `TEMP_STAT_LEDS` with a Neopixel RGB LED strip to change colors based on the current temperatures
 
@@ -56,8 +54,6 @@ _None._
 
 - [ ] Implement [automatic patch file generation](https://stackoverflow.com/questions/9980186/how-to-create-a-patch-for-a-whole-directory-to-update-it) for the entire repository (Didstopia/Marlin#3)
 
-- [ ] Research/implement MPC builds (Didstopia/Marlin#4)
-
-- [ ] Research/implement `DIRECT_STEPPING`
-
 - [ ] Test various "easter eggs" like games in the firmware (with the BTT display running in LCD mode)
+
+- [ ] Try enabling `POWER_MONITOR_CURRENT` and `POWER_MONITOR_VOLTAGE` (`#error "POWER_MONITOR_CURRENT requires a valid POWER_MONITOR_CURRENT_PIN."`)

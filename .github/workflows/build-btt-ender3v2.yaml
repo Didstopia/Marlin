@@ -566,6 +566,12 @@ jobs:
             # Enable Universal Bed Leveling (UBL)
             configEnable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
 
+            # Disable other bed leveling options
+            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
+            configDisable MESH_BED_LEVELING Marlin/Configuration.h
+
             # Increase default mesh inset for UBL
             configValue MESH_INSET 10 Marlin/Configuration.h
 
@@ -577,6 +583,12 @@ jobs:
           else
             # Enable Automatic Bed Leveling (ABL)
             configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
+
+            # Disable other bed leveling options
+            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
+            configDisable MESH_BED_LEVELING Marlin/Configuration.h
           fi
           
           ## TODO: We should probably refactor this for the BTT display instead, once we get that hooked up and working?
@@ -990,9 +1002,10 @@ jobs:
           ## TODO: Check if Cura support bezier curves and have this enabled, as this should benefit ARC massively!
           configEnable BEZIER_CURVE_SUPPORT Marlin/Configuration_adv.h
 
+          ## FIXME: "POWER_MONITOR_CURRENT requires a valid POWER_MONITOR_CURRENT_PIN."
           ## TODO: Test if we can utilize these or not
-          configEnable POWER_MONITOR_CURRENT Marlin/Configuration_adv.h
-          configEnable POWER_MONITOR_VOLTAGE Marlin/Configuration_adv.h
+          # configEnable POWER_MONITOR_CURRENT Marlin/Configuration_adv.h
+          # configEnable POWER_MONITOR_VOLTAGE Marlin/Configuration_adv.h
 
           ## TODO: Test if this improves the host actions/prompts?
           configEnable HOST_STATUS_NOTIFICATIONS Marlin/Configuration_adv.h
