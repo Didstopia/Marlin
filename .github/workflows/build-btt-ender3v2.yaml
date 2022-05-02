@@ -345,21 +345,21 @@ jobs:
 
           # TODO: Do we want these enabled or not? Because sometimes they just get in the way..
           # Require homing after steppers have deactivated/unlocked (and before trying to move)
-          # configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
-          # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
+          configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
+          configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
           #configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          # configValue X_BED_SIZE 230 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          configValue X_BED_SIZE 220 Marlin/Configuration.h
-          configValue Y_BED_SIZE 220 Marlin/Configuration.h
+          configValue X_BED_SIZE 230 Marlin/Configuration.h
+          configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          # configValue X_BED_SIZE 220 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 220 Marlin/Configuration.h
 
           # Extend maximum X position for better probe reachability (for BLTouch/UBL/ABL, default is X_BED_SIZE, Jyers uses X_BED_SIZE + 15)
-          # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
           ## TODO: Bed size is now -10, so added 15 + 10 = +25 to adjust the max X pos accordingly
-          configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
 
           # TODO: This will need adjusting if we end up utilizing mechanical gantry calibration
           # Lower maximum Z position for better mechanical gantry calibration
@@ -593,8 +593,9 @@ jobs:
             # Disable UBL automatic mesh saving
             configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
 
+            ## FIXME: Can this cause our print head crashing into the bed when probing?!
             ## TODO: Not sure if we can use this or not? And what it actually does?
-            configEnable UBL_MESH_WIZARD Marlin/Configuration.h
+            # configEnable UBL_MESH_WIZARD Marlin/Configuration.h
           else
             # Enable Automatic Bed Leveling (ABL)
             configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
@@ -746,15 +747,17 @@ jobs:
             configDisable BLTOUCH_HS_MODE Marlin/Configuration_adv.h
           fi
 
+          ## FIXME: Can this cause our print head crashing into the bed when probing when NOT set?!
           # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
           # Decreate probing delay for BLTouch
           # WARNING: Requires a BLTouch 3.0 or later
-          # configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
+          configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
 
+          ## FIXME: Can this cause our print head crashing into the bed when probing when NOT set?!
           # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
           # Enable 5V mode for BLTouch
           # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
-          # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
+          configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
 
           ## TODO: I'm still not 100% convinced on this, and wondering if this is actually _causing_ skipped steps, instead of fixing them?
           # TODO: This needs testing and supposedly fixes high CPU issues with this specific board, causing skipped steps etc.
@@ -937,11 +940,11 @@ jobs:
           configEnable ADVANCED_OK Marlin/Configuration_adv.h
           # TODO: UPDATE: All of the values below seem unnecessary?
           #               May even want to bring our baud rates back to 115200?
-          # configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
-          # # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
-          # configValue BUFSIZE 32 Marlin/Configuration_adv.h
-          # configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
-          # configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h
+          configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
+          # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
+          configValue BUFSIZE 32 Marlin/Configuration_adv.h
+          configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
+          configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
@@ -1100,8 +1103,9 @@ jobs:
               # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
               #configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
               # TODO: Re-calibrated and 0.15 now looks the best!
-              configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+              # configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
               ## FIXME: Re-calibrate K again!
+              configValue LIN_ADVANCE_K 0 Marlin/Configuration_adv.h
               configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi

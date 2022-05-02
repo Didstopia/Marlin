@@ -240,15 +240,15 @@ setupConfigs() {
   fi
 
   ## FIXME: Use the BTT specific configuration files instead of the default Creality ones?
-  # cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
-  # cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
+  cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
+  cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
 
   ## FIXME: Take $UI into account here, so we can use either CrealityUI or MarlinUI configs as the base?
   # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration.h" Marlin/Configuration.h
   # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
 
-  cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration.h" Marlin/Configuration.h
-  cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
+  # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration.h" Marlin/Configuration.h
+  # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
 }
 
 # Function for patching the build details
