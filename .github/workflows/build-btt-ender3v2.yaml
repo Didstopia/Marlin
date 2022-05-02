@@ -68,7 +68,7 @@ jobs:
         #mpc: [true, false]
         mpc: [false]
         #ui: ["JyersUI", "MarlinUI"]
-        ui: ["JyersUI", "MarlinUI"]
+        ui: ["JyersUI", "MarlinUI", "TFT35"]
         # TODO: Enable this once we have time to test out the BTT's TFT35 display
         # ui: ["JyersUI", "TFT35"]
     steps:
