@@ -67,8 +67,8 @@ jobs:
         hybrid-threshold: [false]
         #mpc: [true, false]
         mpc: [false]
-        #ui: ["JyersUI", "MarlinUI"]
-        ui: ["JyersUI", "MarlinUI", "TFT35"]
+        ui: ["JyersUI", "MarlinUI"]
+        # ui: ["JyersUI", "MarlinUI", "TFT35"]
         # TODO: Enable this once we have time to test out the BTT's TFT35 display
         # ui: ["JyersUI", "TFT35"]
     steps:
@@ -666,10 +666,11 @@ jobs:
             # TODO: Implement BTT TFT35 support here
             ## TODO: We probably want Marlin UI with the BTT screen, right? Portrait or landscape? Probably landscape, right?
             configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configEnable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
+            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
             ## TODO: Experimental options for enabling the BTT TFT35 display
             configEnable BTT_TFT35_SPI_V1_0 Marlin/Configuration.h
+            configEnable TFT_COLOR_UI Marlin/Configuration.h
             configEnable TOUCH_SCREEN Marlin/Configuration.h
 
             # Disable other UIs
@@ -765,7 +766,7 @@ jobs:
           ## TODO: We may want to change this, if we're going to use the BTT screen's SD card slot instead?
           # TODO: Leaving this alone for now, pretty sure it'll default to the board values anyway
           # Set default SD card connection type
-          # configValue SDCARD_CONNECTION ONBOARD Marlin/Configuration_adv.h
+          configValue SDCARD_CONNECTION ONBOARD Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (disabled by default)
           # Enable UTF filename support
@@ -776,12 +777,12 @@ jobs:
 
           # TODO: This is already enabled by default
           # Enable scrolling filenames
-          #configEnable SCROLL_LONG_FILENAMES Marlin/Configuration_adv.h
+          configEnable SCROLL_LONG_FILENAMES Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (disabled by default)
           # TODO: UPDATE: We don't really need this, so disabling it for now
           # Enable automatic reporting of SD card status
-          # configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
+          configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (enabled by default)
           # Enable SD card host drive support
@@ -838,10 +839,10 @@ jobs:
           # TODO: UPDATE: Disabled the first 3 to fallback to polling,
           #               and not sure if fan change was ever even being utilized
           # Enable additional reporting etc. features
-          # configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
-          # configEnable M114_DETAIL Marlin/Configuration_adv.h
+          configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+          configEnable M114_DETAIL Marlin/Configuration_adv.h
           # configEnable M114_REALTIME Marlin/Configuration_adv.h
-          # configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
+          configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
 
           # Enable telling the host to pause on M76 (pause print job)
           configEnable HOST_PAUSE_M76 Marlin/Configuration_adv.h

@@ -31,7 +31,7 @@ See [here](https://code.visualstudio.com/blogs/2020/05/06/github-issues-integrat
 
 - [ ] Probing position is never at the cented of the bed, X seems okay but Y is way too far in the positive numbers
 
-- [ ] Implement BTT TFT display support (with dual mode?), possibly also enabling `BTT_TFT35_SPI_V1_0`?
+- [ ] Implement BTT TFT display support (with dual mode?), possibly also enabling `BTT_TFT35_SPI_V1_0`? (see [here](https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware))
   - [ ] Enable and configure `CUSTOM_MENU_MAIN`, `CUSTOM_MENU_CONFIG`, `CUSTOM_USER_BUTTONS` with the BTT display
 
 ## High
