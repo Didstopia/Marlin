@@ -37,7 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       # Fail early when possible (only applies to matrix jobs)
-      fail-fast: true
+      # fail-fast: true
+      fail-fast: false # NOTE: We do NOT want to fail early, because one configuration might fail where others might not, right?
       # FIXME: Somehow only set this when running locally?
       #        The issue when running locally seems to be multiple
       #        containers trying to access/install the tool cache,
@@ -1011,8 +1012,9 @@ jobs:
           ## TODO: Test if this improves the host actions/prompts?
           configEnable HOST_STATUS_NOTIFICATIONS Marlin/Configuration_adv.h
 
+          ## FIXME: We can't use this due to "M100 - unsupported CPU" error
           ## TODO: Temporarily enable, so we can monitor our memory usage/free memory with the M100 g-code!
-          configEnable M100_FREE_MEMORY_WATCHER Marlin/Configuration_adv.h
+          # configEnable M100_FREE_MEMORY_WATCHER Marlin/Configuration_adv.h
 
           # TODO: This will likely cause A LOT of noise, but potentially benefits quality?
           # Enable and configure Hybrid Threshold
