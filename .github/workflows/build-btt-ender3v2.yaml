@@ -321,8 +321,10 @@ jobs:
           # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
           configValue PROBING_MARGIN 20 Marlin/Configuration.h
 
+          ## FIXME: Something is causing our print head to crash to our bed when homing!
+          ##        Probing is failing, which probably happens due to too fast of a probing speed?!
           # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
-          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
           # TODO: Lowered from 133mm/s to 100mm/s, however some say the BLTouch is more reliable at 60mm/s!
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
@@ -426,9 +428,10 @@ jobs:
           # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
           #configEnable THERMAL_PROTECTION_CHAMBER Marlin/Configuration.h
 
+          ## FIXME: Our print head is crashing into our bed when probing, was this being enabled the cause?!
           ## TODO: This is enabled in Marlin's example firmware, so we could try using this again?
           # Disable endstops interrupt compatibility (required to be disabled for BTT boards, however enabled by default in most configs)
-          # configDisable ENDSTOP_INTERRUPTS_FEATURE Marlin/Configuration.h
+          configDisable ENDSTOP_INTERRUPTS_FEATURE Marlin/Configuration.h
 
           # TODO: Leaving classic jerk alone for now
           # TODO: Should we disable this due to potential issues with Junction Deviation still?
@@ -536,7 +539,8 @@ jobs:
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, 0 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.42 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.42 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.32 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -544,14 +548,24 @@ jobs:
             # configValue DEFAULT_bedKd 287.61 Marlin/Configuration.h
 
             # Configure PID for the PEI bed (60C + Creality Smooth PEI)
-            configValue DEFAULT_bedKp 112.39 Marlin/Configuration.h
-            configValue DEFAULT_bedKi 21.61 Marlin/Configuration.h
-            configValue DEFAULT_bedKd 389.63 Marlin/Configuration.h
+            # configValue DEFAULT_bedKp 112.39 Marlin/Configuration.h
+            # configValue DEFAULT_bedKi 21.61 Marlin/Configuration.h
+            # configValue DEFAULT_bedKd 389.63 Marlin/Configuration.h
+
+            # Configure PID for the PEI bed (60C + Biqu Magnetic Plate)
+            configValue DEFAULT_bedKp 135.93 Marlin/Configuration.h
+            configValue DEFAULT_bedKi 25.36 Marlin/Configuration.h
+            configValue DEFAULT_bedKd 485.74 Marlin/Configuration.h
 
             # # Configure PID for the hotend (215C + Micro Swiss All Metal Hotend)
-            configValue DEFAULT_Kp 25.72 Marlin/Configuration.h
-            configValue DEFAULT_Ki 2.51 Marlin/Configuration.h
-            configValue DEFAULT_Kd 65.85 Marlin/Configuration.h
+            # configValue DEFAULT_Kp 25.72 Marlin/Configuration.h
+            # configValue DEFAULT_Ki 2.51 Marlin/Configuration.h
+            # configValue DEFAULT_Kd 65.85 Marlin/Configuration.h
+
+            # # Configure PID for the hotend (205C + Micro Swiss All Metal Hotend)
+            configValue DEFAULT_Kp 25.69 Marlin/Configuration.h
+            configValue DEFAULT_Ki 2.55 Marlin/Configuration.h
+            configValue DEFAULT_Kd 64.75 Marlin/Configuration.h
 
             # Configure PID for the hotend (200C)
             # configValue DEFAULT_Kp 23.63 Marlin/Configuration.h
@@ -1035,9 +1049,9 @@ jobs:
             # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
             #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
             # TODO: Since 400 works well enough, trying with 450 again
-            configValue E0_CURRENT 450 Marlin/Configuration_adv.h
+            # configValue E0_CURRENT 450 Marlin/Configuration_adv.h
             # TODO: UPDATE: 400 works pretty well, I feel like!
-            #configValue E0_CURRENT 400 Marlin/Configuration_adv.h
+            configValue E0_CURRENT 400 Marlin/Configuration_adv.h
             # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
             #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
 
@@ -1087,6 +1101,7 @@ jobs:
               #configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
               # TODO: Re-calibrated and 0.15 now looks the best!
               configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+              ## FIXME: Re-calibrate K again!
               configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi
