@@ -106,7 +106,9 @@ error() {
 TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
 if [ "$TARGET_BRANCH" = "2.0.x" ]; then
   warning "Target branch is 2.0.x, but this was renamed to import-2.0.x in Marlin configuration repository, so we'll use that instead!"
-  TARGET_BRANCH="import-2.0.x"
+  ## FIXME: Let's try with the bugfix-2.0.x branch instead?
+  # TARGET_BRANCH="import-2.0.x"
+  TARGET_BRANCH="bugfix-2.0.x"
 elif [ ! "$TARGET_BRANCH" = "bugfix-2.0.x" ]; then
   warning "Unsupported branch detected: '$TARGET_BRANCH', defaulting to bugfix-2.0.x!"
   TARGET_BRANCH="bugfix-2.0.x"
@@ -237,8 +239,16 @@ setupConfigs() {
     git clone --quiet --branch ${TARGET_BRANCH} --depth 1 https://github.com/MarlinFirmware/Configurations.git Configurations
   fi
 
-  cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
-  cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
+  ## FIXME: Use the BTT specific configuration files instead of the default Creality ones?
+  # cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
+  # cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
+
+  ## FIXME: Take $UI into account here, so we can use either CrealityUI or MarlinUI configs as the base?
+  # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration.h" Marlin/Configuration.h
+  # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
+
+  cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration.h" Marlin/Configuration.h
+  cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
 }
 
 # Function for patching the build details
@@ -273,53 +283,56 @@ patchDWIN() {
     fi
   fi
 
+  ## TODO: Check if this is fixed, because it should now be?
   ## FIXME: This can be removed once the following PR is merged to both bugfix-2.0.x and 2.0.x branches!
   ##        https://github.com/MarlinFirmware/Marlin/pull/23879
   # Fix Ender 3 V2 DWIN display bug, where it incorrectly shows the progress bar on startup
-  sed -i -E "s/(.+, IS_DWIN_MARLINUI, EXTENSIBLE_UI)(\))(.*|$)/\1, HAS_DWIN_E3V2\2\3/g" Marlin/src/inc/Conditionals_post.h
-  if [ ! -s /tmp/marlin_patch.log ]; then
-    error "Failed to patch DWIN progress bar bug"
-    # return 1
-    false
-  fi
+  # sed -i -E "s/(.+, IS_DWIN_MARLINUI, EXTENSIBLE_UI)(\))(.*|$)/\1, HAS_DWIN_E3V2\2\3/g" Marlin/src/inc/Conditionals_post.h
+  # if [ ! -s /tmp/marlin_patch.log ]; then
+  #   error "Failed to patch DWIN progress bar bug"
+  #   # return 1
+  #   false
+  # fi
 
+  ## TODO: This should also be fixed now, so test to see if it is?
   # Fix the DWIN LCD check to take into account Jyers UI
-  sed -E -i "s/#if EITHER\(DWIN_CREALITY_LCD, IS_DWIN_MARLINUI\)/#if HAS_DWIN_E3V2 \|\| IS_DWIN_MARLINUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
-  if [ ! -s /tmp/marlin_patch.log ]; then
-      error "Failed to patch DWIN Jyers UI support"
-    # return 1
-    false
-  fi
+  # sed -E -i "s/#if EITHER\(DWIN_CREALITY_LCD, IS_DWIN_MARLINUI\)/#if HAS_DWIN_E3V2 \|\| IS_DWIN_MARLINUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
+  # if [ ! -s /tmp/marlin_patch.log ]; then
+  #     error "Failed to patch DWIN Jyers UI support"
+  #   # return 1
+  #   false
+  # fi
 }
 
 ## FIXME: Disable if/when our custom pull request/patch goes through!
 # Function for adding the ability to disable the buzzer on the LCD
-patchBuzzer() {
-  debug "Patching Marlin to allow disabling the buzzer on the LCD"
+# patchBuzzer() {
+#   debug "Patching Marlin to allow disabling the buzzer on the LCD"
 
-  ## FIXME: Temporary hack!
-  if ! grep -Eiq "DISABLE_BUZZER_DEFAULT" Marlin/Configuration.h; then
-    echo "//#define DISABLE_BUZZER_DEFAULT" >> Marlin/Configuration.h
-  fi
+#   ## FIXME: Temporary hack!
+#   if ! grep -Eiq "DISABLE_BUZZER_DEFAULT" Marlin/Configuration.h; then
+#     echo "//#define DISABLE_BUZZER_DEFAULT" >> Marlin/Configuration.h
+#   fi
 
-  # # Add the ability to disable the buzzer on the LCD
-  # sed -i -E "s/^([ ]{2})??(TERN_\(SOUND_MENU_ITEM, ui\.buzzer_enabled = )(true)(\);.*)$/\1#ifdef DISABLE_BUZZER_DEFAULT\n\1\1\2false\4\n\1#else\n\1\1\2true\4\n\1#endif/" Marlin/src/module/settings.cpp
-  # if [ ! -s /tmp/marlin_patch.log ]; then
-  #   error "Failed to patch DWIN buzzer disabling support"
-  #   # return 1
-  #   false
-  # fi
+#   # # Add the ability to disable the buzzer on the LCD
+#   # sed -i -E "s/^([ ]{2})??(TERN_\(SOUND_MENU_ITEM, ui\.buzzer_enabled = )(true)(\);.*)$/\1#ifdef DISABLE_BUZZER_DEFAULT\n\1\1\2false\4\n\1#else\n\1\1\2true\4\n\1#endif/" Marlin/src/module/settings.cpp
+#   # if [ ! -s /tmp/marlin_patch.log ]; then
+#   #   error "Failed to patch DWIN buzzer disabling support"
+#   #   # return 1
+#   #   false
+#   # fi
 
-  # # Add the DISABLE_BUZZER_DEFAULT definition to the Marlin configuration
-  # grep -Eiwq "#define DISABLE_BUZZER_DEFAULT" Marlin/src/module/settings.cpp || \
-  # sed -i -E "s/([ ]*)[^ ]*(#define SOUND_MENU_ITEM.*)/\0\n\1\/\/#define DISABLE_BUZZER_DEFAULT    \/\/ Disable the buzzer by default/" Marlin/Configuration_adv.h
-  # if [ ! -s /tmp/marlin_patch.log ]; then
-  #   error "Failed to add DISABLE_BUZZER_DEFAULT definition"
-  #   # return 1
-  #   false
-  # fi
-}
+#   # # Add the DISABLE_BUZZER_DEFAULT definition to the Marlin configuration
+#   # grep -Eiwq "#define DISABLE_BUZZER_DEFAULT" Marlin/src/module/settings.cpp || \
+#   # sed -i -E "s/([ ]*)[^ ]*(#define SOUND_MENU_ITEM.*)/\0\n\1\/\/#define DISABLE_BUZZER_DEFAULT    \/\/ Disable the buzzer by default/" Marlin/Configuration_adv.h
+#   # if [ ! -s /tmp/marlin_patch.log ]; then
+#   #   error "Failed to add DISABLE_BUZZER_DEFAULT definition"
+#   #   # return 1
+#   #   false
+#   # fi
+# }
 
+## TODO: Check the status of this, if it's already been fixed properly upstream?
 # Function for patching the advance pause prompt so it doesn't hang in the UI
 patchAdvancedPausePrompt() {
   debug "Patching advanced pause prompt UI hanging"
@@ -347,8 +360,9 @@ patchDefaults() {
   configValue MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V3_0 Marlin/Configuration.h
   
   # Change to the correct baud rate
-  configValue BAUDRATE 250000 Marlin/Configuration.h
-  
+  # configValue BAUDRATE 250000 Marlin/Configuration.h
+  configValue BAUDRATE 115200 Marlin/Configuration.h
+
   # Set a custom machine name
   configValue CUSTOM_MACHINE_NAME \"Rasputin\" Marlin/Configuration.h
 
@@ -389,6 +403,6 @@ setupConfigs
 # Apply sane defaults on startup
 patchBuildDetails
 patchDWIN
-patchBuzzer
+# patchBuzzer
 patchAdvancedPausePrompt
 patchDefaults
