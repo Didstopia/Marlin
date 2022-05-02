@@ -712,6 +712,9 @@ jobs:
           # configValue X_MAX_POS "245 - 5" Marlin/Configuration.h
           # configValue Y_MAX_POS "235 - 5" Marlin/Configuration.h
 
+          # ALWAYS disable manual probing (this is likely what's causing our probe issues, right?)
+          configDisable PROBE_MANUALLY Marlin/Configuration.h
+
           ## END OF CONFIGURATION.H
 
 
@@ -758,9 +761,6 @@ jobs:
           # Enable 5V mode for BLTouch
           # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
           # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
-
-          # ALWAYS disable manual probing (this is likely what's causing our probe issues)
-          configDisable PROBE_MANUALLY Marlin/Configuration_adv.h
 
           ## TODO: I'm still not 100% convinced on this, and wondering if this is actually _causing_ skipped steps, instead of fixing them?
           # TODO: This needs testing and supposedly fixes high CPU issues with this specific board, causing skipped steps etc.
