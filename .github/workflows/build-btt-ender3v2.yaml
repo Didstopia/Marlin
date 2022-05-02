@@ -670,7 +670,8 @@ jobs:
             configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
             ## TODO: Experimental options for enabling the BTT TFT35 display
-            configEnable BTT_TFT35_SPI_V1_0 Marlin/Configuration.h
+            # configEnable BTT_TFT35_SPI_V1_0 Marlin/Configuration.h
+            configEnable CR10_STOCKDISPLAY Marlin/Configuration.h
             configEnable TFT_COLOR_UI Marlin/Configuration.h
             configEnable TOUCH_SCREEN Marlin/Configuration.h
 
