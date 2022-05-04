@@ -10,9 +10,11 @@ See [here](https://code.visualstudio.com/blogs/2020/05/06/github-issues-integrat
 
 - [ ] Try lowering `ENCODER_PULSES_PER_STEP` from `4` to `3` or `2`, as the stock Creality DWIN display's rotary encoder seems to not register when changing direction and a single step is produced, requiring an additional step to register (must be a bug, but not sure where/why or if it's actually a hardware fault or not)
 
-- [ ] Try enabling `ADAPTIVE_STEP_SMOOTHING` to see if it works fine with it enabled (most BTT boards recommend or require it to be disabled)
+- [x] Try enabling `ADAPTIVE_STEP_SMOOTHING` to see if it works fine with it enabled (most BTT boards recommend or require it to be disabled)
+      -> Must be enabled, otherwise probes like the BL-Touch will fail at random
 
 - [ ] Try enabling `ENDSTOP_INTERRUPTS_FEATURE` to see if it works fine with it enabled (most BTT boards recommend or require it to be disabled)
+      -> Currently have this enabled, but yet to see if it's causing issues or not
 
 - [ ] Try enabling `SPEAKER` with the BTT display, as it should then be able to display tones at different frequencies etc.
 

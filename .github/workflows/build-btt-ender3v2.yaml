@@ -62,8 +62,8 @@ jobs:
         touch-screen: [false]
         linear-advance: [true, false]
         # linear-advance: [false]
-        # junction-deviation: [true, false]
-        junction-deviation: [false]
+        junction-deviation: [true, false]
+        # junction-deviation: [false]
         #hybrid-threshold: [true, false]
         hybrid-threshold: [false]
         #mpc: [true, false]
@@ -488,6 +488,7 @@ jobs:
             # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration + higher extruder feedrate for direct drive
             # configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 50}" Marlin/Configuration.h
+            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
 
             # TODO: Testing lowering Z travel acceleration from 1000 to 500,
             #       in case this would not cause as much Z sync issues?
@@ -504,6 +505,8 @@ jobs:
             #configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
             # TODO: Trying with default accelerations for now
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
+            # configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
+            onfigValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 1000 }" Marlin/Configuration.h
 
             # TODO: Trying to drastically bump up maximum values
             #configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
@@ -511,6 +514,7 @@ jobs:
             #configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
             # TODO: Trying with default accelerations for now
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
+            configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
@@ -636,6 +640,12 @@ jobs:
             # TODO: Trying to see if enabling Junction Deviation AND Linear Advance will cause issues or not
             # Enable junction deviation by disabling classic jerk handling
             configDisable CLASSIC_JERK Marlin/Configuration.h
+
+            # Tweak junction deviation
+            # NOTE: 0.013 is the default
+            # configValue JUNCTION_DEVIATION_MM 0.013 Marlin/Configuration.h
+            # TODO: Trying 0.08 as the default, as suggested by Teaching Tech
+            configValue JUNCTION_DEVIATION_MM 0.08 Marlin/Configuration.h
           else
             # Disable junction deviation by enabling classic jerk handling
             configEnable CLASSIC_JERK Marlin/Configuration.h
@@ -864,10 +874,10 @@ jobs:
           # TODO: UPDATE: Disabled the first 3 to fallback to polling,
           #               and not sure if fan change was ever even being utilized
           # Enable additional reporting etc. features
-          configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
-          configEnable M114_DETAIL Marlin/Configuration_adv.h
-          # configEnable M114_REALTIME Marlin/Configuration_adv.h
-          configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
+          # configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+          # configEnable M114_DETAIL Marlin/Configuration_adv.h
+          # # configEnable M114_REALTIME Marlin/Configuration_adv.h
+          # configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
 
           # Enable telling the host to pause on M76 (pause print job)
           configEnable HOST_PAUSE_M76 Marlin/Configuration_adv.h
@@ -1109,9 +1119,9 @@ jobs:
               # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
               #configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
               # TODO: Re-calibrated and 0.15 now looks the best!
-              # configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+              configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
               ## FIXME: Re-calibrate K again!
-              configValue LIN_ADVANCE_K 0 Marlin/Configuration_adv.h
+              # configValue LIN_ADVANCE_K 0 Marlin/Configuration_adv.h
               configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi
@@ -1124,6 +1134,14 @@ jobs:
           else
             # Enable retrying bed leveling after a failed attempt
             configEnable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
+          fi
+
+          if [ $UI == "TFT35" ]; then
+            # Enable additional reporting etc. features
+            configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+            configEnable M114_DETAIL Marlin/Configuration_adv.h
+            # configEnable M114_REALTIME Marlin/Configuration_adv.h
+            configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
           fi
 
           ## END OF CONFIGURATION_ADV.H
