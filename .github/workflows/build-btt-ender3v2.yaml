@@ -1068,9 +1068,9 @@ jobs:
             # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
             #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
             # TODO: Since 400 works well enough, trying with 450 again
-            # configValue E0_CURRENT 450 Marlin/Configuration_adv.h
+            configValue E0_CURRENT 450 Marlin/Configuration_adv.h
             # TODO: UPDATE: 400 works pretty well, I feel like!
-            configValue E0_CURRENT 400 Marlin/Configuration_adv.h
+            # configValue E0_CURRENT 400 Marlin/Configuration_adv.h
             # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
             #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
 
@@ -1119,9 +1119,9 @@ jobs:
               # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
               #configValue LIN_ADVANCE_K 0.25 Marlin/Configuration_adv.h
               # TODO: Re-calibrated and 0.15 now looks the best!
-              configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
+              # configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
               ## FIXME: Re-calibrate K again!
-              # configValue LIN_ADVANCE_K 0 Marlin/Configuration_adv.h
+              configValue LIN_ADVANCE_K 0.11 Marlin/Configuration_adv.h
               configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi
