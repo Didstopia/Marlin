@@ -506,7 +506,7 @@ jobs:
             # TODO: Trying with default accelerations for now
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
             # configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
-            onfigValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 1000 }" Marlin/Configuration.h
+            configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 1000 }" Marlin/Configuration.h
 
             # TODO: Trying to drastically bump up maximum values
             #configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
