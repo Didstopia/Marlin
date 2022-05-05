@@ -654,7 +654,9 @@ jobs:
             # NOTE: 0.013 is the default
             # configValue JUNCTION_DEVIATION_MM 0.013 Marlin/Configuration.h
             # TODO: Trying 0.08 as the default, as suggested by Teaching Tech
-            configValue JUNCTION_DEVIATION_MM 0.08 Marlin/Configuration.h
+            # configValue JUNCTION_DEVIATION_MM 0.08 Marlin/Configuration.h
+            # TODO: Supposedly calibrated to 0.15, but the differences are impossible to see?!
+            configValue JUNCTION_DEVIATION_MM 0.15 Marlin/Configuration.h
           else
             # Disable junction deviation by enabling classic jerk handling
             configEnable CLASSIC_JERK Marlin/Configuration.h
