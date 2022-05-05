@@ -9,7 +9,8 @@ on:
     ## TODO: How do we ensure that we always build the "bugfix-2.0.x" branch on updated to the "skr-mini-e3-v3-0" branch?
     # When the following branches are pushed
     branches:
-      - 2.0.x
+      # FIXME: Disabled until Marlin's configs can be reliably used with the main branch again
+      # - 2.0.x
       - bugfix-2.0.x
       - skr-mini-e3-v3-0
     
@@ -47,8 +48,8 @@ jobs:
       matrix:
         board: [STM32G0B1RE_btt]
         #grid: [3, 5, 10, 15]
-        #grid: [5, 10]
-        grid: [10]
+        grid: [5, 10]
+        # grid: [10]
         #high-speed: [true, false]
         #high-speed: [false]
         high-speed: [true]
@@ -277,12 +278,12 @@ jobs:
 
           # TODO: Leaving this alone for now (default is 180)
           # Set minimum extruder temperature when extruding
-          #configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
+          configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (default is 1000)
           # TODO: Wouldn't something like 200 make more sense?
           # Set maximum length to extrude within a single extrusion
-          #configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
+          configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
 
           # Set default/custom steps per unit, per axis
           configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 95.1 }" Marlin/Configuration.h
@@ -327,10 +328,12 @@ jobs:
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
           # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
-          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
           # TODO: Lowered from 133mm/s to 100mm/s, however some say the BLTouch is more reliable at 60mm/s!
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
+          # TODO: Trying a _very_ low speed for improved probing
+          configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
 
           # TODO: Leaving these alone for now
           # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
@@ -399,6 +402,11 @@ jobs:
           # Enable safe homing on the Z axis (disabled by default, enabled in Jyers)
           configEnable Z_SAFE_HOMING Marlin/Configuration.h
 
+          # TODO: Ensure that X_CENTER and Y_CENTER actually exist?
+          # Tweak Z homing position
+          configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
+
           # TODO: Leaving this alone for now (defaults are higher)
           # Reduce homing feed rates (homing speeds)
           #configValue HOMING_FEEDRATE_MM_M "{ \(20\*60\), \(20\*60\), \(4\*60\) }" Marlin/Configuration.h
@@ -424,9 +432,9 @@ jobs:
 
           # TODO: Leaving these alone for now
           # Adjust min/max temperatures
-          #configValue HEATER_0_MINTEMP 5 Marlin/Configuration.h
-          #configValue BED_MINTEMP 5 Marlin/Configuration.h
-          #configValue BED_MAXTEMP 120 Marlin/Configuration.h
+          configValue HEATER_0_MINTEMP 5 Marlin/Configuration.h
+          configValue BED_MINTEMP 5 Marlin/Configuration.h
+          configValue BED_MAXTEMP 150 Marlin/Configuration.h
 
           # TODO: Leaving this alone for now
           # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
@@ -492,7 +500,7 @@ jobs:
 
             # TODO: Testing lowering Z travel acceleration from 1000 to 500,
             #       in case this would not cause as much Z sync issues?
-            # configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+            configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
 
             # Increase Z jerk from 0.3 to 0.4
@@ -548,7 +556,8 @@ jobs:
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.40 }" Marlin/Configuration.h
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.42 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.58 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.58 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -698,15 +707,20 @@ jobs:
             configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
             configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
+            # Disable other UIs
+            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+
+            # Configure speaker
+            configEnable SPEAKER Marlin/Configuration.h
+            configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
+            configValue LCD_FEEDBACK_FREQUENCY_HZ 1000 Marlin/Configuration.h
+
             ## TODO: Experimental options for enabling the BTT TFT35 display
             # configEnable BTT_TFT35_SPI_V1_0 Marlin/Configuration.h
             configEnable CR10_STOCKDISPLAY Marlin/Configuration.h
             # configEnable TFT_COLOR_UI Marlin/Configuration.h
             # configEnable TOUCH_SCREEN Marlin/Configuration.h
-
-            # Disable other UIs
-            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
           fi
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
@@ -752,7 +766,7 @@ jobs:
 
           # TODO: Leaving this alone for now (defaults are slightly higher)
           # Lower homing bump
-          #configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
+          configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
 
           # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
           if ($HIGH_SPEED); then
@@ -796,7 +810,7 @@ jobs:
           # TODO: Leaving this alone for now (enabled by default)
           # TODO: Why would BTT have this disabled?
           # Disable dynamic memory allocation in SD card menus
-          #configValue SDSORT_DYNAMIC_RAM false Marlin/Configuration_adv.h
+          configValue SDSORT_DYNAMIC_RAM false Marlin/Configuration_adv.h
 
           ## TODO: We may want to change this, if we're going to use the BTT screen's SD card slot instead?
           # TODO: Leaving this alone for now, pretty sure it'll default to the board values anyway
@@ -805,7 +819,7 @@ jobs:
 
           # TODO: Leaving this alone for now (disabled by default)
           # Enable UTF filename support
-          #configEnable UTF_FILENAME_SUPPORT Marlin/Configuration_adv.h
+          configEnable UTF_FILENAME_SUPPORT Marlin/Configuration_adv.h
 
           # Enable long filename support
           configEnable LONG_FILENAME_HOST_SUPPORT Marlin/Configuration_adv.h
@@ -861,14 +875,18 @@ jobs:
 
           # TODO: Leaving this alone for now
           # Configure hybrid threshold (still disabled by default)
-          #configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h
+          configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # Configure sensorless homing (still disably by default)
-          #configValue X_STALL_SENSITIVITY 72 Marlin/Configuration_adv.h
-          #configValue Y_STALL_SENSITIVITY 72 Marlin/Configuration_adv.h
-          #configValue Z_STALL_SENSITIVITY 10 Marlin/Configuration_adv.h
-          #configEnable IMPROVE_HOMING_RELIABILITY Marlin/Configuration_adv.h
+          configValue X_STALL_SENSITIVITY 72 Marlin/Configuration_adv.h
+          configValue Y_STALL_SENSITIVITY 72 Marlin/Configuration_adv.h
+          configValue Z_STALL_SENSITIVITY 10 Marlin/Configuration_adv.h
+          configEnable IMPROVE_HOMING_RELIABILITY Marlin/Configuration_adv.h
+
+          # TODO: This needs proper testing!
+          # Disable square wave stepping (BTT has this disabled, Creality has it enabled)
+          configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # TODO: UPDATE: Disabled the first 3 to fallback to polling,
@@ -884,7 +902,7 @@ jobs:
 
           # TODO: Leaving this alone for now, probably requires an LCD anyway
           # Enable fan control options in LCD (might not work with DWIN?)
-          #configEnable CONTROLLER_FAN_EDITABLE Marlin/Configuration_adv.h
+          configEnable CONTROLLER_FAN_EDITABLE Marlin/Configuration_adv.h
 
           # Enable showing remaining time (disabled by default, enabled in Jyers)
           configEnable LCD_SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
@@ -895,7 +913,7 @@ jobs:
           # TODO: Not sure if this only applies to MarlinUI or something?
           #       Either way, keeping it disabled for now
           # Further display/status info customizations
-          configEnable STATUS_HEAT_PERCENT Marlin/Configuration_adv.h # Show heating in a progress bar
+          # configEnable STATUS_HEAT_PERCENT Marlin/Configuration_adv.h # Show heating in a progress bar
 
           ## TODO: Is this fine? Because our Z is always holding now, so lower current would seem better?
           # Configure the current multiplier when holding/locked (default is 0.5)
@@ -933,6 +951,7 @@ jobs:
           # Customize host action commands (disabled by default, enabled in Jyers)
           configEnable HOST_PROMPT_SUPPORT Marlin/Configuration_adv.h
           configEnable HOST_START_MENU_ITEM Marlin/Configuration_adv.h
+          configEnable HOST_SHUTDOWN_MENU_ITEM Marlin/Configuration_adv.h
 
           ## TODO: Disabled MGC, as we're now using a timing belt instead!
           # # Enable mechanical gantry calibration
@@ -964,9 +983,11 @@ jobs:
 
           # TODO: Leaving these alone for now
           # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
-          #configValue WATCH_TEMP_PERIOD 20 Marlin/Configuration_adv.h
-          #configValue THERMAL_PROTECTION_BED_PERIOD 20 Marlin/Configuration_adv.h
-          #configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
+          # configValue WATCH_TEMP_PERIOD 20 Marlin/Configuration_adv.h
+          configValue WATCH_TEMP_PERIOD 30 Marlin/Configuration_adv.h
+          # configValue THERMAL_PROTECTION_BED_PERIOD 20 Marlin/Configuration_adv.h
+          configValue THERMAL_PROTECTION_BED_PERIOD 30 Marlin/Configuration_adv.h
+          configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
 
           # FIXME: #error "LCD_BACKLIGHT_TIMEOUT requires an LCD with encoder or keypad."
           # Turn off display after 30 seconds
@@ -976,8 +997,9 @@ jobs:
           ##               various issues related to babystepping, so it's worth testing more!
           # TODO: Leaving this alone for now (disabled by default)
           # TODO: This MAY just help with our babystepping issues!
+          # TODO: Disabling this again, as our babystepping is just too damn unreliable!
           # Enable integrated babystepping (experimental)
-          configEnable INTEGRATED_BABYSTEPPING Marlin/Configuration_adv.h
+          # configEnable INTEGRATED_BABYSTEPPING Marlin/Configuration_adv.h
 
           # Combine babystepping with the initial Z probe height
           configEnable BABYSTEP_ZPROBE_OFFSET Marlin/Configuration_adv.h

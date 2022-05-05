@@ -6,6 +6,8 @@ See [here](https://code.visualstudio.com/blogs/2020/05/06/github-issues-integrat
 
 ## Critical
 
+- [ ] Try disabling `SQUARE_WAVE_STEPPING`, as it's disabled in BTT by default (enabled in Marlin/Creality by default)
+
 - [ ] Try disabling `SDCARD_CONNECTION`, since this should cause the board itself to figure out the correct SD card connection
 
 - [ ] Try lowering `ENCODER_PULSES_PER_STEP` from `4` to `3` or `2`, as the stock Creality DWIN display's rotary encoder seems to not register when changing direction and a single step is produced, requiring an additional step to register (must be a bug, but not sure where/why or if it's actually a hardware fault or not)
