@@ -723,6 +723,13 @@ jobs:
             configEnable CR10_STOCKDISPLAY Marlin/Configuration.h
             # configEnable TFT_COLOR_UI Marlin/Configuration.h
             # configEnable TOUCH_SCREEN Marlin/Configuration.h
+
+            configEnable G26_MESH_VALIDATION Marlin/Configuration.h
+
+            # FIXME: Can we then use both SD cards and USB ports?
+            # Configure serial ports for touch screem
+            configValue SERIAL_PORT 2 Marlin/Configuration.h
+            configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
           fi
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
@@ -832,8 +839,8 @@ jobs:
 
           # TODO: Leaving this alone for now (disabled by default)
           # TODO: UPDATE: We don't really need this, so disabling it for now
-          # Enable automatic reporting of SD card status
-          configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
+          # # Enable automatic reporting of SD card status
+          # configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now (enabled by default)
           # Enable SD card host drive support
@@ -1163,9 +1170,12 @@ jobs:
           if [ $UI == "TFT35" ]; then
             # Enable additional reporting etc. features
             configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+            configEnable M115_GEOMETRY_REPORT Marlin/Configuration_adv.h
             configEnable M114_DETAIL Marlin/Configuration_adv.h
             # configEnable M114_REALTIME Marlin/Configuration_adv.h
             configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
+            configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
+            configValue SERIAL_FLOAT_PRECISION 4 Marlin/Configuration_adv.h
           fi
 
           ## END OF CONFIGURATION_ADV.H

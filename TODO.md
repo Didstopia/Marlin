@@ -37,7 +37,7 @@ See [here](https://code.visualstudio.com/blogs/2020/05/06/github-issues-integrat
 
 - [ ] Implement an easy way to run these builds locally in Docker (I guess with `act` we could still do that, but it's still a bit buggy)
 
-- [ ] Implement BTT TFT display support (with dual mode?), possibly also enabling `BTT_TFT35_SPI_V1_0`? (see [here](https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware), [here](https://github.com/bigtreetech/BTT-E3-RRF/issues/3) and most importantly [here](https://www.reddit.com/r/BIGTREETECH/comments/t2mvyw/skr_mini_e3_v2_marlin_settings_with_btt_tft35/))
+- [ ] Implement BTT TFT35 (E3 V3.0) display support (with dual mode?), possibly also enabling `BTT_TFT35_SPI_V1_0`? (see [here](https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware), [here](https://github.com/bigtreetech/BTT-E3-RRF/issues/3) and most importantly [here](https://www.reddit.com/r/BIGTREETECH/comments/t2mvyw/skr_mini_e3_v2_marlin_settings_with_btt_tft35/))
   - [ ] Enable and configure `CUSTOM_MENU_MAIN`, `CUSTOM_MENU_CONFIG`, `CUSTOM_USER_BUTTONS` with the BTT display
 
 ## High
