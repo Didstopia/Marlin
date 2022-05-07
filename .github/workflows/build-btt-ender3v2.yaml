@@ -557,7 +557,8 @@ jobs:
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.42 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.58 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.52 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -715,8 +716,9 @@ jobs:
 
             # Configure speaker
             configEnable SPEAKER Marlin/Configuration.h
-            configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
-            configValue LCD_FEEDBACK_FREQUENCY_HZ 1000 Marlin/Configuration.h
+            # FIXME: These produce a WAY too high pitched, "breaking" noise, so trying with defaults next!
+            # configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
+            # configValue LCD_FEEDBACK_FREQUENCY_HZ 1000 Marlin/Configuration.h
 
             ## TODO: Experimental options for enabling the BTT TFT35 display
             # configEnable BTT_TFT35_SPI_V1_0 Marlin/Configuration.h
