@@ -671,6 +671,12 @@ jobs:
             # FIXME: I'm pretty sure jerk is a big part of our problem,
             #        so keep trying and perhaps even try without linear advance and/or junction deviation?
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
+
+            if [ $UI == "TFT35" ]; then
+              ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
+              ##        so we're giving it a go without it, see how that pans out!
+              configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
+            fi
           else
             # Set default extruder jerk
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
@@ -1165,7 +1171,11 @@ jobs:
 
               ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
               ##        so we're giving it a go without it, see how that pans out!
-              # configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+              if [$UI == "TFT35"]; then
+                configDisable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+              else
+                configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+              fi
 
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi
