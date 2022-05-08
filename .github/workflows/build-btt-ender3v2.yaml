@@ -719,6 +719,9 @@ jobs:
             # FIXME: These produce a WAY too high pitched, "breaking" noise, so trying with defaults next!
             # configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
             # configValue LCD_FEEDBACK_FREQUENCY_HZ 1000 Marlin/Configuration.h
+            # TODO: Frequency of 5000 to 8000 seems fine, so long as duration isn't too high!
+            configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
+            configValue LCD_FEEDBACK_FREQUENCY_HZ 5000 Marlin/Configuration.h
 
             ## TODO: Experimental options for enabling the BTT TFT35 display
             # configEnable BTT_TFT35_SPI_V1_0 Marlin/Configuration.h
