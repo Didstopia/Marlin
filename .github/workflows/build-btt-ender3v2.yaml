@@ -1158,7 +1158,11 @@ jobs:
               # configValue LIN_ADVANCE_K 0.15 Marlin/Configuration_adv.h
               ## FIXME: Re-calibrate K again!
               configValue LIN_ADVANCE_K 0.11 Marlin/Configuration_adv.h
-              configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+
+              ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
+              ##        so we're giving it a go without it, see how that pans out!
+              # configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi
           fi
