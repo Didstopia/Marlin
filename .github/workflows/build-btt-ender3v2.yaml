@@ -47,6 +47,9 @@ jobs:
       # max-parallel: 1
       matrix:
         board: [STM32G0B1RE_btt]
+        ## FIXME: Add support for no probe/manual leveling
+        # bltouch: [true, false]
+        bltouch: [true]
         #grid: [3, 5, 10, 15]
         grid: [5, 10]
         # grid: [10]
@@ -55,20 +58,21 @@ jobs:
         high-speed: [true]
         #direct-drive: [true, false]
         direct-drive: [true]
+        ## FIXME: Add support for UBL alternatives
         #ubl: [true, false]
         ubl: [true]
         # touch-screen: [true, false]
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
-        touch-screen: [false]
+        # touch-screen: [false]
         linear-advance: [true, false]
         # linear-advance: [false]
         junction-deviation: [true, false]
         # junction-deviation: [false]
         #hybrid-threshold: [true, false]
         hybrid-threshold: [false]
-        #mpc: [true, false]
-        mpc: [false]
+        mpc: [true, false]
+        # mpc: [false]
         # ui: ["JyersUI", "MarlinUI"]
         ui: ["JyersUI", "MarlinUI", "TFT35"]
         # TODO: Enable this once we have time to test out the BTT's TFT35 display
@@ -624,27 +628,6 @@ jobs:
             configDisable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
             configDisable MESH_BED_LEVELING Marlin/Configuration.h
           fi
-          
-          ## TODO: We should probably refactor this for the BTT display instead, once we get that hooked up and working?
-          # Configure DWIN touch screen support
-          if ($TOUCH_SCREEN); then
-            # Enable the touch screen support
-            configEnable TOUCH_SCREEN Marlin/Configuration.h
-
-            # Ensure Creality and Jyers UI DWIN displays are not enabled
-            configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
-            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
-
-            # TODO: Configure the rest of the DWIN touch screen support,
-            #       as well as use a custom DWIN_SET firmware for the display
-            #       (see Marlin/Configuration.h, search for "DGUS Touch")
-            # FIXME: This is just temporary and no idea if this would work:
-            #        https://github.com/Desuuuu/DGUS-reloaded/releases/tag/1.0.2
-            configEnable DGUS_LCD_UI_RELOADED Marlin/Configuration.h
-
-            # DGUS_LCD_UI_RELOADED requires LEVEL_BED_CORNERS
-            configEnable LEVEL_BED_CORNERS Marlin/Configuration.h
-          fi
 
           if ($JUNCTION_DEVIATION); then
             # TODO: Trying to see if enabling Junction Deviation AND Linear Advance will cause issues or not
@@ -686,9 +669,20 @@ jobs:
           ##        we should be able to use this with eg. Marlin UI, right?
           # NOTE: MPC is still HIGHLY experimental, proceed with caution!
           if ($MPC); then
-            # Disable PID and enable MPC
-            configDisable PIDTEMP Marlin/Configuration.h
-            configEnable MPCTEMP Marlin/Configuration.h
+            if [ $UI == "TFT35" ]; then
+              # Disable PID and enable MPC
+              configDisable PIDTEMP Marlin/Configuration.h
+              configEnable MPCTEMP Marlin/Configuration.h
+
+              # Configure MPC
+              # NOTE: Use "M306" G-Code to autotune MPC
+              configEnable MPC_EDIT_MENU Marlin/Configuration.h
+              configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
+            else
+              # Enable PID and disable MPC
+              configEnable PIDTEMP Marlin/Configuration.h
+              configDisable MPCTEMP Marlin/Configuration.h
+            fi
           else
             # Enable PID and disable MPC
             configEnable PIDTEMP Marlin/Configuration.h
@@ -1203,12 +1197,12 @@ jobs:
 
           ## END OF CONFIGURATION_ADV.H
         env:
+          BLTOUCH: ${{ matrix.bltouch }}
           GRID: ${{ matrix.grid }}
           HIGH_SPEED: ${{ matrix.high-speed }}
           DIRECT_DRIVE: ${{ matrix.direct-drive }}
           TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
           UBL: ${{ matrix.ubl }}
-          TOUCH_SCREEN: ${{ matrix.touch-screen }}
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
           HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
@@ -1220,16 +1214,16 @@ jobs:
         id: compile_firmware
         run: |-
           # Generate a name for the firmware and export it as a step output
+          if ($BLTOUCH); then BLTOUCH_LABEL=-BLTOUCH; else BLTOUCH_LABEL=-NOPROBE; fi;
           if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
-          if ($DIRECT_DRIVE); then DD_LABEL=-DD; else DD_LABEL=; fi;
+          if ($DIRECT_DRIVE); then DD_LABEL=-DD; else DD_LABEL=-BOWDEN; fi;
           if ($UBL); then UBL_LABEL=-UBL; else UBL_LABEL=-ABL; fi;
           if ($LINEAR_ADVANCE); then LINEAR_ADVANCE_LABEL=-LIN; else LINEAR_ADVANCE_LABEL=; fi;
-          if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=; fi;
+          if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=CLASSICJERK; fi;
           if ($HYBRID_THRESHOLD); then HYBRID_THRESHOLD_LABEL=-HT; else HYBRID_THRESHOLD_LABEL=; fi;
-          if ($TOUCH_SCREEN); then TOUCH_SCREEN_LABEL=-TOUCH; else TOUCH_SCREEN_LABEL=; fi;
-          if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=; fi;
+          if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=-PID; fi;
           if [ ! -z "$UI" ]; then UI_LABEL=-$UI; else UI_LABEL=; fi;
-          FIRMWARE_NAME="E3V2-UBL-BLTouch-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${UBL_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}${TOUCH_SCREEN_LABEL}${UI_LABEL}-${BOARD}-${VERSION}"
+          FIRMWARE_NAME="ENDER_E3_V2-${BOARD}${BLTOUCH_LABEL}${UBL_LABEL}${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}${UI_LABEL}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -1246,17 +1240,19 @@ jobs:
 
           ## TODO: !!! Add DWIN customizations here !!!
 
+          ## TODO: !!! Add BTT TFT35 customizations (possibly even compilation?) here, copy built firmware, config and themes also? !!!
+
           # Include the latest DWIN display firmware with all build artifacts
           cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
           cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/private" "temp/${FIRMWARE_NAME}/private"
         env:
           BOARD: ${{ matrix.board }}
+          BLTOUCH: ${{ matrix.bltouch }}
           GRID: ${{ matrix.grid }}
           HIGH_SPEED: ${{ matrix.high-speed }}
           DIRECT_DRIVE: ${{ matrix.direct-drive }}
           VERSION: ${{ env.RELEASE_VERSION }}
           UBL: ${{ matrix.ubl }}
-          TOUCH_SCREEN: ${{ matrix.touch-screen }}
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
           HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
