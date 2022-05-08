@@ -675,7 +675,8 @@ jobs:
               configEnable MPCTEMP Marlin/Configuration.h
 
               # Configure MPC
-              # NOTE: Use "M306" G-Code to autotune MPC
+              # NOTE: Use "M306 T" G-Code to autotune MPC for the hotend
+              ## TODO: How do we MPC autotune the bed temperature?
               configEnable MPC_EDIT_MENU Marlin/Configuration.h
               configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
             else
@@ -1214,16 +1215,16 @@ jobs:
         id: compile_firmware
         run: |-
           # Generate a name for the firmware and export it as a step output
+          if [ ! -z "$UI" ]; then UI_LABEL=-$UI; else UI_LABEL=; fi;
           if ($BLTOUCH); then BLTOUCH_LABEL=-BLTOUCH; else BLTOUCH_LABEL=-NOPROBE; fi;
           if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
           if ($DIRECT_DRIVE); then DD_LABEL=-DD; else DD_LABEL=-BOWDEN; fi;
           if ($UBL); then UBL_LABEL=-UBL; else UBL_LABEL=-ABL; fi;
-          if ($LINEAR_ADVANCE); then LINEAR_ADVANCE_LABEL=-LIN; else LINEAR_ADVANCE_LABEL=; fi;
-          if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JD; else JUNCTION_DEVIATION_LABEL=CLASSICJERK; fi;
-          if ($HYBRID_THRESHOLD); then HYBRID_THRESHOLD_LABEL=-HT; else HYBRID_THRESHOLD_LABEL=; fi;
+          if ($LINEAR_ADVANCE); then LINEAR_ADVANCE_LABEL=-LINEAR_ADVANCE; else LINEAR_ADVANCE_LABEL=; fi;
+          if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JUNCTION_DEVIATION; else JUNCTION_DEVIATION_LABEL=-CLASSIC_JERK; fi;
+          if ($HYBRID_THRESHOLD); then HYBRID_THRESHOLD_LABEL=-HYBRID_THRESHOLD; else HYBRID_THRESHOLD_LABEL=; fi;
           if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=-PID; fi;
-          if [ ! -z "$UI" ]; then UI_LABEL=-$UI; else UI_LABEL=; fi;
-          FIRMWARE_NAME="ENDER_E3_V2-${BOARD}${BLTOUCH_LABEL}${UBL_LABEL}${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}${UI_LABEL}-${VERSION}"
+          FIRMWARE_NAME="ENDER_E3_V2-${BOARD}${UI_LABEL}${BLTOUCH_LABEL}${UBL_LABEL}${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
