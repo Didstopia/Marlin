@@ -734,8 +734,12 @@ jobs:
 
             # FIXME: Can we then use both SD cards and USB ports?
             # Configure serial ports for touch screem
-            configValue SERIAL_PORT 2 Marlin/Configuration.h
-            configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
+            # configValue SERIAL_PORT 2 Marlin/Configuration.h
+            # configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
+            configValue SERIAL_PORT -1 Marlin/Configuration.h
+            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+            configValue BAUDRATE 250000 Marlin/Configuration.h
+            configValue BAUDRATE_2 250000 Marlin/Configuration.h
 
             ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
             ##        so we're giving it a go without it, see how that pans out!
