@@ -89,7 +89,8 @@ jobs:
 
           # Remove old binaries and configs
           find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
-          find "Copy to SD Card root directory to update/" -name '*.ini' -print -delete
+          # find "Copy to SD Card root directory to update/" -name '*.ini' -print -delete
+          find "Copy to SD Card root directory to update/" -name 'config*.ini' -print -delete
 
           # Copy new freshly built binaries and configs
           BTT_DIST_DIR="/tmp/btt-display-firmware"
@@ -98,11 +99,14 @@ jobs:
           find .pio/build/ -name '*.bin' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
           find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
 
+          ## FIXME: THIS seems to be the main issue, where the "Copy..." directory is copied
+          ##        to BTT_DIST_DIR, and NOT its contents, which is what we're after!
           # Copy extra files, such as themes and language packs
           # cp -fr "Copy to SD Card root directory to update"/ $BTT_DIST_DIR/
-          cp -R Copy\ to\ SD\ Card\ root\ directory\ to\ update/ $BTT_DIST_DIR/
+          cp -R Copy\ to\ SD\ Card\ root\ directory\ to\ update/THEME_* $BTT_DIST_DIR/
 
           ## FIXME: This works fine locally, but ALWAYS fails on CI (never deletes anything)
+          ## UPDATE: Looks like it's still the copy command above that's the culprit!
           # Remove files unrelated to the current display model
           rm -fr $BTT_DIST_DIR/THEME_*/!($BTT_DISPLAY_MODEL_SHORT)/
 
