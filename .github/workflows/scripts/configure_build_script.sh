@@ -141,7 +141,7 @@ configEnable() {
     return 1
   fi
 
-  sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\2\3/g w /tmp/marlin_patch.log" ${config}
+  sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\2\3/g w /tmp/marlin_patch.log" "$config"
   if [ ! -s /tmp/marlin_patch.log ]; then
     error "Failed to enable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
     # return 1
@@ -172,7 +172,7 @@ configDisable() {
     false
   fi
 
-  sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\1\/\/\2\3/g w /tmp/marlin_patch.log" ${config}
+  sed -E -i "s/([^ ]*)(#define ${option})( .*|$)/\1\/\/\2\3/g w /tmp/marlin_patch.log" "$config"
   if [ ! -s /tmp/marlin_patch.log ]; then
     error "Failed to disable ${COLOR_GREEN}${option}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"
     # return 1
@@ -209,7 +209,7 @@ configValue() {
     false
   fi
 
-  sed -E -i "s/([^ \n]?)(#define ${key}[ ]+)(\".*\"|\(.*\)|\{.*\}|[-0-9a-zA-Z_.]*)+?([ ]?.*)/\1\2${value}\4/g w /tmp/marlin_patch.log" ${config}
+  sed -E -i "s/([^ \n]?)(#define ${key}[ ]+)(\".*\"|\(.*\)|\{.*\}|[-0-9a-zA-Z_.]*)+?([ ]?.*)/\1\2${value}\4/g w /tmp/marlin_patch.log" "$config"
   # set -x
   if [ ! -s /tmp/marlin_patch.log ]; then
     error "Failed to set ${COLOR_GREEN}${key}${COLOR_RESET} to ${COLOR_YELLOW}${value}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET}"

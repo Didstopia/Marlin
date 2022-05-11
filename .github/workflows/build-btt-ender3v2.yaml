@@ -1284,7 +1284,7 @@ jobs:
         run: |-
 
           # Enable script debugging
-          # set -x
+          set -x
 
           ## TODO: Split or refactor configure_build_script.sh, so we can use its generic error handling
           ##       and logging capabilities here, as well as in any other situation, without requiring us
@@ -1314,10 +1314,10 @@ jobs:
           shopt -s extglob
           BTT_CONF_FILE="/tmp/${UI}/Copy to SD Card root directory to update/config.ini"
           displayConfig() {
-            local option="${1}"
-            local value="${2}"
-            local config="${3}"
-            sed -E -i "s/([^ \n]*?)(${option})(\:)([^ ].*|$)/\2\:${value}/g w /tmp/btt_display_config_patch.log" "${config}"
+            local option=$1
+            local value=$2
+            local config=$3
+            sed -E -i "s/([^ \n]*?)(${option})(\:)([^ ].*|$)/\2\:${value}/g w /tmp/btt_display_config_patch.log" "$config"
             if [ ! -s /tmp/btt_display_config_patch.log ]; then
               echo "::error title=ERROR::Failed to enable ${option} in ${config}"
               exit 1
