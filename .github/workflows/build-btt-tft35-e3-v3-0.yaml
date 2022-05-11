@@ -1,0 +1,114 @@
+name: Build BTT TFT35 E3 V3.0
+
+on:
+  # Trigger custom firmwares builds only in specific situations
+  push:
+    # When the following branches are pushed
+    branches:
+      - 2.0.x
+      - bugfix-2.0.x
+      - skr-mini-e3-v3-0
+    
+    # When the following tags are pushed
+    tags:
+      - 2*
+
+  # Allow manual builds
+  workflow_dispatch:
+
+## TODO: Disable/remove this at some point if we still want to use act locally!
+env:
+  ACT: false
+
+jobs:
+
+  build-display-firmware:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ "BIGTREE_TFT35_E3_V3_0" ]
+
+    steps:
+      - name: Checkout BTT Display Firmware Repository
+        uses: actions/checkout@v3
+        with:
+          repository: bigtreetech/BIGTREETECH-TouchScreenFirmware
+          ref: master
+          fetch-depth: 1
+          submodules: true
+
+      - name: Compile BTT Display Firmware
+        id: compile_btt_display_firmware
+        run: |-
+
+          # Enable script debugging
+          # set -x
+
+          # Enable glob/wildcard support
+          shopt -s extglob
+
+          ## TODO: Store/set the board/display name in the matrix, so we can reuse it here (and elsewhere if necessary)
+          # Compile the firmware
+          platformio run --environment ${BTT_DISPLAY_MODEL}
+
+          # Remove old binaries and configs
+          # find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
+          # find "Copy to SD Card root directory to update/" -name 'config.ini' -print -delete
+
+          # Copy new freshly built binaries and configs
+          BTT_DIST_DIR="/tmp/btt-display-firmware"
+          mkdir -p "${BTT_DIST_DIR}"
+          echo "::set-output name=dist::${FIRMWARE_NAME}"
+          # find .pio/build/ -name '*.bin' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
+          # find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
+          find .pio/build/ -name '*.bin' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
+          find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
+
+          # Remove files unrelated specifically to the display model
+          # rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL})"
+          rm -fr "${BTT_DIST_DIR}/THEME_*/!(${BTT_DISPLAY_MODEL})"
+
+          # Customize the firmware, config and/or theme(s)
+          displayConfig() {
+            local option=$1
+            local value=$2
+            local config=$3
+            sed -E -i "s/([^ \n]*?)(${option})(\:)([^ ].*|$)/\2\:${value}/g w /tmp/btt_display_config_patch.log" "$config"
+            if [ ! -s /tmp/btt_display_config_patch.log ]; then
+              echo "::error title=ERROR::Failed to enable ${option} in ${config}"
+              exit 1
+            fi
+          }
+          # cd "Copy to SD Card root directory to update"
+          displayConfig serial_port "P1:7 P2:0 P3:0 P4:0" ${BTT_DIST_DIR}/config.ini
+          displayConfig emulated_m600 "0" ${BTT_DIST_DIR}/config.ini
+          displayConfig ack_notification "2" ${BTT_DIST_DIR}/config.ini
+          displayConfig files_list_mode "0" ${BTT_DIST_DIR}/config.ini
+          displayConfig persistent_info "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig notification_m117 "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig prog_disp_type "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig layer_disp_type "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig serial_always_on "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig marlin_font_color "2" ${BTT_DIST_DIR}/config.ini
+          displayConfig marlin_title "RASPUTIN" ${BTT_DIST_DIR}/config.ini
+          displayConfig fan_count "3" ${BTT_DIST_DIR}/config.ini
+          displayConfig controller_fan "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig toast_sound "0" ${BTT_DIST_DIR}/config.ini
+          displayConfig lcd_idle_brightness "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig lcd_lock_on_idle "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig knob_led_color "2" ${BTT_DIST_DIR}/config.ini
+          displayConfig custom_label_8 "MPC Autotune" ${BTT_DIST_DIR}/config.ini
+          displayConfig custom_gcode_8 "M306 T \\\n" ${BTT_DIST_DIR}/config.ini
+          # cd ..
+        env:
+          BTT_DISPLAY_MODEL: ${{ matrix.model }}
+
+      - name: Upload BTT Display Firmware
+        ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
+        # if: env.ACT != 'true'
+        if: success() # Ensure we only run this step if the previous one succeeded
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.model }}
+          path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
