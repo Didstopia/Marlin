@@ -84,8 +84,13 @@ jobs:
           platformio run --environment ${BTT_DISPLAY_MODEL}
 
           # Remove old binaries and configs
-          # find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
+          find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
           # find "Copy to SD Card root directory to update/" -name 'config.ini' -print -delete
+          find "Copy to SD Card root directory to update/" -name '*.ini' -print -delete
+
+          # Remove files unrelated specifically to the display model
+          rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL})"
+          # rm -fr "${BTT_DIST_DIR}/THEME_*/!(${BTT_DISPLAY_MODEL})"
 
           # Copy new freshly built binaries and configs
           BTT_DIST_DIR="/tmp/btt-display-firmware"
@@ -96,13 +101,8 @@ jobs:
           find .pio/build/ -name '*.bin' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
           find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
 
-          # Remove files unrelated specifically to the display model
-          # rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL})"
-          rm -fr "${BTT_DIST_DIR}/THEME_*/!(${BTT_DISPLAY_MODEL})"
-
-          # Copy themes and language packs
-          cp -fr "Copy to SD Card root directory to update/THEME_*" "${BTT_DIST_DIR}/"
-          cp -fr "Copy to SD Card root directory to update/Language Packs" "${BTT_DIST_DIR}/"
+          # Copy extra files, such as themes and language packs
+          cp -fr "Copy to SD Card root directory to update/" "${BTT_DIST_DIR}/"
 
           # Customize the firmware, config and/or theme(s)
           displayConfig() {
