@@ -94,7 +94,7 @@ jobs:
           find "Copy to SD Card root directory to update/" -name '*.ini' -print -delete
 
           # Remove files unrelated specifically to the display model
-          rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL_SHORT})"
+          # rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL_SHORT})"
           # rm -fr "${BTT_DIST_DIR}/THEME_*/!(${BTT_DISPLAY_MODEL_SHORT})"
           # ls -lah "Copy to SD Card root directory to update"
 
@@ -109,10 +109,10 @@ jobs:
 
           # Copy extra files, such as themes and language packs
           # cp -fr "Copy to SD Card root directory to update"/ $BTT_DIST_DIR/
-          cp -fr "Copy to SD Card root directory to update"/ /tmp/btt-display-firmware/
+          cp -R "Copy to SD Card root directory to update"/ $BTT_DIST_DIR
 
           # Remove files unrelated to the current display model
-          rm -fr "/tmp/btt-display-firmware/**/THEME_*/!($BTT_DISPLAY_MODEL_SHORT)"
+          rm -fr $BTT_DIST_DIR/THEME_*/!($BTT_DISPLAY_MODEL_SHORT)/
 
           # Customize the firmware, config and/or theme(s)
           displayConfig() {
@@ -149,8 +149,9 @@ jobs:
         env:
           BTT_DISPLAY_MODEL: ${{ matrix.model }}
 
-      # - name: 'Compress Build Files'
-      #   run: tar -cvf /tmp/${{ matrix.model }}.tar ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+      - name: Compress Build Files
+        # run: tar -cvf /tmp/${{ matrix.model }}.tar ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+        run: zip /tmp/${{ matrix.model }}.zip ${{ steps.compile_btt_display_firmware.outputs.dist }}/
 
       - name: Upload BTT Display Firmware
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
@@ -159,6 +160,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.model }}
-          path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+          # path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
           # path: /tmp/${{ matrix.model }}.tar
+          path: /tmp/${{ matrix.model }}.zip
           retention-days: 7
