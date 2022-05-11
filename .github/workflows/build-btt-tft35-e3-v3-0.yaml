@@ -38,6 +38,37 @@ jobs:
           fetch-depth: 1
           submodules: true
 
+      - name: Cache pip
+        if: success() && env.ACT != 'true'
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache PlatformIO
+        if: success() && env.ACT != 'true'
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+      - name: Setup Python
+        if: success() # Ensure we only run this step if the previous one succeeded
+        uses: actions/setup-python@v3
+
+      - name: Install PlatformIO
+        if: success() # Ensure we only run this step if the previous one succeeded
+        run: |-
+
+          # Enable script debugging
+          # set -x
+
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+          platformio platform update
+
       - name: Compile BTT Display Firmware
         id: compile_btt_display_firmware
         run: |-
