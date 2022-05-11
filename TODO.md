@@ -6,6 +6,8 @@ See [here](https://code.visualstudio.com/blogs/2020/05/06/github-issues-integrat
 
 ## Critical
 
+- [ ] Auto-generate/update README.md to include a Markdown table with names, explanations and links to every single matrix build (see [here](https://github.com/marketplace/actions/markdown-autodocs))
+
 - [ ] Try disabling `SQUARE_WAVE_STEPPING`, as it's disabled in BTT by default (enabled in Marlin/Creality by default)
 
 - [ ] Try disabling `SDCARD_CONNECTION`, since this should cause the board itself to figure out the correct SD card connection

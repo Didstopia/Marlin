@@ -108,7 +108,7 @@ jobs:
           find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
 
           # Copy extra files, such as themes and language packs
-          cp -fr "Copy to SD Card root directory to update/" "${BTT_DIST_DIR}"
+          cp -fr "Copy to SD Card root directory to update"/ "${BTT_DIST_DIR}"/
 
           # Customize the firmware, config and/or theme(s)
           displayConfig() {
