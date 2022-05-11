@@ -1312,7 +1312,7 @@ jobs:
 
           # Customize the firmware, config and/or theme(s)
           shopt -s extglob
-          BTT_CONF_FILE="/tmp/${UI}/Copy to SD Card root directory to update/config.ini"
+          BTT_CONF_FILE="/tmp/${UI}/Copy\ to\ SD\ Card\ root\ directory\ to\ update/config.ini"
           displayConfig() {
             local option=$1
             local value=$2
