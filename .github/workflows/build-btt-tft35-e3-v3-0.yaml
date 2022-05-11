@@ -84,26 +84,17 @@ jobs:
 
           ## FIXME: Validate that we have both the display model and the short display model!
 
-          ## TODO: Store/set the board/display name in the matrix, so we can reuse it here (and elsewhere if necessary)
           # Compile the firmware
           platformio run --environment ${BTT_DISPLAY_MODEL}
 
           # Remove old binaries and configs
           find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
-          # find "Copy to SD Card root directory to update/" -name 'config.ini' -print -delete
           find "Copy to SD Card root directory to update/" -name '*.ini' -print -delete
-
-          # Remove files unrelated specifically to the display model
-          # rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL_SHORT})"
-          # rm -fr "${BTT_DIST_DIR}/THEME_*/!(${BTT_DISPLAY_MODEL_SHORT})"
-          # ls -lah "Copy to SD Card root directory to update"
 
           # Copy new freshly built binaries and configs
           BTT_DIST_DIR="/tmp/btt-display-firmware"
           mkdir -p "${BTT_DIST_DIR}"
           echo "::set-output name=dist::${BTT_DIST_DIR}"
-          # find .pio/build/ -name '*.bin' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
-          # find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
           find .pio/build/ -name '*.bin' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
           find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
 
@@ -125,7 +116,6 @@ jobs:
               exit 1
             fi
           }
-          # cd "Copy to SD Card root directory to update"
           displayConfig serial_port "P1:7 P2:0 P3:0 P4:0" ${BTT_DIST_DIR}/config.ini
           displayConfig emulated_m600 "0" ${BTT_DIST_DIR}/config.ini
           displayConfig ack_notification "2" ${BTT_DIST_DIR}/config.ini
@@ -145,13 +135,18 @@ jobs:
           displayConfig knob_led_color "2" ${BTT_DIST_DIR}/config.ini
           displayConfig custom_label_8 "MPC Autotune" ${BTT_DIST_DIR}/config.ini
           displayConfig custom_gcode_8 "M306 T \\\n" ${BTT_DIST_DIR}/config.ini
-          # cd ..
+
+          # Create and export a filename for the build artifact
+          VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}
+          BTT_DIST_NAME="${BTT_DISPLAY_MODEL}-${VERSION}"
+          echo "::set-output name=name::${BTT_DIST_NAME}"
+
         env:
           BTT_DISPLAY_MODEL: ${{ matrix.model }}
 
-      - name: Compress Build Files
-        # run: tar -cvf /tmp/${{ matrix.model }}.tar ${{ steps.compile_btt_display_firmware.outputs.dist }}/
-        run: zip /tmp/${{ matrix.model }}.zip ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+      # https://github.com/actions/upload-artifact/issues/39
+      # - name: Compress Build Files
+      #   run: zip -r /tmp/${{ matrix.model }}.zip ${{ steps.compile_btt_display_firmware.outputs.dist }}/*
 
       - name: Upload BTT Display Firmware
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
@@ -159,8 +154,8 @@ jobs:
         if: success() # Ensure we only run this step if the previous one succeeded
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.model }}
-          # path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
-          # path: /tmp/${{ matrix.model }}.tar
-          path: /tmp/${{ matrix.model }}.zip
+          # name: ${{ matrix.model }}
+          name: ${{ steps.compile_btt_display_firmware.outputs.name }}
+          # path: /tmp/${{ matrix.model }}.zip
+          path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
           retention-days: 7

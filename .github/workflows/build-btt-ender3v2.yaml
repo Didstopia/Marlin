@@ -1368,9 +1368,9 @@ jobs:
       #   env:
       #     UI: ${{ matrix.ui }}
 
-      - name: Compress Build Files
-        # run: tar -cvf /tmp/${{ matrix.model }}.tar ${{ steps.compile_btt_display_firmware.outputs.dist }}/
-        run: zip /tmp/${{ matrix.model }}.zip temp/${{ steps.compile_marlin_firmware.outputs.name }}
+      # https://github.com/actions/upload-artifact/issues/39
+      # - name: Compress Build Files
+      #   run: zip -r /tmp/${{ steps.compile_marlin_firmware.outputs.name }}.zip temp/${{ steps.compile_marlin_firmware.outputs.name }}/*
 
       - name: Publish Artifacts
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
@@ -1378,11 +1378,7 @@ jobs:
         if: success() # Ensure we only run this step if the previous one succeeded
         uses: actions/upload-artifact@v3
         with:
-          # name: ${{ steps.compile_firmware.outputs.filename }}
-          # name: ${{ steps.compile_firmware.outputs.name }}.zip
           name: ${{ steps.compile_marlin_firmware.outputs.name }}
-          # path: temp/build.bin
-          # path: temp/build/
-          # path: temp/${{ steps.compile_marlin_firmware.outputs.name }}
-          path: /tmp/${{ matrix.model }}.zip
+          # path: /tmp/${{ steps.compile_marlin_firmware.outputs.name }}.zip
+          path: temp/${{ steps.compile_marlin_firmware.outputs.name }}/
           retention-days: 7
