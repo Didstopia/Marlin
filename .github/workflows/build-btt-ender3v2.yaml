@@ -1353,7 +1353,7 @@ jobs:
           mkdir -p "${BTT_DIST_DIR}"
 
           # Include built files with the build artifacts
-          cp -R "Copy to SD Card root directory to update" "${BTT_DIST_DIR}/"
+          cp -R "Copy to SD Card root directory to update/" "${BTT_DIST_DIR}"
 
         env:
           UI: ${{ matrix.ui }}
@@ -1362,7 +1362,8 @@ jobs:
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
         # if: env.ACT != 'true'
         if: success() # Ensure we only run this step if the previous one succeeded
-        uses: actions/upload-artifact@v3
+        # uses: actions/upload-artifact@v3 # FIXME: Getting artifact upload errors all of a sudden (unprocessable entity)
+        uses: actions/upload-artifact@v2
         with:
           # name: ${{ steps.compile_firmware.outputs.filename }}
           # name: ${{ steps.compile_firmware.outputs.name }}.zip
