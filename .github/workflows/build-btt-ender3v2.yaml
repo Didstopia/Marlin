@@ -1379,3 +1379,4 @@ jobs:
           name: ${{ steps.compile_marlin_firmware.outputs.name }}
           # path: temp/build.bin
           path: temp/build/
+          retention-days: 7

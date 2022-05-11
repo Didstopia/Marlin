@@ -74,10 +74,15 @@ jobs:
         run: |-
 
           # Enable script debugging
-          # set -x
+          set -x
 
           # Enable glob/wildcard support
           shopt -s extglob
+
+          # Figure out the short display model name
+          BTT_DISPLAY_MODEL_SHORT=$(echo ${BTT_DISPLAY_MODEL} | sed sed -E 's/([^_]*?)\_([^_]*)\_(.*)/\2/')
+
+          ## FIXME: Validate that we have both the display model and the short display model!
 
           ## TODO: Store/set the board/display name in the matrix, so we can reuse it here (and elsewhere if necessary)
           # Compile the firmware
@@ -89,8 +94,9 @@ jobs:
           find "Copy to SD Card root directory to update/" -name '*.ini' -print -delete
 
           # Remove files unrelated specifically to the display model
-          rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL})"
+          rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL_SHORT})"
           # rm -fr "${BTT_DIST_DIR}/THEME_*/!(${BTT_DISPLAY_MODEL})"
+          # ls -lah "Copy to SD Card root directory to update"
 
           # Copy new freshly built binaries and configs
           BTT_DIST_DIR="/tmp/btt-display-firmware"
@@ -102,7 +108,7 @@ jobs:
           find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
 
           # Copy extra files, such as themes and language packs
-          cp -fr "Copy to SD Card root directory to update/" "${BTT_DIST_DIR}/"
+          cp -fr "Copy to SD Card root directory to update/" "${BTT_DIST_DIR}"
 
           # Customize the firmware, config and/or theme(s)
           displayConfig() {
@@ -139,6 +145,9 @@ jobs:
         env:
           BTT_DISPLAY_MODEL: ${{ matrix.model }}
 
+      - name: 'Compress Build Files'
+        run: tar -cvf /tmp/${{ matrix.model }}.tar ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+
       - name: Upload BTT Display Firmware
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
         # if: env.ACT != 'true'
@@ -146,4 +155,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.model }}
-          path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+          # path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+          path: /tmp/${{ matrix.model }}.tar
+          retention-days: 7
