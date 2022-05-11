@@ -90,7 +90,7 @@ jobs:
           # Copy new freshly built binaries and configs
           BTT_DIST_DIR="/tmp/btt-display-firmware"
           mkdir -p "${BTT_DIST_DIR}"
-          echo "::set-output name=dist::${FIRMWARE_NAME}"
+          echo "::set-output name=dist::${BTT_DIST_DIR}"
           # find .pio/build/ -name '*.bin' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
           # find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
           find .pio/build/ -name '*.bin' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
