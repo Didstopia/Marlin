@@ -169,6 +169,13 @@ jobs:
             TARGET_BRANCH=2.0.x
           fi
 
+          ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.0.x" branch
+          # If the target branch is "2.0.x", echo out an error message and fail the build
+          if [ "$TARGET_BRANCH" = "2.0.x" ]; then
+            echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.0.x' branch."
+            exit 1
+          fi
+
           # echo "Final target branch: $TARGET_BRANCH"
           echo "::warning title=Final target branch::$TARGET_BRANCH"
 
@@ -1201,6 +1208,7 @@ jobs:
           fi
 
           ## END OF CONFIGURATION_ADV.H
+
         env:
           BLTOUCH: ${{ matrix.bltouch }}
           GRID: ${{ matrix.grid }}
@@ -1214,10 +1222,11 @@ jobs:
           MPC: ${{ matrix.mpc }}
           UI: ${{ matrix.ui }}
 
-      - name: Compile Firmware
+      - name: Compile Marlin Firmware
         if: success() # Ensure we only run this step if the previous one succeeded
-        id: compile_firmware
+        id: compile_marlin_firmware
         run: |-
+
           # Generate a name for the firmware and export it as a step output
           if [ ! -z "$UI" ]; then UI_LABEL=-$UI; else UI_LABEL=; fi;
           if ($BLTOUCH); then BLTOUCH_LABEL=-BLTOUCH; else BLTOUCH_LABEL=-NOPROBE; fi;
@@ -1248,8 +1257,13 @@ jobs:
           ## TODO: !!! Add BTT TFT35 customizations (possibly even compilation?) here, copy built firmware, config and themes also? !!!
 
           # Include the latest DWIN display firmware with all build artifacts
-          cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
-          cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/private" "temp/${FIRMWARE_NAME}/private"
+          if [ $UI != "TFT35" ]; then
+            cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
+            cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/private" "temp/${FIRMWARE_NAME}/private"
+          else
+            echo "::warning::TFT35 UI detected, skipping DWIN files"
+          fi
+
         env:
           BOARD: ${{ matrix.board }}
           BLTOUCH: ${{ matrix.bltouch }}
@@ -1264,6 +1278,44 @@ jobs:
           MPC: ${{ matrix.mpc }}
           UI: ${{ matrix.ui }}
 
+      - name: Compile BTT TFT35 Firmware
+        if: matrix.ui == 'TFT35'
+        id: compile_btt_tft35_firmware
+        run: |-
+
+          # Enable script debugging
+          set -x
+
+          ## TODO: Split or refactor configure_build_script.sh, so we can use its generic error handling
+          ##       and logging capabilities here, as well as in any other situation, without requiring us
+          ##       to always be at the Marlin source root.
+
+          # Fetch the source code for the TFT35 firmware
+          git clone --depth 1 --branch master --single-branch --recurse-submodules git@github.com:bigtreetech/BIGTREETECH-TouchScreenFirmware.git /tmp/btt-tft35
+
+          # Switch to the source directory
+          cd /tmp/btt-tft35
+
+          # Compile the firmware
+          platformio run --environment BIGTREE_TFT35_E3_V3_0
+
+          ## TODO: Any particular reason we'd even need this?
+          # Remove old binaries and configs
+          find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
+          find "Copy to SD Card root directory to update/" -name 'config.ini' -print -delete
+
+          ## TODO: Any particular reason we'd even need this?
+          # Copy new binaries and configs
+          find .pio/build/ -name '*.bin' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
+          find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
+
+          # Prepare the build artifact directory
+          BTT_DIST_DIR="${GITHUB_WORKSPACE}/temp/${{ steps.compile_marlin_firmware.outputs.name }}/btt-tft35"
+          mkdir -p "${BTT_DIST_DIR}"
+
+          # Include built files with the build artifacts
+          cp -R "Copy to SD Card root directory to update" "${BTT_DIST_DIR}/"
+
       - name: Publish Artifacts
         ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
         # if: env.ACT != 'true'
@@ -1272,6 +1324,6 @@ jobs:
         with:
           # name: ${{ steps.compile_firmware.outputs.filename }}
           # name: ${{ steps.compile_firmware.outputs.name }}.zip
-          name: ${{ steps.compile_firmware.outputs.name }}
+          name: ${{ steps.compile_marlin_firmware.outputs.name }}
           # path: temp/build.bin
           path: temp/
