@@ -1312,36 +1312,36 @@ jobs:
 
           # Customize the firmware, config and/or theme(s)
           shopt -s extglob
-          BTT_CONF_FILE="/tmp/${UI}/Copy\ to\ SD\ Card\ root\ directory\ to\ update/config.ini"
+          BTT_CONF_FILE="/tmp/${UI}/Copy to SD Card root directory to update/config.ini"
           displayConfig() {
-            local option=$1
-            local value=$2
-            local config=$3
-            sed -E -i "s/([^ \n]*?)(${option})(\:)([^ ].*|$)/\2\:${value}/g w /tmp/btt_display_config_patch.log" ${config}
+            local option="${1}"
+            local value="${2}"
+            local config="${3}"
+            sed -E -i "s/([^ \n]*?)(${option})(\:)([^ ].*|$)/\2\:${value}/g w /tmp/btt_display_config_patch.log" "${config}"
             if [ ! -s /tmp/btt_display_config_patch.log ]; then
               echo "::error title=ERROR::Failed to enable ${option} in ${config}"
               exit 1
             fi
           }
-          displayConfig serial_port "P1:7 P2:0 P3:0 P4:0" "${BTT_CONF_FILE}"
-          displayConfig emulated_m600 "0" "${BTT_CONF_FILE}"
-          displayConfig ack_notification "2" "${BTT_CONF_FILE}"
-          displayConfig files_list_mode "0" "${BTT_CONF_FILE}"
-          displayConfig persistent_info "1" "${BTT_CONF_FILE}"
-          displayConfig notification_m117 "1" "${BTT_CONF_FILE}"
-          displayConfig prog_disp_type "1" "${BTT_CONF_FILE}"
-          displayConfig layer_disp_type "1" "${BTT_CONF_FILE}"
-          displayConfig serial_always_on "1" "${BTT_CONF_FILE}"
-          dislayConfig marlin_font_color "2" "${BTT_CONF_FILE}"
-          displayConfig marlin_title "RASPUTIN" "${BTT_CONF_FILE}"
-          displayConfig fan_count "3" "${BTT_CONF_FILE}"
-          displayConfig controller_fan "1" "${BTT_CONF_FILE}"
-          displayConfig toast_sound "0" "${BTT_CONF_FILE}"
-          displayConfig lcd_idle_brightness "1" "${BTT_CONF_FILE}"
-          displayConfig lcd_lock_on_idle "1" "${BTT_CONF_FILE}"
-          displayConfig knob_led_color "2" "${BTT_CONF_FILE}"
-          displayConfig custom_label_8 "MPC Autotune" "${BTT_CONF_FILE}"
-          displayConfig custom_gcode_8 "M306 T \\\n" "${BTT_CONF_FILE}"
+          displayConfig serial_port "P1:7 P2:0 P3:0 P4:0" ${BTT_CONF_FILE}
+          displayConfig emulated_m600 "0" ${BTT_CONF_FILE}
+          displayConfig ack_notification "2" ${BTT_CONF_FILE}
+          displayConfig files_list_mode "0" ${BTT_CONF_FILE}
+          displayConfig persistent_info "1" ${BTT_CONF_FILE}
+          displayConfig notification_m117 "1" ${BTT_CONF_FILE}
+          displayConfig prog_disp_type "1" ${BTT_CONF_FILE}
+          displayConfig layer_disp_type "1" ${BTT_CONF_FILE}
+          displayConfig serial_always_on "1" ${BTT_CONF_FILE}
+          dislayConfig marlin_font_color "2" ${BTT_CONF_FILE}
+          displayConfig marlin_title "RASPUTIN" ${BTT_CONF_FILE}
+          displayConfig fan_count "3" ${BTT_CONF_FILE}
+          displayConfig controller_fan "1" ${BTT_CONF_FILE}
+          displayConfig toast_sound "0" ${BTT_CONF_FILE}
+          displayConfig lcd_idle_brightness "1" ${BTT_CONF_FILE}
+          displayConfig lcd_lock_on_idle "1" ${BTT_CONF_FILE}
+          displayConfig knob_led_color "2" ${BTT_CONF_FILE}
+          displayConfig custom_label_8 "MPC Autotune" ${BTT_CONF_FILE}
+          displayConfig custom_gcode_8 "M306 T \\\n" ${BTT_CONF_FILE}
 
           # Remove files unrelated specifically to the display model
           # rm -fr Copy\ to\ SD\ Card\ root\ directory\ to\ update/THEME_*/!(${UI})
