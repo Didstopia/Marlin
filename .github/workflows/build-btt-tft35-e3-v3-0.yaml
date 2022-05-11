@@ -100,7 +100,7 @@ jobs:
 
           # Copy extra files, such as themes and language packs
           # cp -fr "Copy to SD Card root directory to update"/ $BTT_DIST_DIR/
-          cp -R "Copy to SD Card root directory to update"/ $BTT_DIST_DIR
+          cp -R Copy\ to\ SD\ Card\ root\ directory\ to\ update/ $BTT_DIST_DIR/
 
           ## FIXME: This works fine locally, but ALWAYS fails on CI (never deletes anything)
           # Remove files unrelated to the current display model
