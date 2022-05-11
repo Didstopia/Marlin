@@ -1332,7 +1332,7 @@ jobs:
           displayConfig prog_disp_type "1" config.ini
           displayConfig layer_disp_type "1" config.ini
           displayConfig serial_always_on "1" config.ini
-          dislayConfig marlin_font_color "2" config.ini
+          displayConfig marlin_font_color "2" config.ini
           displayConfig marlin_title "RASPUTIN" config.ini
           displayConfig fan_count "3" config.ini
           displayConfig controller_fan "1" config.ini
