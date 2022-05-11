@@ -1291,10 +1291,10 @@ jobs:
           ##       to always be at the Marlin source root.
 
           # Fetch the source code for the BTT display firmware
-          git clone --depth 1 --branch master --single-branch --recurse-submodules https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware.git "/tmp/${DISPLAY_MODEL}"
+          git clone --depth 1 --branch master --single-branch --recurse-submodules https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware.git "/tmp/${UI}"
 
           # Switch to the source directory
-          cd "/tmp/${DISPLAY_MODEL}"
+          cd "/tmp/${UI}"
 
           ## TODO: Store/set the board/display name in the matrix, so we can reuse it here (and elsewhere if necessary)
           # Compile the firmware
@@ -1312,7 +1312,7 @@ jobs:
 
           # Customize the firmware, config and/or theme(s)
           shopt -s extglob
-          BTT_CONF_FILE="/tmp/${DISPLAY_MODEL}/Copy to SD Card root directory to update/config.ini"
+          BTT_CONF_FILE="/tmp/${UI}/Copy to SD Card root directory to update/config.ini"
           displayConfig() {
             local option=$1
             local value=$2
