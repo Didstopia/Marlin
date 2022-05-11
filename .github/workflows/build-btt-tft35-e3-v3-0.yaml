@@ -100,6 +100,10 @@ jobs:
           # rm -fr "Copy to SD Card root directory to update/THEME_*/!(${BTT_DISPLAY_MODEL})"
           rm -fr "${BTT_DIST_DIR}/THEME_*/!(${BTT_DISPLAY_MODEL})"
 
+          # Copy themes and language packs
+          cp -fr "Copy to SD Card root directory to update/THEME_*" "${BTT_DIST_DIR}/"
+          cp -fr "Copy to SD Card root directory to update/Language Packs" "${BTT_DIST_DIR}/"
+
           # Customize the firmware, config and/or theme(s)
           displayConfig() {
             local option=$1
