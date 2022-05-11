@@ -1291,7 +1291,7 @@ jobs:
           ##       to always be at the Marlin source root.
 
           # Fetch the source code for the TFT35 firmware
-          git clone --depth 1 --branch master --single-branch --recurse-submodules git@github.com:bigtreetech/BIGTREETECH-TouchScreenFirmware.git /tmp/btt-tft35
+          git clone --depth 1 --branch master --single-branch --recurse-submodules https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware.git /tmp/btt-tft35
 
           # Switch to the source directory
           cd /tmp/btt-tft35
