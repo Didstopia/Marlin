@@ -80,7 +80,7 @@ jobs:
           shopt -s extglob
 
           # Figure out the short display model name
-          BTT_DISPLAY_MODEL_SHORT=$(echo ${BTT_DISPLAY_MODEL} | sed sed -E 's/([^_]*?)\_([^_]*)\_(.*)/\2/')
+          BTT_DISPLAY_MODEL_SHORT=$(echo ${BTT_DISPLAY_MODEL} | sed -E "s/([^_]*?)\_([^_]*)\_(.*)/\2/")
 
           ## FIXME: Validate that we have both the display model and the short display model!
 
