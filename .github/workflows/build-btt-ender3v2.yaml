@@ -243,6 +243,10 @@ jobs:
         uses: actions/setup-python@v3
         # with:
         #   cache: ${{ !env.ACT && 'pip' || '' }}
+        ## NOTE: Using specific versions that match Marlin CI workflows
+        with:
+          python-version: '3.7' # Version range or exact version of a Python version to use, using semvers version range syntax.
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install PlatformIO
         if: success() # Ensure we only run this step if the previous one succeeded
@@ -251,8 +255,10 @@ jobs:
           # Enable script debugging
           # set -x
 
-          python -m pip install --upgrade pip
-          pip install --upgrade platformio
+          ## NOTE: Using specific versions that match Marlin CI workflows
+          #python -m pip install --upgrade pip
+          #pip install --upgrade platformio
+          pip install -U https://github.com/platformio/platformio-core/archive/v5.2.5.zip
           platformio platform update
 
       - name: Prepare Build Script
