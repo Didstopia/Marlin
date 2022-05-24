@@ -16,16 +16,17 @@ on:
 
   # Allow manual builds
   workflow_dispatch:
-
-## TODO: Disable/remove this at some point if we still want to use act locally!
-env:
-  ACT: false
+    inputs:
+      targetBranch:
+        description: "Target Branch"
+        required: true
+        default: "bugfix-2.0.x"
 
 jobs:
 
   build-display-firmware:
     ## TODO: Ensure that this works as expected
-    if: ${{ github.base_ref == 'bugfix-2.0.x' }}
+    # if: ${{ github.base_ref == 'bugfix-2.0.x' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -41,43 +42,49 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      - name: Cache pip
-        if: ${{ success() && env.ACT != 'true' }}
-        uses: actions/cache@v3
+      - name: Build Setup
+        uses: ./.github/workflows/build-setup
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          currentBranch: ${{ github.base_ref }}
+          targetBranch: ${{ env.github.event.inputs.targetBranch }}
 
-      - name: Cache PlatformIO
-        if: ${{ success() && env.ACT != 'true' }}
-        uses: actions/cache@v3
-        with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      # - name: Cache pip
+      #   if: success()
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pip-
 
-      - name: Setup Python
-        if: success() # Ensure we only run this step if the previous one succeeded
-        uses: actions/setup-python@v3
+      # - name: Cache PlatformIO
+      #   if: success()
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.platformio
+      #     key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
-      - name: Install PlatformIO
-        if: success() # Ensure we only run this step if the previous one succeeded
-        run: |-
+      # - name: Setup Python
+      #   if: success() # Ensure we only run this step if the previous one succeeded
+      #   uses: actions/setup-python@v3
 
-          # Enable script debugging
-          # set -x
+      # - name: Install PlatformIO
+      #   if: success() # Ensure we only run this step if the previous one succeeded
+      #   run: |-
 
-          python -m pip install --upgrade pip
-          pip install --upgrade platformio
-          platformio platform update
+      #     # Enable script debugging
+      #     # set -x
+
+      #     python -m pip install --upgrade pip
+      #     pip install --upgrade platformio
+      #     platformio platform update
 
       - name: Compile BTT Display Firmware
         id: compile_btt_display_firmware
         run: |-
 
           # Enable script debugging
-          set -x
+          # set -x
 
           # Enable glob/wildcard support
           shopt -s extglob
@@ -157,8 +164,6 @@ jobs:
       #   run: zip -r /tmp/${{ matrix.model }}.zip ${{ steps.compile_btt_display_firmware.outputs.dist }}/*
 
       - name: Upload BTT Display Firmware
-        ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
-        # if: env.ACT != 'true'
         if: success() # Ensure we only run this step if the previous one succeeded
         uses: actions/upload-artifact@v3
         with:

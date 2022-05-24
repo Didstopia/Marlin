@@ -28,15 +28,11 @@ on:
         required: true
         default: "bugfix-2.0.x"
 
-## TODO: Disable/remove this at some point if we still want to use act locally!
-env:
-  ACT: false
-
 jobs:
 
   build-marlin-firmware:
     ## TODO: Ensure that this works as expected
-    if: ${{ github.base_ref == 'bugfix-2.0.x' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
+    # if: ${{ github.base_ref == 'bugfix-2.0.x' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
     name: Build Marlin Firmware
     runs-on: ubuntu-latest
     strategy:
@@ -49,7 +45,8 @@ jobs:
       #        so not entirely sure what else to do, than to limit this?
       # max-parallel: 1
       matrix:
-        branch: ${{ github.event.inputs.targetBranch || env.GITHUB_BASE_REF }}
+        currentBranch: ${{ github.base_ref }}
+        targetBranch: ${{ github.event.inputs.targetBranch }}
         board: [STM32G0B1RE_btt]
         ## FIXME: Add support for no probe/manual leveling
         # bltouch: [true, false]
@@ -83,207 +80,150 @@ jobs:
         # ui: ["JyersUI", "BIGTREE_TFT35_E3_V3_0"]
     steps:
 
-      - name: Checkout Repository
-        if: env.ACT == 'true'
-        uses: actions/checkout@v3
+      # - name: Prepare Target Branch
+      #   if: success() # Ensure we only run this step if the previous one succeeded
+      #   run: |-
 
-      - name: Prepare Test Environment
-        if: success() && env.ACT == 'true'
-        run: |-
+      #     # Enable script debugging
+      #     # set -x
 
-          # Copy the current scripts to a temporary folder
-          if [ ${{ env.ACT }} == 'true' ]; then
-            cp -fr .github/workflows/scripts /tmp
-            # ls -lah /tmp
-          fi
-
-          # Fix tool cache paths when running locally
-          # if [ ${{ env.ACT }} == 'true' ]; then
-          #   echo "RUN_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
-          #   echo "RUNNER_TOOL_CACHE=/toolcache" >> $GITHUB_ENV
-          #   echo "AGENT_TOOLSDIRECTORY=/toolcache" >> $GITHUB_ENV
-          # fi
-          # if [ ${{ env.ACT }} == 'true' ]; then
-          #   echo "RUN_TOOL_CACHE=/opt/hostedtoolcache" >> $GITHUB_ENV
-          #   echo "RUNNER_TOOL_CACHE=/opt/hostedtoolcache" >> $GITHUB_ENV
-          #   echo "AGENT_TOOLSDIRECTORY=/opt/hostedtoolcache" >> $GITHUB_ENV
-          # fi
-          # TODO: If this alone isn't enough, check if we need to move or copy /opt/toolcache/* to /toolcache first?
-          # TODO: UPDATE: Removing the toolcache might be a bad move, but we'll see if it works..
-          # set -x
-          # ls -lah /opt
-          # ls -lah /opt/hostedtoolcache || true
-          # ls -lah /toolcache
-          \cp -fa /opt/hostedtoolcache/. /toolcache/
-          rm -fr /opt/hostedtoolcache
-          ln -sf /toolcache /opt/hostedtoolcache
-          # ls -lah /opt
-          # ls -lah /opt/hostedtoolcache || true
-          # ls -lah /toolcache
-          # set +x
-          # exit 1
-
-          # FIXME: This currently throws multiple errors with actions/setup-python,
-          #        at least when running for the first time?
-          # TODO: UPDATE: Looks like we're still getting errors, even without this, so the issue is something else entirely!?
-          # Fix python package caching when running locally
-          # if [ ${{ env.ACT }} == 'true' ]; then
-          #   echo "PIP_USER=true" >> $GITHUB_ENV
-          #   mkdir -p /toolcache/pythonuserbase/bin
-          #   echo "PYTHONUSERBASE=/toolcache/pythonuserbase" >> $GITHUB_ENV
-          #   echo "PATH=/toolcache/pythonuserbase/bin:${PATH}" >> $GITHUB_ENV
-          # fi
-          if [ ${{ env.ACT }} == 'true' ]; then
-            echo "PIP_USER=true" >> $GITHUB_ENV
-            mkdir -p /opt/hostedtoolcache/pythonuserbase/bin
-            echo "PYTHONUSERBASE=/opt/hostedtoolcache/pythonuserbase" >> $GITHUB_ENV
-            echo "PATH=/opt/hostedtoolcache/pythonuserbase/bin:${PATH}" >> $GITHUB_ENV
-          fi
-
-      - name: Prepare Target Branch
-        if: success() # Ensure we only run this step if the previous one succeeded
-        run: |-
-
-          # Enable script debugging
-          # set -x
-
-          # Target branch defaults to base ref
-          TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
-          echo "Target branch: $TARGET_BRANCH"
+      #     # Target branch defaults to base ref
+      #     TARGET_BRANCH=${{ env.GITHUB_BASE_REF }}
+      #     echo "Target branch: $TARGET_BRANCH"
           
-          # If our target branch is not set, default to the "bugfix-2.0.x" branch instead
-          if [ -z "${TARGET_BRANCH}" ]; then
-            echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
-            TARGET_BRANCH=bugfix-2.0.x
-          fi
+      #     # If our target branch is not set, default to the "bugfix-2.0.x" branch instead
+      #     if [ -z "${TARGET_BRANCH}" ]; then
+      #       echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
+      #       TARGET_BRANCH=bugfix-2.0.x
+      #     fi
 
-          # Allow overriding the target branch with manual builds
-          OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
-          if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
-            echo "Branch override detected, setting branch to: '${OVERRIDE_TARGET_BRANCH}'"
-            TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
-          fi
+      #     # Allow overriding the target branch with manual builds
+      #     OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
+      #     if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
+      #       echo "Branch override detected, setting branch to: '${OVERRIDE_TARGET_BRANCH}'"
+      #       TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
+      #     fi
 
-          # If this is a tagged release, always use the "2.0.x" branch instead
-          REF_TYPE=${{ env.GITHUB_REF_TYPE }}
-          REF_NAME=${{ env.GITHUB_REF_NAME }}
-          if [ "$REF_TYPE" = "tag" ]; then
-            echo "Release tag detected, setting branch to '2.0.x'"
-            echo "TARGET_TAG=${REF_NAME}" >> $GITHUB_ENV
-            TARGET_BRANCH=2.0.x
-          fi
+      #     # If this is a tagged release, always use the "2.0.x" branch instead
+      #     REF_TYPE=${{ env.GITHUB_REF_TYPE }}
+      #     REF_NAME=${{ env.GITHUB_REF_NAME }}
+      #     if [ "$REF_TYPE" = "tag" ]; then
+      #       echo "Release tag detected, setting branch to '2.0.x'"
+      #       echo "TARGET_TAG=${REF_NAME}" >> $GITHUB_ENV
+      #       TARGET_BRANCH=2.0.x
+      #     fi
 
-          ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.0.x" branch
-          # If the target branch is "2.0.x", echo out an error message and fail the build
-          if [ "$TARGET_BRANCH" = "2.0.x" ]; then
-            echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.0.x' branch."
-            exit 1
-          fi
+      #     ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.0.x" branch
+      #     # If the target branch is "2.0.x", echo out an error message and fail the build
+      #     if [ "$TARGET_BRANCH" = "2.0.x" ]; then
+      #       echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.0.x' branch."
+      #       exit 1
+      #     fi
 
-          # echo "Final target branch: $TARGET_BRANCH"
-          echo "::warning title=Final target branch::$TARGET_BRANCH"
+      #     # echo "Final target branch: $TARGET_BRANCH"
+      #     echo "::warning title=Final target branch::$TARGET_BRANCH"
 
-          # Ensure that we have a target branch
-          if [ -z "${TARGET_BRANCH}" ]; then
-            echo "::error title=Missing target branch::Could not detect target branch, unable to continue"
-            exit 1
-          else
-            # Export the final target branch as a global environment variable
-            echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
-          fi
+      #     # Ensure that we have a target branch
+      #     if [ -z "${TARGET_BRANCH}" ]; then
+      #       echo "::error title=Missing target branch::Could not detect target branch, unable to continue"
+      #       exit 1
+      #     else
+      #       # Export the final target branch as a global environment variable
+      #       echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
+      #     fi
 
-          # exit 1
+      #     # exit 1
 
-      - name: Checkout Repository
-        if: success() # Ensure we only run this step if the previous one succeeded
-        uses: actions/checkout@v3
+      - name: Build Setup
+        uses: ./.github/workflows/build-setup
         with:
-          ref: ${{ env.TARGET_BRANCH }}
-          persist-credentials: false
+          currentBranch: ${{ github.base_ref }}
+          targetBranch: ${{ env.github.event.inputs.targetBranch }}
 
-      - name: Prepare Environment
-        if: success() # Ensure we only run this step if the previous one succeeded
-        run: |-
+      # - name: Checkout Repository
+      #   if: success() # Ensure we only run this step if the previous one succeeded
+      #   uses: actions/checkout@v3
+      #   with:
+      #     ref: ${{ env.TARGET_BRANCH }}
+      #     persist-credentials: false
 
-          # Enable script debugging
-          # set -x
+      # - name: Prepare Environment
+      #   if: success() # Ensure we only run this step if the previous one succeeded
+      #   run: |-
 
-          # Copy the scripts back into place when testing locally
-          if [ ${{ env.ACT }} == 'true' ]; then
-            cp -fr /tmp/scripts .github/workflows
-            # ls -lah .github/workflows .github/workflows/scripts
-          fi
+      #     # Enable script debugging
+      #     # set -x
 
-          # Generate the version based on the branch and commit/tag
-          if [ -z "${TARGET_TAG}" ]; then
-            echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
-          else
-            echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-${{ env.TARGET_TAG }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
-          fi
+      #     # Generate the version based on the branch and commit/tag
+      #     if [ -z "${TARGET_TAG}" ]; then
+      #       echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+      #     else
+      #       echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-${{ env.TARGET_TAG }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+      #     fi
 
-          # Print out the version
-          echo "::notice title=Version::${{ env.RELEASE_VERSION }}"
+      #     # Print out the version
+      #     echo "::notice title=Version::${{ env.RELEASE_VERSION }}"
 
-      - name: Cache pip
-        if: success() && env.ACT != 'true'
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+      # - name: Cache pip
+      #   if: success() && env.ACT != 'true'
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pip-
 
-      - name: Cache PlatformIO
-        if: success() && env.ACT != 'true'
-        uses: actions/cache@v3
-        with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      # - name: Cache PlatformIO
+      #   if: success() && env.ACT != 'true'
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.platformio
+      #     key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
 
-      # WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager.
-      #          It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
-      - name: Setup Python
-        if: success() # Ensure we only run this step if the previous one succeeded
-        uses: actions/setup-python@v3
-        # with:
-        #   cache: ${{ !env.ACT && 'pip' || '' }}
-        ## NOTE: Using specific versions that match Marlin CI workflows
-        with:
-          python-version: '3.7' # Version range or exact version of a Python version to use, using semvers version range syntax.
-          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+      # # WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager.
+      # #          It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+      # - name: Setup Python
+      #   if: success() # Ensure we only run this step if the previous one succeeded
+      #   uses: actions/setup-python@v3
+      #   # with:
+      #   #   cache: ${{ !env.ACT && 'pip' || '' }}
+      #   ## NOTE: Using specific versions that match Marlin CI workflows
+      #   with:
+      #     python-version: '3.7' # Version range or exact version of a Python version to use, using semvers version range syntax.
+      #     architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
-      - name: Install PlatformIO
-        if: success() # Ensure we only run this step if the previous one succeeded
-        run: |-
+      # - name: Install PlatformIO
+      #   if: success() # Ensure we only run this step if the previous one succeeded
+      #   run: |-
 
-          # Enable script debugging
-          # set -x
+      #     # Enable script debugging
+      #     # set -x
 
-          ## NOTE: Using specific versions that match Marlin CI workflows
-          python -m pip install --upgrade pip
-          pip install --upgrade platformio
-          # pip install -U https://github.com/platformio/platformio-core/archive/v5.2.5.zip
-          # platformio platform update
-          ## NOTE: Now using development versions of PlatformIO Core 6.X
-          pio upgrade --dev
-          pio pkg update --global
+      #     ## NOTE: Using specific versions that match Marlin CI workflows
+      #     python -m pip install --upgrade pip
+      #     pip install --upgrade platformio
+      #     # pip install -U https://github.com/platformio/platformio-core/archive/v5.2.5.zip
+      #     # platformio platform update
+      #     ## NOTE: Now using development versions of PlatformIO Core 6.X
+      #     pio upgrade --dev
+      #     pio pkg update --global
 
-      - name: Prepare Build Script
-        if: success() && env.ACT != 'true'
-        id: configure_build_script
-        run: |-
+      # - name: Prepare Build Script
+      #   if: success()
+      #   id: configure_build_script
+      #   run: |-
 
-          # Enable script debugging
-          # set -x
+      #     # Enable script debugging
+      #     # set -x
 
-          # Download the latest helper build script
-          mkdir -p .github/workflows/scripts
-          wget \
-            https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/scripts/configure_build_script.sh \
-            -O .github/workflows/scripts/configure_build_script.sh
+      #     # Download the latest helper build script
+      #     mkdir -p .github/workflows/scripts
+      #     wget \
+      #       https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/scripts/configure_build_script.sh \
+      #       -O .github/workflows/scripts/configure_build_script.sh
 
       - name: Configure Firmware
-        if: success() # Ensure we only run this step if the previous one succeeded
+        if: success()
         id: configure_firmware
         run: |-
 
@@ -1386,9 +1326,7 @@ jobs:
       #   run: zip -r /tmp/${{ steps.compile_marlin_firmware.outputs.name }}.zip temp/${{ steps.compile_marlin_firmware.outputs.name }}/*
 
       - name: Publish Artifacts
-        ## FIXME: Artifact uploading is broken with act, the server doesn't work, so disabling for now
-        # if: env.ACT != 'true'
-        if: success() # Ensure we only run this step if the previous one succeeded
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.compile_marlin_firmware.outputs.name }}
