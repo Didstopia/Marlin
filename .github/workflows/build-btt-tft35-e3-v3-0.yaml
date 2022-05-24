@@ -42,7 +42,22 @@ jobs:
           fetch-depth: 1
           submodules: true
 
+      - name: Install Dependencies
+        if: success()
+        id: install_dependencies
+        run: |-
+
+          # Enable script debugging
+          set -x
+
+          # Download the latest build setup action
+          mkdir -p mkdir -p .github/workflows/build-setup-action
+          wget \
+            https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/build-setup-action/action.yml \
+            -O .github/workflows/build-setup-action/action.yml
+
       - name: Build Setup
+        id: build_setup
         uses: ./.github/workflows/build-setup-action
         with:
           currentBranch: ${{ github.base_ref }}

@@ -37,13 +37,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       # Fail early when possible (only applies to matrix jobs)
-      # fail-fast: true
-      fail-fast: false # NOTE: We do NOT want to fail early, because one configuration might fail where others might not, right?
+      fail-fast: true
+      # fail-fast: false # NOTE: We do NOT want to fail early, because one configuration might fail where others might not, right?
       # FIXME: Somehow only set this when running locally?
       #        The issue when running locally seems to be multiple
       #        containers trying to access/install the tool cache,
       #        so not entirely sure what else to do, than to limit this?
-      # max-parallel: 1
+      max-parallel: 1
       matrix:
         ## FIXME: These don't work, but ideally we'd want something in the matrix to easily identify the source and target branches, tags etc. ?
         # currentBranch: ${{ github.base_ref }}
@@ -135,7 +135,22 @@ jobs:
 
       #     # exit 1
 
+      - name: Install Dependencies
+        if: success()
+        id: install_dependencies
+        run: |-
+
+          # Enable script debugging
+          set -x
+
+          # Download the latest build setup action
+          mkdir -p mkdir -p .github/workflows/build-setup-action
+          wget \
+            https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/build-setup-action/action.yml \
+            -O .github/workflows/build-setup-action/action.yml
+
       - name: Build Setup
+        id: build_setup
         uses: ./.github/workflows/build-setup-action
         with:
           currentBranch: ${{ github.base_ref }}
