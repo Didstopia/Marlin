@@ -42,7 +42,7 @@ jobs:
           submodules: true
 
       - name: Cache pip
-        if: success() && env.ACT != 'true'
+        if: ${{ success() && env.ACT != 'true' }}
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -51,7 +51,7 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Cache PlatformIO
-        if: success() && env.ACT != 'true'
+        if: ${{ success() && env.ACT != 'true' }}
         uses: actions/cache@v3
         with:
           path: ~/.platformio
