@@ -32,7 +32,7 @@ jobs:
 
   build-marlin-firmware:
     ## TODO: Ensure that this works as expected
-    if: ${{ github.base_ref == 'bugfix-2.0.x' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
+    if: ${{ github.base_ref == 'bugfix-2.0.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
     name: Build Marlin Firmware
     runs-on: ubuntu-latest
     strategy:
