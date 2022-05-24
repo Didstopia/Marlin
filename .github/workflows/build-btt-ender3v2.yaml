@@ -45,8 +45,9 @@ jobs:
       #        so not entirely sure what else to do, than to limit this?
       # max-parallel: 1
       matrix:
-        currentBranch: ${{ github.base_ref }}
-        targetBranch: ${{ github.event.inputs.targetBranch }}
+        ## FIXME: These don't work, but ideally we'd want something in the matrix to easily identify the source and target branches, tags etc. ?
+        # currentBranch: ${{ github.base_ref }}
+        # targetBranch: ${{ github.event.inputs.targetBranch }}
         board: [STM32G0B1RE_btt]
         ## FIXME: Add support for no probe/manual leveling
         # bltouch: [true, false]
