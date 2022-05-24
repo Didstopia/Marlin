@@ -135,7 +135,7 @@ jobs:
       #     # exit 1
 
       - name: Build Setup
-        uses: ./.github/workflows/build-setup
+        uses: ./.github/workflows/build-setup-action
         with:
           currentBranch: ${{ github.base_ref }}
           targetBranch: ${{ env.github.event.inputs.targetBranch }}

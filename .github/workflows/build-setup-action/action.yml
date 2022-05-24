@@ -1,0 +1,167 @@
+name: "Build Setup"
+description: "Setup the build environment"
+
+inputs:
+  currentBranch:
+    description: "Current Branch"
+    required: true
+    # default: "bugfix-2.0.x"
+  targetBranch:
+    description: "Target Branch"
+    required: true
+    default: "bugfix-2.0.x"
+
+outputs:
+  targetBranch:
+    description: "Target Branch"
+    value: ${{ steps.prepare-target-branch.outputs.targetBranch }}
+  targetTag:
+    description: "Target Tag"
+    value: ${{ steps.prepare-target-branch.outputs.targetTag }}
+  releaseVersion:
+    description: "Release Version"
+    value: ${{ steps.prepare-environment.outputs.releaseVersion }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare Target Branch
+      shell: bash
+      id: prepare-target-branch
+      run: |-
+
+        # Enable script debugging
+        set -x
+
+        # Target branch defaults to base ref
+        TARGET_BRANCH=${{ github.event.inputs.targetBranch || github.event.inputs.currentBranch || env.GITHUB_BASE_REF }}
+        echo "Target branch: $TARGET_BRANCH"
+        
+        # If our target branch is not set, default to the "bugfix-2.0.x" branch instead
+        if [ -z "${TARGET_BRANCH}" ]; then
+          echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
+          TARGET_BRANCH=bugfix-2.0.x
+        fi
+
+        # Allow overriding the target branch with manual builds
+        OVERRIDE_TARGET_BRANCH=${{ github.event.inputs.targetBranch }}
+        if [ ! -z "${OVERRIDE_TARGET_BRANCH}" ]; then
+          echo "Branch override detected, setting branch to: '${OVERRIDE_TARGET_BRANCH}'"
+          TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
+        fi
+
+        # If this is a tagged release, always use the "2.0.x" branch instead
+        REF_TYPE=${{ env.GITHUB_REF_TYPE }}
+        REF_NAME=${{ env.GITHUB_REF_NAME }}
+        if [ "$REF_TYPE" = "tag" ]; then
+          echo "Release tag detected, setting branch to '2.0.x'"
+          echo "TARGET_TAG=${REF_NAME}" >> $GITHUB_ENV
+          echo "::set-output name=targetTag::$(echo ${REF_NAME})"
+          TARGET_BRANCH=2.0.x
+        fi
+
+        ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.0.x" branch
+        # If the target branch is "2.0.x", echo out an error message and fail the build
+        if [ "$TARGET_BRANCH" = "2.0.x" ]; then
+          echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.0.x' branch."
+          exit 1
+        fi
+
+        # echo "Final target branch: $TARGET_BRANCH"
+        echo "::warning title=Final target branch::$TARGET_BRANCH"
+
+        # Ensure that we have a target branch
+        if [ -z "${TARGET_BRANCH}" ]; then
+          echo "::error title=Missing target branch::Could not detect target branch, unable to continue"
+          exit 1
+        else
+          # Export the final target branch as a global environment variable
+          echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
+          echo "::set-output name=targetBranch::$(echo ${TARGET_BRANCH})"
+        fi
+
+    - name: Checkout Repository
+      if: success()
+      shell: bash
+      id: checkout-repository
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ env.TARGET_BRANCH }}
+        persist-credentials: false
+
+    - name: Prepare Environment
+      if: success()
+      shell: bash
+      id: prepare-environment
+      run: |-
+
+        # Enable script debugging
+        set -x
+
+        # Generate the version based on the branch and commit/tag
+        if [ -z "${TARGET_TAG}" ]; then
+          echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+          echo "::set-output name=releaseVersion::$(echo $(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT})"
+        else
+          echo "RELEASE_VERSION=$(git rev-parse --abbrev-ref HEAD)-${{ env.TARGET_TAG }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+          echo "::set-output name=releaseVersion::$(echo $(git rev-parse --abbrev-ref HEAD)-${{ env.TARGET_TAG }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT})"
+        fi
+
+        # Print out the version
+        echo "::notice title=Version::${{ env.RELEASE_VERSION }}"
+
+    - name: Prepare Build Script
+      if: success()
+      shell: bash
+      id: prepare-build-script
+      run: |-
+
+        # Enable script debugging
+        set -x
+
+        # Download the latest helper build script
+        mkdir -p .github/workflows/scripts
+        wget \
+          https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/scripts/configure_build_script.sh \
+          -O .github/workflows/scripts/configure_build_script.sh
+
+    - name: Cache pip
+      if: success()
+      shell: bash
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Cache PlatformIO
+      if: success()
+      shell: bash
+      id: cache-platformio
+      uses: actions/cache@v3
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+    - name: Setup Python
+      if: success()
+      uses: actions/setup-python@v3
+      #   ## NOTE: Using specific versions that match Marlin CI workflows
+      with:
+        python-version: '3.7' # Version range or exact version of a Python version to use, using semvers version range syntax.
+        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+
+    - name: Install PlatformIO
+      if: success()
+      shell: bash
+      id: install-platformio
+      run: |-
+
+        # Enable script debugging
+        set -x
+
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+        pio upgrade --dev
+        pio pkg update --global
