@@ -1,14 +1,15 @@
 name: Build BTT TFT35 E3 V3.0
 
+## FIXME: Fix proper build support for various branches AND tags/releases!
 on:
   # Trigger custom firmwares builds only in specific situations
   push:
     # When the following branches are pushed
     branches:
-      # - 2.0.x
+      - 2.0.x
       - bugfix-2.0.x
       - skr-mini-e3-v3-0
-    
+
     # When the following tags are pushed
     tags:
       - 2*
@@ -23,6 +24,8 @@ env:
 jobs:
 
   build-display-firmware:
+    ## TODO: Ensure that this works as expected
+    if: ${{ github.base_ref == 'bugfix-2.0.x' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

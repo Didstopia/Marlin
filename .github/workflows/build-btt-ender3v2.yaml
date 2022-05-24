@@ -14,7 +14,7 @@ on:
       - 2.0.x
       - bugfix-2.0.x
       - skr-mini-e3-v3-0
-    
+
     ## TODO: How do we ensure that we always build the "2.0.x" branch on new tags?
     # When the following tags are pushed
     tags:
@@ -36,7 +36,7 @@ jobs:
 
   build-marlin-firmware:
     ## TODO: Ensure that this works as expected
-    if: github.event.inputs.targetBranch == 'bugfix-2.0.x' || env.GITHUB_BASE_REF == 'bugfix-2.0.x'
+    if: ${{ github.base_ref == 'bugfix-2.0.x' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
     name: Build Marlin Firmware
     runs-on: ubuntu-latest
     strategy:
