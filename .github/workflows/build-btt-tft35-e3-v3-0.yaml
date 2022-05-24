@@ -26,7 +26,7 @@ jobs:
 
   build-display-firmware:
     ## TODO: Ensure that this works as expected
-    # if: ${{ github.base_ref == 'bugfix-2.0.x' }}
+    if: ${{ github.base_ref == 'bugfix-2.0.x' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -42,57 +42,37 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      - name: Install Dependencies
+      - name: Cache pip
         if: success()
-        id: install_dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache PlatformIO
+        if: success()
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+      - name: Setup Python
+        if: success()
+        uses: actions/setup-python@v3
+
+      - name: Install PlatformIO
+        if: success()
         run: |-
 
           # Enable script debugging
           set -x
 
-          # Download the latest build setup action
-          mkdir -p mkdir -p .github/workflows/build-setup-action
-          wget \
-            https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/build-setup-action/action.yml \
-            -O .github/workflows/build-setup-action/action.yml
-
-      - name: Build Setup
-        id: build_setup
-        uses: ./.github/workflows/build-setup-action
-        with:
-          currentBranch: ${{ github.base_ref }}
-          targetBranch: ${{ env.github.event.inputs.targetBranch }}
-
-      # - name: Cache pip
-      #   if: success()
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-
-      # - name: Cache PlatformIO
-      #   if: success()
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.platformio
-      #     key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-
-      # - name: Setup Python
-      #   if: success() # Ensure we only run this step if the previous one succeeded
-      #   uses: actions/setup-python@v3
-
-      # - name: Install PlatformIO
-      #   if: success() # Ensure we only run this step if the previous one succeeded
-      #   run: |-
-
-      #     # Enable script debugging
-      #     # set -x
-
-      #     python -m pip install --upgrade pip
-      #     pip install --upgrade platformio
-      #     platformio platform update
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+          pio upgrade --dev
+          pio pkg update --global
 
       - name: Compile BTT Display Firmware
         id: compile_btt_display_firmware
