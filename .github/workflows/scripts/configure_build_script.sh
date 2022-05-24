@@ -271,11 +271,11 @@ patchBuildDetails() {
 # Function for patching DWIN support with Jyers UI
 patchDWIN() {
   # Check if the error is already disabled
-  if ! grep -Eiq "[\/]+(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h; then
+  if ! grep -Eiq "[\/]+(#error \".*DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h; then
     debug "Patching DWIN support"
 
     # Disable the error about requiring a custom cable for the DWIN display
-    sed -i -E "s/([^ ]*)(#error \"DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
+    sed -i -E "s/([^ ]*)(#error \".*DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
     if [ ! -s /tmp/marlin_patch.log ]; then
       error "Failed to remove DWIN custom cable error"
       # return 1
@@ -404,5 +404,6 @@ setupConfigs
 patchBuildDetails
 patchDWIN
 # patchBuzzer
-patchAdvancedPausePrompt
+## FIXME: Testing if this has been fixed yet
+# patchAdvancedPausePrompt
 patchDefaults
