@@ -3,6 +3,7 @@
 
 name: Build BTT SKR Mini E3 V3.0 (Ender 3 V2)
 
+## FIXME: Fix proper build support for various branches AND tags/releases!
 on:
   # Trigger custom firmwares builds only in specific situations
   push:
@@ -10,7 +11,7 @@ on:
     # When the following branches are pushed
     branches:
       # FIXME: Disabled until Marlin's configs can be reliably used with the main branch again
-      # - 2.0.x
+      - 2.0.x
       - bugfix-2.0.x
       - skr-mini-e3-v3-0
     
@@ -34,6 +35,8 @@ env:
 jobs:
 
   build-marlin-firmware:
+    ## TODO: Ensure that this works as expected
+    if: github.event.inputs.targetBranch == 'bugfix-2.0.x' || env.GITHUB_BASE_REF == 'bugfix-2.0.x'
     name: Build Marlin Firmware
     runs-on: ubuntu-latest
     strategy:
@@ -46,6 +49,7 @@ jobs:
       #        so not entirely sure what else to do, than to limit this?
       # max-parallel: 1
       matrix:
+        branch: ${{ github.event.inputs.targetBranch || env.GITHUB_BASE_REF }}
         board: [STM32G0B1RE_btt]
         ## FIXME: Add support for no probe/manual leveling
         # bltouch: [true, false]

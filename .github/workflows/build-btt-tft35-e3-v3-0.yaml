@@ -5,7 +5,7 @@ on:
   push:
     # When the following branches are pushed
     branches:
-      - 2.0.x
+      # - 2.0.x
       - bugfix-2.0.x
       - skr-mini-e3-v3-0
     
