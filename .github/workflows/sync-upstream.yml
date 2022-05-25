@@ -18,7 +18,7 @@ on:
 jobs:
 
   sync_main_branch:
-    name: Sync latest commits from upstream (main branch)
+    name: Sync Upstream (2.0.x)
     # FIXME: "env" is not available for job context
     #        https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     # if: ${{ env.ACT }} != 'true'
@@ -91,7 +91,7 @@ jobs:
 
   sync_bugfix_branch:
     runs-on: ubuntu-latest
-    name: Sync latest commits from upstream (bugfix branch)
+    name: Sync Upstream (bugfix-2.0.x)
 
     steps:
     # REQUIRED step
