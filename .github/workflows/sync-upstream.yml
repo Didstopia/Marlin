@@ -54,6 +54,8 @@ jobs:
         upstream_sync_branch: 2.0.x
         upstream_sync_repo: MarlinFirmware/Marlin
         # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+        # Overwrite and keep the upstream commits
+        upstream_pull_args: '-s recursive -Xtheirs --allow-unrelated-histories'
 
         # Rebase instead of merge
         git_config_pull_rebase: true
@@ -121,6 +123,8 @@ jobs:
         upstream_sync_branch: bugfix-2.0.x
         upstream_sync_repo: MarlinFirmware/Marlin
         # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+        # Overwrite and keep the upstream commits
+        upstream_pull_args: '-s recursive -Xtheirs --allow-unrelated-histories'
 
         # Rebase instead of merge
         git_config_pull_rebase: true
