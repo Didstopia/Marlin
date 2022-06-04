@@ -52,6 +52,8 @@ jobs:
       #        containers trying to access/install the tool cache,
       #        so not entirely sure what else to do, than to limit this?
       # max-parallel: 1
+      ## TODO: Use include/exclude to create more specific builds?
+      ##       https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations
       matrix:
         ## FIXME: These don't work, but ideally we'd want something in the matrix to easily identify the source and target branches, tags etc. ?
         # currentBranch: ${{ github.base_ref }}
@@ -228,12 +230,12 @@ jobs:
 
           # TODO: Leaving this alone for now (default is 180)
           # Set minimum extruder temperature when extruding
-          configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
+          # configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (default is 1000)
           # TODO: Wouldn't something like 200 make more sense?
           # Set maximum length to extrude within a single extrusion
-          configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
+          # configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
 
           # Set default/custom steps per unit, per axis
           configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 95.1 }" Marlin/Configuration.h
@@ -283,7 +285,7 @@ jobs:
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
           # TODO: Trying a _very_ low speed for improved probing
-          configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
 
           # TODO: Leaving these alone for now
           # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
@@ -291,10 +293,10 @@ jobs:
           #configValue Z_PROBE_OFFSET_RANGE_MAX 20 Marlin/Configuration.h
 
           # Enable multiple probings (for BLTouch/UBL)
-          configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
+          # configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
 
           # Enable extra probing
-          configValue EXTRA_PROBING 1 Marlin/Configuration.h
+          # configValue EXTRA_PROBING 1 Marlin/Configuration.h
 
           # Enable Z probe testing (for BLTouch/UBL)
           configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
@@ -309,8 +311,8 @@ jobs:
           #configValue Y_BED_SIZE 235 Marlin/Configuration.h
           # configValue X_BED_SIZE 230 Marlin/Configuration.h
           # configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          configValue X_BED_SIZE 220 Marlin/Configuration.h
-          configValue Y_BED_SIZE 220 Marlin/Configuration.h
+          # configValue X_BED_SIZE 220 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 220 Marlin/Configuration.h
 
           # Extend maximum X position for better probe reachability (for BLTouch/UBL/ABL, default is X_BED_SIZE, Jyers uses X_BED_SIZE + 15)
           # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
@@ -321,7 +323,7 @@ jobs:
           # Lower maximum Z position for better mechanical gantry calibration
           # NOTE: We can't go higher than 250 without breaking something!
           ## TODO: 235 is pretty much close to comfort already, with the timing belt setup anyway..
-          configValue Z_MAX_POS 235 Marlin/Configuration.h # Default is 250
+          # configValue Z_MAX_POS 235 Marlin/Configuration.h # Default is 250
 
           # Enable filament runout sensor
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
@@ -446,11 +448,11 @@ jobs:
             # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration + higher extruder feedrate for direct drive
             # configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 50}" Marlin/Configuration.h
-            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
+            # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
 
             # TODO: Testing lowering Z travel acceleration from 1000 to 500,
             #       in case this would not cause as much Z sync issues?
-            configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
 
             # Increase Z jerk from 0.3 to 0.4
@@ -464,7 +466,7 @@ jobs:
             # TODO: Trying with default accelerations for now
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
             # configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
-            configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 1000 }" Marlin/Configuration.h
+            # configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 1000 }" Marlin/Configuration.h
 
             # TODO: Trying to drastically bump up maximum values
             #configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
@@ -472,7 +474,7 @@ jobs:
             #configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
             # TODO: Trying with default accelerations for now
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
-            configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
@@ -507,8 +509,8 @@ jobs:
             #configValue NOZZLE_TO_PROBE_OFFSET "{ -29.0, 5.3, -1.30 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.42 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.58 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.52 }" Marlin/Configuration.h
-            # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.52 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -586,7 +588,9 @@ jobs:
             # TODO: Trying 0.08 as the default, as suggested by Teaching Tech
             # configValue JUNCTION_DEVIATION_MM 0.08 Marlin/Configuration.h
             # TODO: Supposedly calibrated to 0.15, but the differences are impossible to see?!
-            configValue JUNCTION_DEVIATION_MM 0.15 Marlin/Configuration.h
+            # configValue JUNCTION_DEVIATION_MM 0.15 Marlin/Configuration.h
+            # FIXME: Recalibrate this and check for bulging AND ringing! This is just a test value!
+            configValue JUNCTION_DEVIATION_MM 0.10 Marlin/Configuration.h
           else
             # Disable junction deviation by enabling classic jerk handling
             configEnable CLASSIC_JERK Marlin/Configuration.h
@@ -596,16 +600,16 @@ jobs:
           if ($LINEAR_ADVANCE); then
             # TODO: Trying with a higher e-jerk again, just for good measure!
             # Increase extruder jerk for linear advance + direct drive
-            #configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+            configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
             # FIXME: I'm pretty sure jerk is a big part of our problem,
             #        so keep trying and perhaps even try without linear advance and/or junction deviation?
-            configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
+            # configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
 
-            if [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then
-              ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
-              ##        so we're giving it a go without it, see how that pans out!
-              configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
-            fi
+            # if [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then
+            #   ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
+            #   ##        so we're giving it a go without it, see how that pans out!
+            #   configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
+            # fi
           else
             # Set default extruder jerk
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
@@ -686,7 +690,7 @@ jobs:
 
             ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
             ##        so we're giving it a go without it, see how that pans out!
-            configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
+            # configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
           fi
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
@@ -753,7 +757,7 @@ jobs:
           # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
           # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
 
-          ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail?!
+          ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail when enabled?!
           ##        https://github.com/MarlinFirmware/Marlin/issues/23958
           ## TODO: I'm still not 100% convinced on this, and wondering if this is actually _causing_ skipped steps, instead of fixing them?
           # TODO: This needs testing and supposedly fixes high CPU issues with this specific board, causing skipped steps etc.
@@ -851,8 +855,9 @@ jobs:
           configEnable IMPROVE_HOMING_RELIABILITY Marlin/Configuration_adv.h
 
           # TODO: This needs proper testing!
+          ## TODO: UPDATE: Apparently leaving this enabled won't do anything if drivers are in standalone mode, which they are for us?!
           # Disable square wave stepping (BTT has this disabled, Creality has it enabled)
-          configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
+          # configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # TODO: UPDATE: Disabled the first 3 to fallback to polling,
@@ -1019,7 +1024,6 @@ jobs:
           # Set the bed screw thread size (M3, M4, M5 etc.)
           #configValue TRAMMING_SCREW_THREAD 40 Marlin/Configuration_adv.h
 
-          ## FIXME: This is technically a "configValue", however I'm assuming configEnable still works for it?
           ## TODO: Test fan kickstarting, to enable higher RPM more quickly and reliably
           configEnable FAN_KICKSTART_TIME Marlin/Configuration_adv.h
 
@@ -1113,11 +1117,12 @@ jobs:
 
               ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
               ##        so we're giving it a go without it, see how that pans out!
-              if [$UI == "BIGTREE_TFT35_E3_V3_0"]; then
-                configDisable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
-              else
-                configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
-              fi
+              # if [$UI == "BIGTREE_TFT35_E3_V3_0"]; then
+              #   configDisable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+              # else
+              #   configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+              # fi
+              configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
 
               configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
             fi
