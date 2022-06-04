@@ -103,15 +103,15 @@ error() {
 
 # Figure out the target branch
 # (mainly used for default configuration files)
-TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.0.x}
-if [ "$TARGET_BRANCH" = "2.0.x" ]; then
-  warning "Target branch is 2.0.x, but this was renamed to import-2.0.x in Marlin configuration repository, so we'll use that instead!"
-  ## FIXME: Let's try with the bugfix-2.0.x branch instead?
-  # TARGET_BRANCH="import-2.0.x"
-  TARGET_BRANCH="bugfix-2.0.x"
-elif [ ! "$TARGET_BRANCH" = "bugfix-2.0.x" ]; then
-  warning "Unsupported branch detected: '$TARGET_BRANCH', defaulting to bugfix-2.0.x!"
-  TARGET_BRANCH="bugfix-2.0.x"
+TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.1.x}
+if [ "$TARGET_BRANCH" = "2.1.x" ]; then
+  warning "Target branch is 2.1.x, but this was renamed to import-2.1.x in Marlin configuration repository, so we'll use that instead!"
+  ## FIXME: Let's try with the bugfix-2.1.x branch instead?
+  TARGET_BRANCH="import-2.1.x"
+  # TARGET_BRANCH="bugfix-2.1.x"
+elif [ ! "$TARGET_BRANCH" = "bugfix-2.1.x" ]; then
+  warning "Unsupported branch detected: '$TARGET_BRANCH', defaulting to bugfix-2.1.x!"
+  TARGET_BRANCH="bugfix-2.1.x"
 fi
 
 # Add GNU tools to path if we're on macOS
@@ -284,7 +284,7 @@ patchDWIN() {
   fi
 
   ## TODO: Check if this is fixed, because it should now be?
-  ## FIXME: This can be removed once the following PR is merged to both bugfix-2.0.x and 2.0.x branches!
+  ## FIXME: This can be removed once the following PR is merged to both bugfix-2.1.x and 2.1.x branches!
   ##        https://github.com/MarlinFirmware/Marlin/pull/23879
   # Fix Ender 3 V2 DWIN display bug, where it incorrectly shows the progress bar on startup
   # sed -i -E "s/(.+, IS_DWIN_MARLINUI, EXTENSIBLE_UI)(\))(.*|$)/\1, HAS_DWIN_E3V2\2\3/g" Marlin/src/inc/Conditionals_post.h

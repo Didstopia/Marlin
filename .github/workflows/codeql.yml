@@ -14,14 +14,14 @@ name: "CodeQL"
 on:
   #push:
   #  branches:
-  #    - 2.0.x
-  #    - bugfix-2.0.x
+  #    - 2.1.x
+  #    - bugfix-2.1.x
   #    # - skr-mini-e3-v3-0
   #pull_request:
   #  # The branches below must be a subset of the branches above
   #  branches:
-  #    - 2.0.x
-  #    - bugfix-2.0.x
+  #    - 2.1.x
+  #    - bugfix-2.1.x
   #    # - skr-mini-e3-v3-0
   schedule:
     - cron: '0 7 * * *' # Once a day at 07:00
@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branch: [ '2.0.x', 'bugfix-2.0.x' ]
+        branch: [ '2.1.x', 'bugfix-2.1.x' ]
         language: [ 'cpp' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://git.io/codeql-language-support

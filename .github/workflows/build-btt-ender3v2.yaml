@@ -7,15 +7,15 @@ name: Build BTT SKR Mini E3 V3.0 (Ender 3 V2)
 on:
   # Trigger custom firmwares builds only in specific situations
   push:
-    ## TODO: How do we ensure that we always build the "bugfix-2.0.x" branch on updated to the "skr-mini-e3-v3-0" branch?
+    ## TODO: How do we ensure that we always build the "bugfix-2.1.x" branch on updated to the "skr-mini-e3-v3-0" branch?
     # When the following branches are pushed
     branches:
       # FIXME: Disabled until Marlin's configs can be reliably used with the main branch again
-      - 2.0.x
-      - bugfix-2.0.x
+      - 2.1.x
+      - bugfix-2.1.x
       - skr-mini-e3-v3-0
 
-    ## TODO: How do we ensure that we always build the "2.0.x" branch on new tags?
+    ## TODO: How do we ensure that we always build the "2.1.x" branch on new tags?
     # When the following tags are pushed
     tags:
       - 2*
@@ -26,7 +26,7 @@ on:
       targetBranch:
         description: "Target Branch"
         required: true
-        default: "bugfix-2.0.x"
+        default: "bugfix-2.1.x"
 
 jobs:
 
@@ -35,8 +35,8 @@ jobs:
 
   build-marlin-firmware:
     ## TODO: Ensure that this works as expected
-    # if: ${{ github.base_ref == 'bugfix-2.0.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
-    if: ${{ github.ref == 'refs/heads/bugfix-2.0.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
+    # # if: ${{ github.base_ref == 'bugfix-2.1.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
+    # if: ${{ github.ref == 'refs/heads/bugfix-2.1.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
     name: Build Marlin Firmware
     runs-on: ubuntu-latest
     strategy:
@@ -95,10 +95,10 @@ jobs:
           TARGET_BRANCH=${{ github.event.inputs.currentBranch || env.GITHUB_BASE_REF }}
           echo "Target branch: $TARGET_BRANCH"
           
-          # If our target branch is not set, default to the "bugfix-2.0.x" branch instead
+          # If our target branch is not set, default to the "bugfix-2.1.x" branch instead
           if [ -z "${TARGET_BRANCH}" ]; then
-            echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
-            TARGET_BRANCH=bugfix-2.0.x
+            echo "Target branch not available, defaulting to 'bugfix-2.1.x'"
+            TARGET_BRANCH=bugfix-2.1.x
           fi
 
           # Allow overriding the target branch with manual builds
@@ -108,21 +108,21 @@ jobs:
             TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
           fi
 
-          # If this is a tagged release, always use the "2.0.x" branch instead
+          # If this is a tagged release, always use the "2.1.x" branch instead
           REF_TYPE=${{ env.GITHUB_REF_TYPE }}
           REF_NAME=${{ env.GITHUB_REF_NAME }}
           if [ "$REF_TYPE" = "tag" ]; then
-            echo "Release tag detected, setting branch to '2.0.x'"
+            echo "Release tag detected, setting branch to '2.1.x'"
             echo "TARGET_TAG=${REF_NAME}" >> $GITHUB_ENV
-            TARGET_BRANCH=2.0.x
+            TARGET_BRANCH=2.1.x
           fi
 
-          ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.0.x" branch
-          # If the target branch is "2.0.x", echo out an error message and fail the build
-          if [ "$TARGET_BRANCH" = "2.0.x" ]; then
-            echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.0.x' branch."
-            exit 1
-          fi
+          ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.1.x" branch
+          # If the target branch is "2.1.x", echo out an error message and fail the build
+          # if [ "$TARGET_BRANCH" = "2.1.x" ]; then
+          #   echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.1.x' branch."
+          #   exit 1
+          # fi
 
           # echo "Final target branch: $TARGET_BRANCH"
           echo "::warning title=Final target branch::$TARGET_BRANCH"
@@ -136,14 +136,14 @@ jobs:
             echo "TARGET_BRANCH=${TARGET_BRANCH}" >> $GITHUB_ENV
           fi
 
-      - name: Checkout Repository
+      - name: Checkout Repository (${{ env.TARGET_BRANCH }})
         if: success()
         uses: actions/checkout@v3
         with:
           ref: ${{ env.TARGET_BRANCH }}
           persist-credentials: false
 
-      - name: Prepare Environment
+      - name: Prepare Environment (${{ env.TARGET_BRANCH }})
         if: success()
         run: |-
 
@@ -193,20 +193,18 @@ jobs:
       - name: Setup Python
         if: success()
         uses: actions/setup-python@v3
+        with:
+          python-version: '3.7' # Version range or exact version of a Python version to use, using semvers version range syntax.
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install PlatformIO
         if: success()
-        run: |-
-
-          # Enable script debugging
-          set -x
-
-          python -m pip install --upgrade pip
-          pip install --upgrade platformio
+        run: |
+          pip install -U platformio
           pio upgrade --dev
           pio pkg update --global
 
-      - name: Configure Firmware
+      - name: Configure Firmware (${{ matrix.board }})
         if: success()
         id: configure_firmware
         run: |-
@@ -1161,7 +1159,7 @@ jobs:
           MPC: ${{ matrix.mpc }}
           UI: ${{ matrix.ui }}
 
-      - name: Compile Marlin Firmware
+      - name: Compile Marlin Firmware (${{ matrix.board }})
         if: success() # Ensure we only run this step if the previous one succeeded
         id: compile_marlin_firmware
         run: |-

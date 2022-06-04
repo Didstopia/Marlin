@@ -7,12 +7,12 @@ on:
         description: "Current Branch"
         required: true
         type: string
-        # default: "bugfix-2.0.x"
+        # default: "bugfix-2.1.x"
       targetBranch:
         description: "Target Branch"
         required: true
         type: string
-        default: "bugfix-2.0.x"
+        default: "bugfix-2.1.x"
 
 jobs:
   setup-platformio:
@@ -28,10 +28,10 @@ jobs:
           TARGET_BRANCH=${{ github.event.inputs.currentBranch || env.GITHUB_BASE_REF }}
           echo "Target branch: $TARGET_BRANCH"
           
-          # If our target branch is not set, default to the "bugfix-2.0.x" branch instead
+          # If our target branch is not set, default to the "bugfix-2.1.x" branch instead
           if [ -z "${TARGET_BRANCH}" ]; then
-            echo "Target branch not available, defaulting to 'bugfix-2.0.x'"
-            TARGET_BRANCH=bugfix-2.0.x
+            echo "Target branch not available, defaulting to 'bugfix-2.1.x'"
+            TARGET_BRANCH=bugfix-2.1.x
           fi
 
           # Allow overriding the target branch with manual builds
@@ -41,19 +41,19 @@ jobs:
             TARGET_BRANCH=${OVERRIDE_TARGET_BRANCH}
           fi
 
-          # If this is a tagged release, always use the "2.0.x" branch instead
+          # If this is a tagged release, always use the "2.1.x" branch instead
           REF_TYPE=${{ env.GITHUB_REF_TYPE }}
           REF_NAME=${{ env.GITHUB_REF_NAME }}
           if [ "$REF_TYPE" = "tag" ]; then
-            echo "Release tag detected, setting branch to '2.0.x'"
+            echo "Release tag detected, setting branch to '2.1.x'"
             echo "TARGET_TAG=${REF_NAME}" >> $GITHUB_ENV
-            TARGET_BRANCH=2.0.x
+            TARGET_BRANCH=2.1.x
           fi
 
-          ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.0.x" branch
-          # If the target branch is "2.0.x", echo out an error message and fail the build
-          if [ "$TARGET_BRANCH" = "2.0.x" ]; then
-            echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.0.x' branch."
+          ## FIXME: Disable/fix this once we have a config that we can actually use with the "2.1.x" branch
+          # If the target branch is "2.1.x", echo out an error message and fail the build
+          if [ "$TARGET_BRANCH" = "2.1.x" ]; then
+            echo "::error title=Unsupported target branch::This workflow is not currently configured to run on the '2.1.x' branch."
             exit 1
           fi
 

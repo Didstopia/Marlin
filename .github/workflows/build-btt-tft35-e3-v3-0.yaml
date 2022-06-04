@@ -6,8 +6,8 @@ on:
   push:
     # When the following branches are pushed
     branches:
-      - 2.0.x
-      - bugfix-2.0.x
+      - 2.1.x
+      - bugfix-2.1.x
       - skr-mini-e3-v3-0
 
     # When the following tags are pushed
@@ -20,7 +20,7 @@ on:
       targetBranch:
         description: "Target Branch"
         required: true
-        default: "bugfix-2.0.x"
+        default: "bugfix-2.1.x"
 
 jobs:
 
@@ -29,8 +29,8 @@ jobs:
 
   build-display-firmware:
     ## TODO: Ensure that this works as expected
-    # if: ${{ github.base_ref == 'bugfix-2.0.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
-    if: ${{ github.ref == 'refs/heads/bugfix-2.0.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.0.x' }}
+    # # if: ${{ github.base_ref == 'bugfix-2.1.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
+    # if: ${{ github.ref == 'refs/heads/bugfix-2.1.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

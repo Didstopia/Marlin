@@ -6,8 +6,8 @@ on:
   # push:
   #   # Only when the following branches are pushed to
   #   branches:
-  #     - 2.0.x
-  #     - bugfix-2.0.x
+  #     - 2.1.x
+  #     - bugfix-2.1.x
   #     - skr-mini-e3-v3-0
   # Trigger upstream sync on a schedule
   schedule:
@@ -18,7 +18,7 @@ on:
 jobs:
 
   sync_main_branch:
-    name: Sync Upstream (2.0.x)
+    name: Sync Upstream (2.1.x)
     # FIXME: "env" is not available for job context
     #        https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     # if: ${{ env.ACT }} != 'true'
@@ -33,7 +33,7 @@ jobs:
         # optional: set the branch to checkout,
         # sync action checks out your 'target_sync_branch' anyway
         # ref: skr-mini-e3-v3-0
-        ref: 2.0.x
+        ref: 2.1.x
         # REQUIRED if your upstream repo is private (see wiki)
         persist-credentials: false
 
@@ -46,12 +46,12 @@ jobs:
       uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
       with:
         # Target branch in this repository
-        target_sync_branch: 2.0.x
+        target_sync_branch: 2.1.x
         # REQUIRED 'target_repo_token' exactly like this!
         # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
         target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
         # Upstream branch in another repository
-        upstream_sync_branch: 2.0.x
+        upstream_sync_branch: 2.1.x
         upstream_sync_repo: MarlinFirmware/Marlin
         # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
         # Overwrite and keep the upstream commits
@@ -78,7 +78,7 @@ jobs:
           --data '{
               "ref": "skr-mini-e3-v3-0",
               "inputs": {
-                "targetBranch": "2.0.x"
+                "targetBranch": "2.1.x"
               }
             }'
     
@@ -91,7 +91,7 @@ jobs:
 
   sync_bugfix_branch:
     runs-on: ubuntu-latest
-    name: Sync Upstream (bugfix-2.0.x)
+    name: Sync Upstream (bugfix-2.1.x)
 
     steps:
     # REQUIRED step
@@ -102,7 +102,7 @@ jobs:
         # optional: set the branch to checkout,
         # sync action checks out your 'target_sync_branch' anyway
         # ref: skr-mini-e3-v3-0
-        ref: bugfix-2.0.x
+        ref: bugfix-2.1.x
         # REQUIRED if your upstream repo is private (see wiki)
         persist-credentials: false
 
@@ -115,12 +115,12 @@ jobs:
       uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
       with:
         # Target branch in this repository
-        target_sync_branch: bugfix-2.0.x
+        target_sync_branch: bugfix-2.1.x
         # REQUIRED 'target_repo_token' exactly like this!
         # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
         target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
         # Upstream branch in another repository
-        upstream_sync_branch: bugfix-2.0.x
+        upstream_sync_branch: bugfix-2.1.x
         upstream_sync_repo: MarlinFirmware/Marlin
         # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
         # Overwrite and keep the upstream commits
@@ -147,7 +147,7 @@ jobs:
           --data '{
               "ref": "skr-mini-e3-v3-0",
               "inputs": {
-                "targetBranch": "bugfix-2.0.x"
+                "targetBranch": "bugfix-2.1.x"
               }
             }'
     
