@@ -22,7 +22,9 @@ jobs:
     # FIXME: "env" is not available for job context
     #        https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     # if: ${{ env.ACT }} != 'true'
-    runs-on: ubuntu-latest
+    ## TODO: Test running on self-hosted runners instead
+    # runs-on: ubuntu-latest
+    runs-on: [self-hosted, ubuntu-latest]
 
     steps:
     # REQUIRED step
@@ -90,7 +92,9 @@ jobs:
     #   run: echo ${{ steps.sync.outputs.has_new_commits }}
 
   sync_bugfix_branch:
-    runs-on: ubuntu-latest
+    ## TODO: Test running on self-hosted runners instead
+    # runs-on: ubuntu-latest
+    runs-on: [self-hosted, ubuntu-latest]
     name: Sync Upstream (bugfix-2.1.x)
 
     steps:
