@@ -24,7 +24,9 @@ jobs:
     # if: ${{ env.ACT }} != 'true'
     ## TODO: Test running on self-hosted runners instead
     # runs-on: ubuntu-latest
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: self-hosted
+    # runs-on: [self-hosted, ubuntu-latest]
+    timeout-minutes: 15
 
     steps:
     # REQUIRED step
@@ -94,8 +96,10 @@ jobs:
   sync_bugfix_branch:
     ## TODO: Test running on self-hosted runners instead
     # runs-on: ubuntu-latest
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: self-hosted
+    # runs-on: [self-hosted, ubuntu-latest]
     name: Sync Upstream (bugfix-2.1.x)
+    timeout-minutes: 15
 
     steps:
     # REQUIRED step
