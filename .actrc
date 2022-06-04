@@ -1,1 +1,0 @@
---artifact-server-path "$(pwd)/.artifacts" --actor Dids --rm --defaultbranch "bugfix-2.0.x" push
