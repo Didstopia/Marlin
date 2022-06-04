@@ -23,8 +23,8 @@ jobs:
     #        https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     # if: ${{ env.ACT }} != 'true'
     ## TODO: Test running on self-hosted runners instead
-    # runs-on: ubuntu-latest
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    # runs-on: self-hosted
     # runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 15
 
@@ -95,8 +95,8 @@ jobs:
 
   sync_bugfix_branch:
     ## TODO: Test running on self-hosted runners instead
-    # runs-on: ubuntu-latest
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    # runs-on: self-hosted
     # runs-on: [self-hosted, ubuntu-latest]
     name: Sync Upstream (bugfix-2.1.x)
     timeout-minutes: 15

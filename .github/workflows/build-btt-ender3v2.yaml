@@ -39,8 +39,8 @@ jobs:
     # if: ${{ github.ref == 'refs/heads/bugfix-2.1.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
     name: Build Marlin Firmware
     ## TODO: Test running on self-hosted runners instead
-    # runs-on: ubuntu-latest
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    # runs-on: self-hosted
     # runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 15
     strategy:
