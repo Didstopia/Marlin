@@ -909,6 +909,7 @@ jobs:
           # Enable stepper driver debugging
           configEnable TMC_DEBUG Marlin/Configuration_adv.h
 
+          ## TODO: Add build configs that toggle between meatpack and binary transfer stuff?
           ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
           #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
           # Enable meatpack g-code compression (disabled by default, enabled in Jyers)
@@ -1015,10 +1016,17 @@ jobs:
           # Enable moving the nozzle out of the way for adjusting when assisted tramming is enabled
           # configEnable ASSISTED_TRAMMING_WAIT_POSITION Marlin/Configuration_adv.h
 
+          ## TODO: Add build configs that toggle between meatpack and binary transfer stuff?
           ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
           #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
           # Enable Marlin binary file transfer support (marlinbft)
-          # configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
+          configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
+          ## TODO: !!! THIS IS RELATED TO BINARY_FILE_TRANSFER AND MEATPACK, SEE ABOVE !!!
+          # Enable custom firmware uploading (eg. with BINARY_FILE_TRANSFER + a USB connection)
+          configEnable CUSTOM_FIRMWARE_UPLOAD Marlin/Configuration_adv.h
+          # Disable meatpack when using binary file transfer and/or custom firmware upload
+          configDisable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
+          configDisable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
 
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
@@ -1195,19 +1203,27 @@ jobs:
           # FIRMWARE_NAME="build"
 
           # Copy the firmware and configuration files to a named temporary folder
-          mkdir -p "temp/${FIRMWARE_NAME}"
+          mkdir -p "temp/${FIRMWARE_NAME}/Configs"
           ## TODO: Get the board env name dynamically instead?
           cp .pio/build/$BOARD/firmware.bin "temp/${FIRMWARE_NAME}/firmware.bin"
-          cp Marlin/Configuration.h "temp/${FIRMWARE_NAME}/Configuration.h"
-          cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configuration_adv.h"
+          cp Marlin/Configuration.h "temp/${FIRMWARE_NAME}/Configs/Configuration.h"
+          cp Marlin/Configuration_adv.h "temp/${FIRMWARE_NAME}/Configs/Configuration_adv.h"
 
           ## TODO: Add DWIN customizations here?
 
           # Include the latest DWIN display firmware with all build artifacts
           if [ $UI != "BIGTREE_TFT35_E3_V3_0" ]; then
-            cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/DWIN_SET"
-            cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/private" "temp/${FIRMWARE_NAME}/private"
+            cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/Configs/DWIN_SET"
+            cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/private" "temp/${FIRMWARE_NAME}/Configs/private"
           else
+            ## TODO: Wouldn't it be better if we could always bundle the display firmware with the build artifacts?
+            ## 
+            ##       What if we had an extra build job, which this matrix build depended on, and would then use artifact download
+            ##       to download the display firmware, finally copying it to the build artifact folder, so it'd be included with all the builds?
+            ##       Or maybe only include it with a specific build?
+            ## 
+            ##       OR, what if, we had one more build job, which would bundle ALL the firmware files and deploy a SINGLE
+            ##       build artifact, which would include ALL possible configurations of the firmwares + all extra files?
             echo "::warning::BIGTREE_TFT35_E3_V3_0 UI detected, skipping DWIN files"
           fi
 
