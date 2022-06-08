@@ -887,9 +887,9 @@ jobs:
           configEnable IMPROVE_HOMING_RELIABILITY Marlin/Configuration_adv.h
 
           # TODO: This needs proper testing!
-          ## TODO: UPDATE: Apparently leaving this enabled won't do anything if drivers are in standalone mode, which they are for us?!
+          ## TODO: UPDATE: Supposedly leaving this enabled won't do anything if drivers are in standalone mode, which they are for us?!
           # Disable square wave stepping (BTT has this disabled, Creality has it enabled)
-          # configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
+          configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # TODO: UPDATE: Disabled the first 3 to fallback to polling,
