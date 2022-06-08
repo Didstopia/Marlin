@@ -280,7 +280,7 @@ jobs:
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
           # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
-          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
           # TODO: Lowered from 133mm/s to 100mm/s, however some say the BLTouch is more reliable at 60mm/s!
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
@@ -293,10 +293,15 @@ jobs:
           #configValue Z_PROBE_OFFSET_RANGE_MAX 20 Marlin/Configuration.h
 
           # Enable multiple probings (for BLTouch/UBL)
-          # configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
+          configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
 
           # Enable extra probing
           # configValue EXTRA_PROBING 1 Marlin/Configuration.h
+
+          # Require heated bed and nozzle when auto-leveling
+          configEnable PREHEAT_BEFORE_LEVELING Marlin/Configuration.h
+          configValue LEVELING_NOZZLE_TEMP 200 Marlin/Configuration.h
+          configValue LEVELING_BED_TEMP 60 Marlin/Configuration.h
 
           # Enable Z probe testing (for BLTouch/UBL)
           configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
@@ -361,8 +366,11 @@ jobs:
 
           # TODO: Ensure that X_CENTER and Y_CENTER actually exist?
           # Tweak Z homing position
-          configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
-          configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
+          # TODO: Using values from Jyers instead
+          configValue Z_SAFE_HOMING_X_POINT "((X_BED_SIZE - 10) / 2)" Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_Y_POINT "((Y_BED_SIZE - 10) / 2)" Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (defaults are higher)
           # Reduce homing feed rates (homing speeds)
@@ -441,6 +449,9 @@ jobs:
             # Adjust e-steps for direct drive
             configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415 }" Marlin/Configuration.h
 
+            # Limit maximum Z position when using a direct drive
+            configValue Z_MAX_POS 230 Marlin/Configuration.h # Default is 250
+
             # FIXME: Adjust max feedrate for direct drive
             #configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
             # TODO: Trying to drastically bump up maximum values
@@ -505,6 +516,10 @@ jobs:
             # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
 
+            # FIXME: !!! This needs to be HEAVILY tested, as with our new probe offsets, the margins have changed! !!!
+            # configValue PROBING_MARGIN 15 Marlin/Configuration.h # Default is 20
+            configValue PROBING_MARGIN 10 Marlin/Configuration.h # Default is 20
+
             # FIXME: Our Z offset still keeps changing, but this might be from Z going out of sync?
             #        Needs further testing regardless, so will update as things progress.. (btw, bed was loose, eccentric nuts especially)
             # Adjust offsets for direct drive
@@ -516,7 +531,10 @@ jobs:
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.58 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.52 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.240, 4.00, -1.420 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.240, 4.00, -1.420 }" Marlin/Configuration.h
+            # TODO: Apparently when the probe is in front of the nozzle (eg. towards you),
+            #       it should be a NEGATIVE value and NOT a positive value!?
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.240, -4.00, -1.420 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
