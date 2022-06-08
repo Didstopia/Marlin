@@ -38,6 +38,7 @@ jobs:
     # # if: ${{ github.base_ref == 'bugfix-2.1.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
     # if: ${{ github.ref == 'refs/heads/bugfix-2.1.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
     # name: Build Marlin Firmware
+    name: Build
     ## TODO: Test running on self-hosted runners instead
     runs-on: ubuntu-latest
     # runs-on: self-hosted
@@ -369,8 +370,8 @@ jobs:
           # configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
           # configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
           # TODO: Using values from Jyers instead
-          configValue Z_SAFE_HOMING_X_POINT "((X_BED_SIZE - 10) / 2)" Marlin/Configuration.h
-          configValue Z_SAFE_HOMING_Y_POINT "((Y_BED_SIZE - 10) / 2)" Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_X_POINT "\(\(X_BED_SIZE - 10) \/ 2\)" Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_Y_POINT "\(\(Y_BED_SIZE - 10\) \/ 2\)" Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (defaults are higher)
           # Reduce homing feed rates (homing speeds)
