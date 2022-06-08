@@ -306,6 +306,11 @@ jobs:
           # configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
           # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
+          # TODO: Reverting bed size stuff back to Jyers defaults, for better probing/UBL support
+          configValue X_BED_SIZE 230 Marlin/Configuration.h
+          configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
           #configValue Y_BED_SIZE 235 Marlin/Configuration.h
@@ -317,7 +322,7 @@ jobs:
           # Extend maximum X position for better probe reachability (for BLTouch/UBL/ABL, default is X_BED_SIZE, Jyers uses X_BED_SIZE + 15)
           # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
           ## TODO: Bed size is now -10, so added 15 + 10 = +25 to adjust the max X pos accordingly
-          configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
 
           # TODO: This will need adjusting if we end up utilizing mechanical gantry calibration
           # Lower maximum Z position for better mechanical gantry calibration
@@ -510,7 +515,8 @@ jobs:
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.42 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.58 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, -1.52 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -34.0, 4.0, 0 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.240, 4.00, -1.420 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -629,6 +635,12 @@ jobs:
               ## TODO: How do we MPC autotune the bed temperature?
               configEnable MPC_EDIT_MENU Marlin/Configuration.h
               configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
+
+              # Customize MPC
+              configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.3800f }" Marlin/Configuration.h
+              configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2110f }" Marlin/Configuration.h
+              configValue MPC_AMBIENT_XFER_COEFF "{ 0.1330f }" Marlin/Configuration.h
+              configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1439f }" Marlin/Configuration.h
             else
               # Enable PID and disable MPC
               configEnable PIDTEMP Marlin/Configuration.h
@@ -914,6 +926,7 @@ jobs:
           #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
           # Enable meatpack g-code compression (disabled by default, enabled in Jyers)
           configEnable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
+          configEnable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
 
           configEnable GCODE_CASE_INSENSITIVE Marlin/Configuration_adv.h
 
@@ -1016,17 +1029,18 @@ jobs:
           # Enable moving the nozzle out of the way for adjusting when assisted tramming is enabled
           # configEnable ASSISTED_TRAMMING_WAIT_POSITION Marlin/Configuration_adv.h
 
+          ## FIXME: Disabled until we have separate builds with meatpack vs binary file transfer!
           ## TODO: Add build configs that toggle between meatpack and binary transfer stuff?
           ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
           #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
-          # Enable Marlin binary file transfer support (marlinbft)
-          configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
-          ## TODO: !!! THIS IS RELATED TO BINARY_FILE_TRANSFER AND MEATPACK, SEE ABOVE !!!
-          # Enable custom firmware uploading (eg. with BINARY_FILE_TRANSFER + a USB connection)
-          configEnable CUSTOM_FIRMWARE_UPLOAD Marlin/Configuration_adv.h
-          # Disable meatpack when using binary file transfer and/or custom firmware upload
-          configDisable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
-          configDisable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
+          # # Enable Marlin binary file transfer support (marlinbft)
+          # configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
+          # ## TODO: !!! THIS IS RELATED TO BINARY_FILE_TRANSFER AND MEATPACK, SEE ABOVE !!!
+          # # Enable custom firmware uploading (eg. with BINARY_FILE_TRANSFER + a USB connection)
+          # configEnable CUSTOM_FIRMWARE_UPLOAD Marlin/Configuration_adv.h
+          # # Disable meatpack when using binary file transfer and/or custom firmware upload
+          # configDisable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
+          # configDisable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
 
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
