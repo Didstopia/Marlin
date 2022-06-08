@@ -518,8 +518,9 @@ jobs:
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
 
             # FIXME: !!! This needs to be HEAVILY tested, as with our new probe offsets, the margins have changed! !!!
-            # configValue PROBING_MARGIN 15 Marlin/Configuration.h # Default is 20
-            configValue PROBING_MARGIN 10 Marlin/Configuration.h # Default is 20
+            configValue PROBING_MARGIN 15 Marlin/Configuration.h # Default is 20
+            # TODO: This works alright on the left, right and front sides, but the back is hitting the edge and/or holes on the bed plate!
+            # configValue PROBING_MARGIN 10 Marlin/Configuration.h # Default is 20
 
             # FIXME: Our Z offset still keeps changing, but this might be from Z going out of sync?
             #        Needs further testing regardless, so will update as things progress.. (btw, bed was loose, eccentric nuts especially)
@@ -535,7 +536,7 @@ jobs:
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.240, 4.00, -1.420 }" Marlin/Configuration.h
             # TODO: Apparently when the probe is in front of the nozzle (eg. towards you),
             #       it should be a NEGATIVE value and NOT a positive value!?
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.240, -4.00, -1.420 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.240, -4.00, 0 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
