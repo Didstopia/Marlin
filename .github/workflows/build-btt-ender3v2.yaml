@@ -518,7 +518,7 @@ jobs:
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
 
             # FIXME: !!! This needs to be HEAVILY tested, as with our new probe offsets, the margins have changed! !!!
-            configValue PROBING_MARGIN 15 Marlin/Configuration.h # Default is 20
+            # configValue PROBING_MARGIN 15 Marlin/Configuration.h # Default is 20
             # TODO: This works alright on the left, right and front sides, but the back is hitting the edge and/or holes on the bed plate!
             # configValue PROBING_MARGIN 10 Marlin/Configuration.h # Default is 20
 
@@ -614,9 +614,9 @@ jobs:
             # TODO: Trying 0.08 as the default, as suggested by Teaching Tech
             # configValue JUNCTION_DEVIATION_MM 0.08 Marlin/Configuration.h
             # TODO: Supposedly calibrated to 0.15, but the differences are impossible to see?!
-            # configValue JUNCTION_DEVIATION_MM 0.15 Marlin/Configuration.h
+            configValue JUNCTION_DEVIATION_MM 0.15 Marlin/Configuration.h
             # FIXME: Recalibrate this and check for bulging AND ringing! This is just a test value!
-            configValue JUNCTION_DEVIATION_MM 0.10 Marlin/Configuration.h
+            # configValue JUNCTION_DEVIATION_MM 0.10 Marlin/Configuration.h
           else
             # Disable junction deviation by enabling classic jerk handling
             configEnable CLASSIC_JERK Marlin/Configuration.h
@@ -768,7 +768,7 @@ jobs:
 
           # TODO: Leaving this alone for now (defaults are slightly higher)
           # Lower homing bump
-          configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
+          # configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
 
           # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
           if ($HIGH_SPEED); then
@@ -987,12 +987,12 @@ jobs:
           # configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
-          # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
-          # configValue WATCH_TEMP_PERIOD 20 Marlin/Configuration_adv.h
-          configValue WATCH_TEMP_PERIOD 30 Marlin/Configuration_adv.h
-          # configValue THERMAL_PROTECTION_BED_PERIOD 20 Marlin/Configuration_adv.h
-          configValue THERMAL_PROTECTION_BED_PERIOD 30 Marlin/Configuration_adv.h
-          configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
+          # # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
+          # # configValue WATCH_TEMP_PERIOD 20 Marlin/Configuration_adv.h
+          # configValue WATCH_TEMP_PERIOD 30 Marlin/Configuration_adv.h
+          # # configValue THERMAL_PROTECTION_BED_PERIOD 20 Marlin/Configuration_adv.h
+          # configValue THERMAL_PROTECTION_BED_PERIOD 30 Marlin/Configuration_adv.h
+          # configValue WATCH_BED_TEMP_PERIOD 60 Marlin/Configuration_adv.h
 
           # FIXME: #error "LCD_BACKLIGHT_TIMEOUT requires an LCD with encoder or keypad."
           # Turn off display after 30 seconds
@@ -1120,15 +1120,16 @@ jobs:
             #configValue BABYSTEP_MULTIPLICATOR_Z 0.01 Marlin/Configuration_adv.h
             #configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
 
-            ## TODO: Why are we doing these babystep adjustments again?!
-            # Increase the babystepping amount from 0.0025mm to 0.01mm
-            configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
+            # TODO: Disabled these for now, just because I wanted to try how stock feels again!
+            # ## TODO: Why are we doing these babystep adjustments again?!
+            # # Increase the babystepping amount from 0.0025mm to 0.01mm
+            # configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
 
-            # Set the X and Y axis babystepping to equal the Z axis
-            configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
+            # # Set the X and Y axis babystepping to equal the Z axis
+            # configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
 
-            # Increase fine manual move amount from 0.025mm to 0.005mm
-            configValue FINE_MANUAL_MOVE 0.005 Marlin/Configuration_adv.h
+            # # Increase fine manual move amount from 0.025mm to 0.005mm
+            # configValue FINE_MANUAL_MOVE 0.005 Marlin/Configuration_adv.h
 
             # TODO: Disable just to see if it reduces the sounds?!
             # TODO: This needs HEAVY testing, as it may be too aggressive!
