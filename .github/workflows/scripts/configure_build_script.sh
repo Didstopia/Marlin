@@ -106,9 +106,10 @@ error() {
 TARGET_BRANCH=${TARGET_BRANCH:-bugfix-2.1.x}
 if [ "$TARGET_BRANCH" = "2.1.x" ]; then
   warning "Target branch is 2.1.x, but this was renamed to import-2.1.x in Marlin configuration repository, so we'll use that instead!"
-  ## FIXME: Let's try with the bugfix-2.1.x branch instead?
-  TARGET_BRANCH="import-2.1.x"
+  ## FIXME: Marlin now complains that we should never build with the import-* branches, but use bugfix-* or release-* branches instead?!
+  # TARGET_BRANCH="import-2.1.x"
   # TARGET_BRANCH="bugfix-2.1.x"
+  TARGET_BRANCH="release-2.1"
 elif [ ! "$TARGET_BRANCH" = "bugfix-2.1.x" ]; then
   warning "Unsupported branch detected: '$TARGET_BRANCH', defaulting to bugfix-2.1.x!"
   TARGET_BRANCH="bugfix-2.1.x"
