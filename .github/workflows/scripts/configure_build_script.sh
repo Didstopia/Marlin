@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+# set -x
 
 ## TODO
 # - Use more modern configuration files as a base?
