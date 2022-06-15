@@ -283,12 +283,16 @@ jobs:
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
           # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
-          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
           # TODO: Lowered from 133mm/s to 100mm/s, however some say the BLTouch is more reliable at 60mm/s!
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
           # TODO: Trying a _very_ low speed for improved probing
           # configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(150*60)" Marlin/Configuration.h
+          
+          # Decrease the amount of Z travel when moving between probing points (default is 5)
+          configValue Z_CLEARANCE_BETWEEN_PROBES 3 Marlin/Configuration.h
 
           # TODO: Leaving these alone for now
           # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
@@ -296,7 +300,7 @@ jobs:
           #configValue Z_PROBE_OFFSET_RANGE_MAX 20 Marlin/Configuration.h
 
           # Enable multiple probings (for BLTouch/UBL)
-          configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
+          # configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
 
           # Enable extra probing
           # configValue EXTRA_PROBING 1 Marlin/Configuration.h
@@ -453,7 +457,7 @@ jobs:
             configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415.0 }" Marlin/Configuration.h
 
             # Limit maximum Z position when using a direct drive
-            configValue Z_MAX_POS 230 Marlin/Configuration.h # Default is 250
+            # configValue Z_MAX_POS 230 Marlin/Configuration.h # Default is 250
 
             # FIXME: Adjust max feedrate for direct drive
             #configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
@@ -494,7 +498,8 @@ jobs:
             # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
             
             # Customized and optimized speed and acceleration values for this particular printer/firmware setup
-            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+            # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 20, 50}" Marlin/Configuration.h
             configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 5000 }" Marlin/Configuration.h
             configValue DEFAULT_ACCELERATION 2000 Marlin/Configuration.h
             configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
@@ -506,6 +511,7 @@ jobs:
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
             # configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
             # TODO: Should we default back to BTT's homing speeds instead
+            configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
 
             # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
             #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
@@ -519,6 +525,7 @@ jobs:
             #configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
             # TODO: Nozzle was hitting the bed, so trying to go a little bit slower here
             #configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
+            configValue Z_PROBE_FEEDRATE_FAST "\(10\*60\)" Marlin/Configuration.h
 
             # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
@@ -778,6 +785,7 @@ jobs:
           # Decreate probing delay for BLTouch
           # WARNING: Requires a BLTouch 3.0 or later
           # configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
+          configValue BLTOUCH_DELAY 300 Marlin/Configuration_adv.h
 
           ## FIXME: Can this cause our print head crashing into the bed when probing when NOT set?!
           # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
@@ -1154,7 +1162,9 @@ jobs:
               
               ## FIXME: Re-calibrate K again! The value below is currently NOT accurate anymore!
               # configValue LIN_ADVANCE_K 0.11 Marlin/Configuration_adv.h
-              configValue LIN_ADVANCE_K 0.12 Marlin/Configuration_adv.h
+              # configValue LIN_ADVANCE_K 0.12 Marlin/Configuration_adv.h
+              ## NOTE: We set linear advance K value to zero, so that it's effectively disabled by default!
+              configValue LIN_ADVANCE_K 0.0 Marlin/Configuration_adv.h
 
               ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
               ##        so we're giving it a go without it, see how that pans out!
