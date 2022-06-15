@@ -810,10 +810,14 @@ jobs:
           # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
 
           # Override probing margins
-          configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
+          # configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
+          # configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
+          # configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
+          # configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_LEFT 0 Marlin/Configuration_adv.h
           configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_FRONT 0 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_BACK 0 Marlin/Configuration_adv.h
 
           # Override mesh insets
           # configValue MESH_MIN_X "UBL_MESH_INSET" Marlin/Configuration_adv.h
