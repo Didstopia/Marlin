@@ -137,6 +137,7 @@ jobs:
           }
           displayConfig serial_port "P1:7 P2:0 P3:0 P4:0" ${BTT_DIST_DIR}/config.ini
           displayConfig emulated_m600 "0" ${BTT_DIST_DIR}/config.ini
+          displayConfig status_screen "0" ${BTT_DIST_DIR}/config.ini
           displayConfig ack_notification "2" ${BTT_DIST_DIR}/config.ini
           displayConfig files_list_mode "0" ${BTT_DIST_DIR}/config.ini
           displayConfig persistent_info "1" ${BTT_DIST_DIR}/config.ini
