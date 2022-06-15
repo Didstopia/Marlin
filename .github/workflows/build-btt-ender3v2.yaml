@@ -520,7 +520,7 @@ jobs:
             # configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
             # TODO: Should we default back to BTT's homing speeds instead
             # configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
-            onfigValue HOMING_FEEDRATE_MM_M "{ \(100\*60\), \(100\*60\), \(10\*60\) }" Marlin/Configuration.h
+            configValue HOMING_FEEDRATE_MM_M "{ \(100\*60\), \(100\*60\), \(10\*60\) }" Marlin/Configuration.h
 
             # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
             #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
