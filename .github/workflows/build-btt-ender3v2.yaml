@@ -580,7 +580,7 @@ jobs:
             # Adjust offsets for direct drive
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
             ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -32.00, -3.00, -1.46 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.46 }" Marlin/Configuration.h
 
             # Override mesh insets to be lower
             configValue MESH_INSET 0 Marlin/Configuration.h
@@ -825,8 +825,8 @@ jobs:
           # configValue MESH_MIN_Y "UBL_MESH_INSET" Marlin/Configuration_adv.h
           # configValue MESH_MAX_Y "(Y_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
           ## TODO: Should we possibly use PROBIN_MARGIN_* here to offset instead?
-          configValue MESH_MIN_X "X_MIN_POS + 10" Marlin/Configuration_adv.h
-          configValue MESH_MIN_Y "Y_MIN_POS + 10" Marlin/Configuration_adv.h
+          configValue MESH_MIN_X "X_MIN_POS + 20" Marlin/Configuration_adv.h
+          configValue MESH_MIN_Y "Y_MIN_POS + 20" Marlin/Configuration_adv.h
           configValue MESH_MAX_X "X_MAX_POS" Marlin/Configuration_adv.h
           configValue MESH_MAX_Y "Y_MAX_POS" Marlin/Configuration_adv.h
 
