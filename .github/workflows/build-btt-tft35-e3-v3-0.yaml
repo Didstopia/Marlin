@@ -147,6 +147,7 @@ jobs:
           displayConfig marlin_title "RASPUTIN" ${BTT_DIST_DIR}/config.ini
           displayConfig fan_count "3" ${BTT_DIST_DIR}/config.ini
           displayConfig controller_fan "1" ${BTT_DIST_DIR}/config.ini
+          displayconfig touch_sound "0" ${BTT_DIST_DIR}/config.ini
           displayConfig toast_sound "0" ${BTT_DIST_DIR}/config.ini
           displayConfig lcd_idle_brightness "1" ${BTT_DIST_DIR}/config.ini
           displayConfig lcd_lock_on_idle "1" ${BTT_DIST_DIR}/config.ini
