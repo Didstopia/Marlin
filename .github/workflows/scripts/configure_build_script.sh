@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# set -x
+set -x
 
 ## TODO
 # - Use more modern configuration files as a base?
@@ -248,8 +248,8 @@ setupConfigs() {
   # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration.h" Marlin/Configuration.h
   # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
 
-  cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration.h" Marlin/Configuration.h
-  cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
+  cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration.h" Marlin/Configuration.h
+  cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
 }
 
 # Function for patching the build details
