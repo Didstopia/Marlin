@@ -275,10 +275,14 @@ jobs:
           configEnable BLTOUCH Marlin/Configuration.h
 
           # Set default/custom nozzle offsets
-          configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.h
+          # configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.h
+          ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
+          configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, -1.46 }" Marlin/Configuration.h
 
           # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
-          configValue PROBING_MARGIN 20 Marlin/Configuration.h
+          # configValue PROBING_MARGIN 20 Marlin/Configuration.h
+          ## NOTE: Decrease it back to 10, so we can reach more probable points?
+          configValue PROBING_MARGIN 10 Marlin/Configuration.h
 
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
@@ -320,9 +324,12 @@ jobs:
           # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # TODO: Reverting bed size stuff back to Jyers defaults, for better probing/UBL support
-          configValue X_BED_SIZE 230 Marlin/Configuration.h
-          configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          # configValue X_BED_SIZE 230 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          configValue X_BED_SIZE 235 Marlin/Configuration.h
+          configValue Y_BED_SIZE 235 Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 45" Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
