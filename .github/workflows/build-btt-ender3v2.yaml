@@ -280,7 +280,7 @@ jobs:
           # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
           # configValue PROBING_MARGIN 20 Marlin/Configuration.h
           ## NOTE: Decrease it back to 10, so we can reach more probable points?
-          configValue PROBING_MARGIN 10 Marlin/Configuration.h
+          configValue PROBING_MARGIN 15 Marlin/Configuration.h
 
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
@@ -327,7 +327,7 @@ jobs:
           # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
           configValue X_BED_SIZE 235 Marlin/Configuration.h
           configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
