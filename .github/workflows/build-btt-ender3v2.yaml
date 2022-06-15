@@ -301,6 +301,7 @@ jobs:
 
           # Enable multiple probings (for BLTouch/UBL)
           # configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
+          configDisable MULTIPLE_PROBING Marlin/Configuration.h
 
           # Enable extra probing
           # configValue EXTRA_PROBING 1 Marlin/Configuration.h
