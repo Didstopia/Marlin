@@ -275,9 +275,7 @@ jobs:
           configEnable BLTOUCH Marlin/Configuration.h
 
           # Set default/custom nozzle offsets
-          # configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.h
-          ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
-          configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, -1.46 }" Marlin/Configuration.h
+          # configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.
 
           # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
           # configValue PROBING_MARGIN 20 Marlin/Configuration.h
@@ -329,7 +327,7 @@ jobs:
           # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
           configValue X_BED_SIZE 235 Marlin/Configuration.h
           configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE + 45" Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
@@ -544,7 +542,9 @@ jobs:
             # configValue PROBING_MARGIN 10 Marlin/Configuration.h # Default is 20
             
             # Adjust offsets for direct drive
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
+            ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, -1.46 }" Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
