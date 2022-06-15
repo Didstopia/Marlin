@@ -461,6 +461,37 @@ jobs:
           ## TODO: UPDATE: This only works with scaling, and seems to affect heaters too, so not going deeper into this right now..
           # configEnable SOFT_PWM_DITHER Marlin/Configuration.h
 
+          # Configure UBL/ABL specific options
+          if ($UBL); then
+            # Enable Universal Bed Leveling (UBL)
+            configEnable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
+
+            # Disable other bed leveling options
+            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
+            configDisable MESH_BED_LEVELING Marlin/Configuration.h
+
+            # Increase default mesh inset for UBL
+            configValue MESH_INSET 10 Marlin/Configuration.h
+
+            # Disable UBL automatic mesh saving
+            configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
+
+            ## FIXME: Can this cause our print head crashing into the bed when probing?!
+            ## TODO: Not sure if we can use this or not? And what it actually does?
+            configEnable UBL_MESH_WIZARD Marlin/Configuration.h
+          else
+            # Enable Automatic Bed Leveling (ABL)
+            configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
+
+            # Disable other bed leveling options
+            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
+            configDisable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
+            configDisable MESH_BED_LEVELING Marlin/Configuration.h
+          fi
+
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
             # Adjust e-steps for direct drive
@@ -549,7 +580,10 @@ jobs:
             # Adjust offsets for direct drive
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
             ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, -1.46 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -32.00, -3.00, -1.46 }" Marlin/Configuration.h
+
+            # Override mesh insets to be lower
+            configValue MESH_INSET 0 Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -583,37 +617,6 @@ jobs:
 
             # FIXME: Adjust home offsets for direct drive, since they're now wrong?!
             #        But how/where? HOTEND_OFFSET_X/Y/Z?
-          fi
-
-          # Configure UBL/ABL specific options
-          if ($UBL); then
-            # Enable Universal Bed Leveling (UBL)
-            configEnable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
-
-            # Disable other bed leveling options
-            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
-            configDisable MESH_BED_LEVELING Marlin/Configuration.h
-
-            # Increase default mesh inset for UBL
-            configValue MESH_INSET 10 Marlin/Configuration.h
-
-            # Disable UBL automatic mesh saving
-            configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
-
-            ## FIXME: Can this cause our print head crashing into the bed when probing?!
-            ## TODO: Not sure if we can use this or not? And what it actually does?
-            configEnable UBL_MESH_WIZARD Marlin/Configuration.h
-          else
-            # Enable Automatic Bed Leveling (ABL)
-            configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
-
-            # Disable other bed leveling options
-            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
-            configDisable MESH_BED_LEVELING Marlin/Configuration.h
           fi
 
           if ($JUNCTION_DEVIATION); then
@@ -811,6 +814,17 @@ jobs:
           configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
           configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
           configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
+
+          # Override mesh insets
+          # configValue MESH_MIN_X "UBL_MESH_INSET" Marlin/Configuration_adv.h
+          # configValue MESH_MAX_X "(X_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
+          # configValue MESH_MIN_Y "UBL_MESH_INSET" Marlin/Configuration_adv.h
+          # configValue MESH_MAX_Y "(Y_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
+          ## TODO: Should we possibly use PROBIN_MARGIN_* here to offset instead?
+          configValue MESH_MIN_X X_MIN_POS Marlin/Configuration_adv.h
+          configValue MESH_MAX_X X_MAX_POS Marlin/Configuration_adv.h
+          configValue MESH_MIN_Y Y_MIN_POS Marlin/Configuration_adv.h
+          configValue MESH_MAX_Y Y_MAX_POS Marlin/Configuration_adv.h
 
           ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail when enabled?!
           ##        https://github.com/MarlinFirmware/Marlin/issues/23958
