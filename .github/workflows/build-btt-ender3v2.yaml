@@ -65,8 +65,8 @@ jobs:
         bltouch: [true]
         #grid: [3, 5, 10, 15]
         # grid: [4]
-        grid: [5]
-        # grid: [10]
+        # grid: [5]
+        grid: [10]
         high-speed: [true, false]
         #high-speed: [false]
         #high-speed: [true]
@@ -821,10 +821,10 @@ jobs:
           # configValue MESH_MIN_Y "UBL_MESH_INSET" Marlin/Configuration_adv.h
           # configValue MESH_MAX_Y "(Y_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
           ## TODO: Should we possibly use PROBIN_MARGIN_* here to offset instead?
-          configValue MESH_MIN_X X_MIN_POS Marlin/Configuration_adv.h
-          configValue MESH_MAX_X X_MAX_POS Marlin/Configuration_adv.h
-          configValue MESH_MIN_Y Y_MIN_POS Marlin/Configuration_adv.h
-          configValue MESH_MAX_Y Y_MAX_POS Marlin/Configuration_adv.h
+          configValue MESH_MIN_X "X_MIN_POS" Marlin/Configuration_adv.h
+          configValue MESH_MIN_Y "Y_MIN_POS" Marlin/Configuration_adv.h
+          configValue MESH_MAX_X "X_MAX_POS" Marlin/Configuration_adv.h
+          configValue MESH_MAX_Y "Y_MAX_POS" Marlin/Configuration_adv.h
 
           ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail when enabled?!
           ##        https://github.com/MarlinFirmware/Marlin/issues/23958
