@@ -291,7 +291,8 @@ jobs:
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
           # TODO: Trying a _very_ low speed for improved probing
           # configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
-          configValue XY_PROBE_FEEDRATE "(150*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(150*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           
           # Decrease the amount of Z travel when moving between probing points (default is 5)
           configValue Z_CLEARANCE_BETWEEN_PROBES 3 Marlin/Configuration.h
@@ -327,7 +328,8 @@ jobs:
           # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
           configValue X_BED_SIZE 235 Marlin/Configuration.h
           configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE + 20" Marlin/Configuration.h
+          configValue X_MAX_POS 245 Marlin/Configuration.h
+          configValue Y_MAX_POS 225 Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
@@ -517,7 +519,8 @@ jobs:
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
             # configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
             # TODO: Should we default back to BTT's homing speeds instead
-            configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
+            # configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
+            onfigValue HOMING_FEEDRATE_MM_M "{ \(100\*60\), \(100\*60\), \(10\*60\) }" Marlin/Configuration.h
 
             # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
             #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
@@ -800,6 +803,12 @@ jobs:
           # Enable 5V mode for BLTouch
           # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
           # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
+
+          # Override probing margins
+          configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
 
           ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail when enabled?!
           ##        https://github.com/MarlinFirmware/Marlin/issues/23958
