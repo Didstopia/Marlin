@@ -791,7 +791,7 @@ jobs:
           # configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
 
           # Adjust homing bumping due to our higher homing speeds
-          onfigValue HOMING_BUMP_MM "{ 6, 6, 2 }" Marlin/Configuration_adv.h
+          configValue HOMING_BUMP_MM "{ 6, 6, 2 }" Marlin/Configuration_adv.h
           configValue HOMING_BUMP_DIVISOR "{ 4, 4, 4 }" Marlin/Configuration_adv.h
 
           # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
