@@ -542,8 +542,8 @@ jobs:
             # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
             configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 20, 50}" Marlin/Configuration.h
             configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 5000 }" Marlin/Configuration.h
-            configValue DEFAULT_ACCELERATION 2000 Marlin/Configuration.h
-            configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
+            configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
+            configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
@@ -553,7 +553,7 @@ jobs:
             # configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
             # TODO: Should we default back to BTT's homing speeds instead
             # configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
-            configValue HOMING_FEEDRATE_MM_M "{ \(100\*60\), \(100\*60\), \(10\*60\) }" Marlin/Configuration.h
+            configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(8\*60\) }" Marlin/Configuration.h
 
             # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
             #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
@@ -567,7 +567,7 @@ jobs:
             #configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
             # TODO: Nozzle was hitting the bed, so trying to go a little bit slower here
             #configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
-            configValue Z_PROBE_FEEDRATE_FAST "\(10\*60\)" Marlin/Configuration.h
+            configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
 
             # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
@@ -580,10 +580,11 @@ jobs:
             # Adjust offsets for direct drive
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
             ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.46 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
 
             # Override mesh insets to be lower
-            configValue MESH_INSET 0 Marlin/Configuration.h
+            # configValue MESH_INSET 0 Marlin/Configuration.h
+            configValue MESH_INSET 10 Marlin/Configuration.h
             
             # # Configure PID for the bed (60C)
             # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
@@ -789,6 +790,10 @@ jobs:
           # Lower homing bump
           # configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
 
+          # Adjust homing bumping due to our higher homing speeds
+          onfigValue HOMING_BUMP_MM "{ 6, 6, 2 }" Marlin/Configuration_adv.h
+          configValue HOMING_BUMP_DIVISOR "{ 4, 4, 4 }" Marlin/Configuration_adv.h
+
           # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
           if ($HIGH_SPEED); then
             configValue BLTOUCH_HS_MODE true Marlin/Configuration_adv.h
@@ -814,10 +819,10 @@ jobs:
           # configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
           # configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
           # configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_LEFT 0 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
           configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_FRONT 0 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_BACK 0 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_FRONT 5 Marlin/Configuration_adv.h
+          configValue PROBING_MARGIN_BACK 6 Marlin/Configuration_adv.h
 
           # Override mesh insets
           # configValue MESH_MIN_X "UBL_MESH_INSET" Marlin/Configuration_adv.h
