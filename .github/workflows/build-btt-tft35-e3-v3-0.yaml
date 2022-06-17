@@ -45,8 +45,10 @@ jobs:
       - name: Checkout BTT Display Firmware Repository
         uses: actions/checkout@v3
         with:
-          repository: bigtreetech/BIGTREETECH-TouchScreenFirmware
-          ref: master
+          # repository: bigtreetech/BIGTREETECH-TouchScreenFirmware
+          repository: Didstopia/BIGTREETECH-TouchScreenFirmware
+          # ref: master
+          ref: feature/language_fi
           fetch-depth: 1
           submodules: true
 
@@ -118,6 +120,10 @@ jobs:
           # cp -fr "Copy to SD Card root directory to update"/ $BTT_DIST_DIR/
           cp -R Copy\ to\ SD\ Card\ root\ directory\ to\ update/THEME_* $BTT_DIST_DIR/
           cp -R Copy\ to\ SD\ Card\ root\ directory\ to\ update/Language\ Packs $BTT_DIST_DIR/
+
+          # Bundle our custom logos
+          mkdir -p "${BTT_DIST_DIR}/CUSTOM"
+          cp -R .github/workflows/resources/*.bmp $BTT_DIST_DIR/CUSTOM/
 
           ## FIXME: This works fine locally, but ALWAYS fails on CI (never deletes anything)
           ## UPDATE: Looks like it's still the copy command above that's the culprit!
