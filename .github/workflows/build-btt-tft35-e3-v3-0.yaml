@@ -174,6 +174,7 @@ jobs:
 
           # Create and export a filename for the build artifact
           VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}
+          VERSION=${VERSION//\//_}
           BTT_DIST_NAME="${BTT_DISPLAY_MODEL}-${VERSION}"
           echo "::set-output name=name::${BTT_DIST_NAME}"
 
