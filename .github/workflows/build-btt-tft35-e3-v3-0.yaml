@@ -118,12 +118,12 @@ jobs:
           ##        to BTT_DIST_DIR, and NOT its contents, which is what we're after!
           # Copy extra files, such as themes and language packs
           # cp -fr "Copy to SD Card root directory to update"/ $BTT_DIST_DIR/
-          cp -R Copy\ to\ SD\ Card\ root\ directory\ to\ update/THEME_* $BTT_DIST_DIR/
+          cp -fR Copy\ to\ SD\ Card\ root\ directory\ to\ update/THEME_* $BTT_DIST_DIR/
           cp -R Copy\ to\ SD\ Card\ root\ directory\ to\ update/Language\ Packs $BTT_DIST_DIR/
 
           # Bundle our custom logos
           mkdir -p "${BTT_DIST_DIR}/CUSTOM"
-          cp -R .github/workflows/resources/*.bmp $BTT_DIST_DIR/CUSTOM/
+          cp -f ${GITHUB_WORKSPACE}/.github/workflows/resources/*.bmp $BTT_DIST_DIR/CUSTOM/
 
           ## FIXME: This works fine locally, but ALWAYS fails on CI (never deletes anything)
           ## UPDATE: Looks like it's still the copy command above that's the culprit!
