@@ -269,41 +269,41 @@ patchBuildDetails() {
   ## TODO: Patch build number or version, somewhere, somehow?
 }
 
-# Function for patching DWIN support with Jyers UI
-patchDWIN() {
-  # Check if the error is already disabled
-  if ! grep -Eiq "[\/]+(#error \".*DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h; then
-    debug "Patching DWIN support"
+# # Function for patching DWIN support with Jyers UI
+# patchDWIN() {
+#   # Check if the error is already disabled
+#   if ! grep -Eiq "[\/]+(#error \".*DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h; then
+#     debug "Patching DWIN support"
 
-    # Disable the error about requiring a custom cable for the DWIN display
-    sed -i -E "s/([^ ]*)(#error \".*DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
-    if [ ! -s /tmp/marlin_patch.log ]; then
-      error "Failed to remove DWIN custom cable error"
-      # return 1
-      false
-    fi
-  fi
+#     # Disable the error about requiring a custom cable for the DWIN display
+#     sed -i -E "s/([^ ]*)(#error \".*DWIN_CREALITY_LCD requires a custom cable.*)( .*|$)/\1\/\/\2\3/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
+#     if [ ! -s /tmp/marlin_patch.log ]; then
+#       error "Failed to remove DWIN custom cable error"
+#       # return 1
+#       false
+#     fi
+#   fi
 
-  ## TODO: Check if this is fixed, because it should now be?
-  ## FIXME: This can be removed once the following PR is merged to both bugfix-2.1.x and 2.1.x branches!
-  ##        https://github.com/MarlinFirmware/Marlin/pull/23879
-  # Fix Ender 3 V2 DWIN display bug, where it incorrectly shows the progress bar on startup
-  # sed -i -E "s/(.+, IS_DWIN_MARLINUI, EXTENSIBLE_UI)(\))(.*|$)/\1, HAS_DWIN_E3V2\2\3/g" Marlin/src/inc/Conditionals_post.h
-  # if [ ! -s /tmp/marlin_patch.log ]; then
-  #   error "Failed to patch DWIN progress bar bug"
-  #   # return 1
-  #   false
-  # fi
+#   ## TODO: Check if this is fixed, because it should now be?
+#   ## FIXME: This can be removed once the following PR is merged to both bugfix-2.1.x and 2.1.x branches!
+#   ##        https://github.com/MarlinFirmware/Marlin/pull/23879
+#   # Fix Ender 3 V2 DWIN display bug, where it incorrectly shows the progress bar on startup
+#   # sed -i -E "s/(.+, IS_DWIN_MARLINUI, EXTENSIBLE_UI)(\))(.*|$)/\1, HAS_DWIN_E3V2\2\3/g" Marlin/src/inc/Conditionals_post.h
+#   # if [ ! -s /tmp/marlin_patch.log ]; then
+#   #   error "Failed to patch DWIN progress bar bug"
+#   #   # return 1
+#   #   false
+#   # fi
 
-  ## TODO: This should also be fixed now, so test to see if it is?
-  # Fix the DWIN LCD check to take into account Jyers UI
-  # sed -E -i "s/#if EITHER\(DWIN_CREALITY_LCD, IS_DWIN_MARLINUI\)/#if HAS_DWIN_E3V2 \|\| IS_DWIN_MARLINUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
-  # if [ ! -s /tmp/marlin_patch.log ]; then
-  #     error "Failed to patch DWIN Jyers UI support"
-  #   # return 1
-  #   false
-  # fi
-}
+#   ## TODO: This should also be fixed now, so test to see if it is?
+#   # Fix the DWIN LCD check to take into account Jyers UI
+#   # sed -E -i "s/#if EITHER\(DWIN_CREALITY_LCD, IS_DWIN_MARLINUI\)/#if HAS_DWIN_E3V2 \|\| IS_DWIN_MARLINUI/g" Marlin/src/pins/stm32g0/pins_BTT_SKR_MINI_E3_V3_0.h
+#   # if [ ! -s /tmp/marlin_patch.log ]; then
+#   #     error "Failed to patch DWIN Jyers UI support"
+#   #   # return 1
+#   #   false
+#   # fi
+# }
 
 ## FIXME: Disable if/when our custom pull request/patch goes through!
 # Function for adding the ability to disable the buzzer on the LCD
@@ -334,18 +334,18 @@ patchDWIN() {
 # }
 
 ## TODO: Check the status of this, if it's already been fixed properly upstream?
-# Function for patching the advance pause prompt so it doesn't hang in the UI
-patchAdvancedPausePrompt() {
-  debug "Patching advanced pause prompt UI hanging"
+# # Function for patching the advance pause prompt so it doesn't hang in the UI
+# patchAdvancedPausePrompt() {
+#   debug "Patching advanced pause prompt UI hanging"
 
-  # Fix the advanced pause prompt UI hanging
-  sed -i -E 's/(.*[ ]*case PAUSE_MESSAGE_OPTION:[ ]*)(CrealityDWIN\.Popup_Handler\(PurgeMore\);)([ ]*)(break;)/\1pause_menu_response = PAUSE_RESPONSE_WAIT_FOR;\3\2\3\4/' Marlin/src/lcd/e3v2/jyersui/dwin.cpp
-  if [ ! -s /tmp/marlin_patch.log ]; then
-      error "Failed to patch advanced pause prompt UI hanging"
-    # return 1
-    false
-  fi
-}
+#   # Fix the advanced pause prompt UI hanging
+#   sed -i -E 's/(.*[ ]*case PAUSE_MESSAGE_OPTION:[ ]*)(CrealityDWIN\.Popup_Handler\(PurgeMore\);)([ ]*)(break;)/\1pause_menu_response = PAUSE_RESPONSE_WAIT_FOR;\3\2\3\4/' Marlin/src/lcd/e3v2/jyersui/dwin.cpp
+#   if [ ! -s /tmp/marlin_patch.log ]; then
+#       error "Failed to patch advanced pause prompt UI hanging"
+#     # return 1
+#     false
+#   fi
+# }
 
 # Function for patching sane configuration defaults
 patchDefaults() {
@@ -380,8 +380,8 @@ patchDefaults() {
   configValue INVERT_E0_DIR true Marlin/Configuration.h
 
   # Switch from Creality UI to Jyers UI
-  configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
-  configEnable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+  # configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
+  # configEnable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
 
   # Configure default stepper motor driver currents
   configValue X_CURRENT 580 Marlin/Configuration_adv.h
@@ -403,7 +403,7 @@ setupConfigs
 
 # Apply sane defaults on startup
 patchBuildDetails
-patchDWIN
+# patchDWIN
 # patchBuzzer
 ## FIXME: Testing if this has been fixed yet
 # patchAdvancedPausePrompt

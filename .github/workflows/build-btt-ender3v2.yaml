@@ -88,11 +88,9 @@ jobs:
         # mpc: [true, false]
         # mpc: [false]
         mpc: [true]
-        # ui: ["JyersUI", "MarlinUI"]
-        # ui: ["JyersUI", "MarlinUI", "BIGTREE_TFT35_E3_V3_0"]
-        ui: ["BIGTREE_TFT35_E3_V3_0"]
         # TODO: Enable this once we have time to test out the BTT's BIGTREE_TFT35_E3_V3_0 display
-        # ui: ["JyersUI", "BIGTREE_TFT35_E3_V3_0"]
+        # ui: ["MarlinUI", "BIGTREE_TFT35_E3_V3_0"]
+        ui: ["BIGTREE_TFT35_E3_V3_0"]
     steps:
 
       - name: Prepare Target Branch
@@ -700,21 +698,21 @@ jobs:
             configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
             # Disable Jyers UI
-            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
-          elif [ $UI == "JyersUI" ]; then
-            # Enable the Jyers UI
-            configEnable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+            # configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+          # elif [ $UI == "JyersUI" ]; then
+          #   # Enable the Jyers UI
+          #   configEnable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
 
-            # Disable Marlin UI
-            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
+          #   # Disable Marlin UI
+          #   configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+          #   configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
           elif [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then
             configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
             configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
             # Disable other UIs
             configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+            # configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
 
             # Configure speaker
             configEnable SPEAKER Marlin/Configuration.h
