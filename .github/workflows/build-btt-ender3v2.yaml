@@ -578,7 +578,8 @@ jobs:
             # Adjust offsets for direct drive
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
             ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
 
             # Override mesh insets to be lower
             # configValue MESH_INSET 0 Marlin/Configuration.h
@@ -732,10 +733,10 @@ jobs:
 
             # FIXME: Can we then use both SD cards and USB ports?
             # Configure serial ports for touch screem
-            # configValue SERIAL_PORT 2 Marlin/Configuration.h
-            # configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
-            configValue SERIAL_PORT -1 Marlin/Configuration.h
-            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+            configValue SERIAL_PORT 2 Marlin/Configuration.h
+            configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
+            # configValue SERIAL_PORT -1 Marlin/Configuration.h
+            # configValue SERIAL_PORT_2 2 Marlin/Configuration.h
             configValue BAUDRATE 250000 Marlin/Configuration.h
             configValue BAUDRATE_2 250000 Marlin/Configuration.h
 
