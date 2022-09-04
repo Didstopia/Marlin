@@ -443,7 +443,8 @@ jobs:
           #configEnable G26_MESH_VALIDATION Marlin/Configuration.h
 
           # Turn off display after 5 minutes
-          configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
+          # configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
+          configValue TOUCH_IDLE_SLEEP_MINS 5 Marlin/Configuration.h
 
           # Configure PID for the bed
           configValue DEFAULT_bedKp 129.98 Marlin/Configuration.h
