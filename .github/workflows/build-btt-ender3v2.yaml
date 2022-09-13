@@ -1038,11 +1038,11 @@ jobs:
           configEnable ADVANCED_OK Marlin/Configuration_adv.h
           # TODO: UPDATE: All of the values below seem unnecessary?
           #               May even want to bring our baud rates back to 115200?
-          # configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h
-          # # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h
-          # configValue BUFSIZE 32 Marlin/Configuration_adv.h
-          # configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h
-          # configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h
+          configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h # Default 8/16
+          # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h # Default 96
+          configValue BUFSIZE 32 Marlin/Configuration_adv.h # Default 4
+          configValue TX_BUFFER_SIZE 256 Marlin/Configuration_adv.h # Default 0
+          configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h # Default <disabled>
 
           # TODO: Leaving these alone for now
           # # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
