@@ -739,11 +739,12 @@ jobs:
 
             # FIXME: Can we then use both SD cards and USB ports?
             # Configure serial ports for touch screem
-            # configValue SERIAL_PORT 2 Marlin/Configuration.h
-            # configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
-            # TODO: Restoring these in hopes of getting Marlin <-> TFT35 <-> RPI4/OctoPrint working!
-            configValue SERIAL_PORT -1 Marlin/Configuration.h
-            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+            ## NOTE: This is for BTT TFT35 + USB
+            configValue SERIAL_PORT 2 Marlin/Configuration.h
+            configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
+            ## NOTE: This is for USB + TFT35
+            # configValue SERIAL_PORT -1 Marlin/Configuration.h
+            # configValue SERIAL_PORT_2 2 Marlin/Configuration.h
             configValue BAUDRATE 250000 Marlin/Configuration.h
             configValue BAUDRATE_2 250000 Marlin/Configuration.h
 
