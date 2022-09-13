@@ -146,7 +146,7 @@ jobs:
               exit 1
             fi
           }
-          displayConfig serial_port "P1:7 P2:0 P3:0 P4:0" ${BTT_DIST_DIR}/config.ini
+          displayConfig serial_port "P1:7 P2:7 P3:7 P4:0" ${BTT_DIST_DIR}/config.ini
           displayConfig emulated_m600 "0" ${BTT_DIST_DIR}/config.ini
           displayConfig status_screen "0" ${BTT_DIST_DIR}/config.ini
           displayConfig ack_notification "2" ${BTT_DIST_DIR}/config.ini

@@ -19,6 +19,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+*.bin
+*.gz
+
 buildroot/
 
 # Environment variables and secrets

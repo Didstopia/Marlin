@@ -447,14 +447,14 @@ jobs:
           configValue TOUCH_IDLE_SLEEP_MINS 5 Marlin/Configuration.h
 
           # Configure PID for the bed
-          configValue DEFAULT_bedKp 129.98 Marlin/Configuration.h
-          configValue DEFAULT_bedKi 25.00 Marlin/Configuration.h
-          configValue DEFAULT_bedKd 450.59 Marlin/Configuration.h
+          # configValue DEFAULT_bedKp 129.98 Marlin/Configuration.h
+          # configValue DEFAULT_bedKi 25.00 Marlin/Configuration.h
+          # configValue DEFAULT_bedKd 450.59 Marlin/Configuration.h
 
           # Configure PID for the hotend
-          configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
-          configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
-          configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
+          # configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
+          # configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
+          # configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
 
           ## TODO: Testing fan PWM dithering
           ## TODO: UPDATE: This only works with scaling, and seems to affect heaters too, so not going deeper into this right now..
@@ -547,12 +547,15 @@ jobs:
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
             # Increase homing feed rates (homing speeds)
+            # DEFAULT: { (50*60), (50*60), (4*60) }
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(25\*60\) }" Marlin/Configuration.h
             #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
             # configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
             # TODO: Should we default back to BTT's homing speeds instead
             # configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
-            configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(8\*60\) }" Marlin/Configuration.h
+            # configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(8\*60\) }" Marlin/Configuration.h
+            # TODO: Lowered Z homing from 8*60 to 4*60, as otherwise the probe hits the bed quite hard
+            configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(4\*60\) }" Marlin/Configuration.h
 
             # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
             #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
@@ -566,7 +569,9 @@ jobs:
             #configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
             # TODO: Nozzle was hitting the bed, so trying to go a little bit slower here
             #configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
-            configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
+            # configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
+            # TODO: Lowered Z homing from 8*60 to 4*60, as otherwise the probe hits the bed quite hard
+            configValue Z_PROBE_FEEDRATE_FAST "\(4\*60\)" Marlin/Configuration.h
 
             # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
@@ -597,9 +602,9 @@ jobs:
             # configValue DEFAULT_bedKd 389.63 Marlin/Configuration.h
 
             # Configure PID for the PEI bed (60C + Biqu Magnetic Plate)
-            configValue DEFAULT_bedKp 135.93 Marlin/Configuration.h
-            configValue DEFAULT_bedKi 25.36 Marlin/Configuration.h
-            configValue DEFAULT_bedKd 485.74 Marlin/Configuration.h
+            # configValue DEFAULT_bedKp 135.93 Marlin/Configuration.h
+            # configValue DEFAULT_bedKi 25.36 Marlin/Configuration.h
+            # configValue DEFAULT_bedKd 485.74 Marlin/Configuration.h
 
             # # Configure PID for the hotend (215C + Micro Swiss All Metal Hotend)
             # configValue DEFAULT_Kp 25.72 Marlin/Configuration.h
@@ -607,9 +612,9 @@ jobs:
             # configValue DEFAULT_Kd 65.85 Marlin/Configuration.h
 
             # # Configure PID for the hotend (205C + Micro Swiss All Metal Hotend)
-            configValue DEFAULT_Kp 25.69 Marlin/Configuration.h
-            configValue DEFAULT_Ki 2.55 Marlin/Configuration.h
-            configValue DEFAULT_Kd 64.75 Marlin/Configuration.h
+            # configValue DEFAULT_Kp 25.69 Marlin/Configuration.h
+            # configValue DEFAULT_Ki 2.55 Marlin/Configuration.h
+            # configValue DEFAULT_Kd 64.75 Marlin/Configuration.h
 
             # Configure PID for the hotend (200C)
             # configValue DEFAULT_Kp 23.63 Marlin/Configuration.h
@@ -734,10 +739,11 @@ jobs:
 
             # FIXME: Can we then use both SD cards and USB ports?
             # Configure serial ports for touch screem
-            configValue SERIAL_PORT 2 Marlin/Configuration.h
-            configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
-            # configValue SERIAL_PORT -1 Marlin/Configuration.h
-            # configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+            # configValue SERIAL_PORT 2 Marlin/Configuration.h
+            # configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
+            # TODO: Restoring these in hopes of getting Marlin <-> TFT35 <-> RPI4/OctoPrint working!
+            configValue SERIAL_PORT -1 Marlin/Configuration.h
+            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
             configValue BAUDRATE 250000 Marlin/Configuration.h
             configValue BAUDRATE_2 250000 Marlin/Configuration.h
 
@@ -791,6 +797,7 @@ jobs:
           # Lower homing bump
           # configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
 
+          # FIXME: There are still (rare) occasions where the X (and sometimes Y?) axis will no trigger the endstop
           # Adjust homing bumping due to our higher homing speeds
           configValue HOMING_BUMP_MM "{ 6, 6, 2 }" Marlin/Configuration_adv.h
           configValue HOMING_BUMP_DIVISOR "{ 4, 4, 4 }" Marlin/Configuration_adv.h
@@ -873,6 +880,9 @@ jobs:
           # Enable long filename support
           configEnable LONG_FILENAME_HOST_SUPPORT Marlin/Configuration_adv.h
 
+          # Enable long filename write support
+          configEnable LONG_FILENAME_WRITE_SUPPORT Marlin/Configuration_adv.h
+
           # TODO: This is already enabled by default
           # Enable scrolling filenames
           configEnable SCROLL_LONG_FILENAMES Marlin/Configuration_adv.h
@@ -936,7 +946,7 @@ jobs:
           # TODO: This needs proper testing!
           ## TODO: UPDATE: Supposedly leaving this enabled won't do anything if drivers are in standalone mode, which they are for us?!
           # Disable square wave stepping (BTT has this disabled, Creality has it enabled)
-          configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
+          # configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # TODO: UPDATE: Disabled the first 3 to fallback to polling,
@@ -1101,13 +1111,13 @@ jobs:
           ## NOTE: Marlin BFT pip package is basically dead, so no point in even trying to use it!
           #        Meatpack and Binary File Transfer can NOT be enabled at the same time!
           # # Enable Marlin binary file transfer support (marlinbft)
-          # configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
+          configEnable BINARY_FILE_TRANSFER Marlin/Configuration_adv.h
           # ## TODO: !!! THIS IS RELATED TO BINARY_FILE_TRANSFER AND MEATPACK, SEE ABOVE !!!
-          # # Enable custom firmware uploading (eg. with BINARY_FILE_TRANSFER + a USB connection)
-          # configEnable CUSTOM_FIRMWARE_UPLOAD Marlin/Configuration_adv.h
-          # # Disable meatpack when using binary file transfer and/or custom firmware upload
-          # configDisable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
-          # configDisable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
+          # Enable custom firmware uploading (eg. with BINARY_FILE_TRANSFER + a USB connection)
+          configEnable CUSTOM_FIRMWARE_UPLOAD Marlin/Configuration_adv.h
+          # Disable meatpack when using binary file transfer and/or custom firmware upload
+          configDisable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
+          configDisable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
 
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
