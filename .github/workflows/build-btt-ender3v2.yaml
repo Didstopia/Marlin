@@ -447,9 +447,9 @@ jobs:
           configValue TOUCH_IDLE_SLEEP_MINS 5 Marlin/Configuration.h
 
           # Configure PID for the bed
-          # configValue DEFAULT_bedKp 129.98 Marlin/Configuration.h
-          # configValue DEFAULT_bedKi 25.00 Marlin/Configuration.h
-          # configValue DEFAULT_bedKd 450.59 Marlin/Configuration.h
+          configValue DEFAULT_bedKp 89.2660 Marlin/Configuration.h
+          configValue DEFAULT_bedKi 16.1714 Marlin/Configuration.h
+          configValue DEFAULT_bedKd 328.4990 Marlin/Configuration.h
 
           # Configure PID for the hotend
           # configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
@@ -683,10 +683,11 @@ jobs:
               configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
 
               # Customize MPC
-              configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.3800f }" Marlin/Configuration.h
-              configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2110f }" Marlin/Configuration.h
-              configValue MPC_AMBIENT_XFER_COEFF "{ 0.1330f }" Marlin/Configuration.h
-              configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1439f }" Marlin/Configuration.h
+              configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.7500f }" Marlin/Configuration.h
+              configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2213f }" Marlin/Configuration.h
+              configValue MPC_AMBIENT_XFER_COEFF "{ 0.1350f }" Marlin/Configuration.h
+              configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1473f }" Marlin/Configuration.h
+              configValue FILAMENT_HEAT_CAPACITY_PERMM "{ 0.0056f}" Marlin/Configuration.h
             else
               # Enable PID and disable MPC
               configEnable PIDTEMP Marlin/Configuration.h
@@ -946,8 +947,9 @@ jobs:
 
           # TODO: This needs proper testing!
           ## TODO: UPDATE: Supposedly leaving this enabled won't do anything if drivers are in standalone mode, which they are for us?!
+          ## TODO: UPDATE: Enabled this (commented out) and homing went on the fritz, loud motors etc.
           # Disable square wave stepping (BTT has this disabled, Creality has it enabled)
-          # configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
+          configDisable SQUARE_WAVE_STEPPING Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # TODO: UPDATE: Disabled the first 3 to fallback to polling,
