@@ -323,13 +323,14 @@ jobs:
           # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # TODO: Reverting bed size stuff back to Jyers defaults, for better probing/UBL support
-          # configValue X_BED_SIZE 230 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
-          configValue X_BED_SIZE 235 Marlin/Configuration.h
-          configValue Y_BED_SIZE 225 Marlin/Configuration.h
-          configValue X_MAX_POS 245 Marlin/Configuration.h
-          configValue Y_MAX_POS 225 Marlin/Configuration.h
+          configValue X_BED_SIZE 230 Marlin/Configuration.h
+          configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          configValue Y_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
+          # configValue X_BED_SIZE 235 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 225 Marlin/Configuration.h
+          # configValue X_MAX_POS 245 Marlin/Configuration.h
+          # configValue Y_MAX_POS 225 Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
@@ -585,7 +586,8 @@ jobs:
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
             ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.36 }" Marlin/Configuration.h
 
             # Override mesh insets to be lower
             # configValue MESH_INSET 0 Marlin/Configuration.h
@@ -757,8 +759,8 @@ jobs:
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
           # configValue X_BED_SIZE 235 Marlin/Configuration.h
           # configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          # configValue X_MIN_POS 0 Marlin/Configuration.h
-          # configValue Y_MIN_POS 0 Marlin/Configuration.h
+          configValue X_MIN_POS 0 Marlin/Configuration.h
+          configValue Y_MIN_POS 0 Marlin/Configuration.h
           # configValue X_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
           # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
 
@@ -825,25 +827,25 @@ jobs:
           # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
 
           # Override probing margins
+          # # configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
+          # # configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
+          # # configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
+          # # configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
           # configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
           # configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
-          # configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
-          # configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_FRONT 5 Marlin/Configuration_adv.h
-          configValue PROBING_MARGIN_BACK 6 Marlin/Configuration_adv.h
+          # configValue PROBING_MARGIN_FRONT 5 Marlin/Configuration_adv.h
+          # configValue PROBING_MARGIN_BACK 6 Marlin/Configuration_adv.h
 
           # Override mesh insets
-          # configValue MESH_MIN_X "UBL_MESH_INSET" Marlin/Configuration_adv.h
-          # configValue MESH_MAX_X "(X_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
-          # configValue MESH_MIN_Y "UBL_MESH_INSET" Marlin/Configuration_adv.h
-          # configValue MESH_MAX_Y "(Y_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
-          ## TODO: Should we possibly use PROBIN_MARGIN_* here to offset instead?
-          configValue MESH_MIN_X "X_MIN_POS + 20" Marlin/Configuration_adv.h
-          configValue MESH_MIN_Y "Y_MIN_POS + 20" Marlin/Configuration_adv.h
-          configValue MESH_MAX_X "X_MAX_POS" Marlin/Configuration_adv.h
-          configValue MESH_MAX_Y "Y_MAX_POS" Marlin/Configuration_adv.h
+          # # configValue MESH_MIN_X "UBL_MESH_INSET" Marlin/Configuration_adv.h
+          # # configValue MESH_MAX_X "(X_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
+          # # configValue MESH_MIN_Y "UBL_MESH_INSET" Marlin/Configuration_adv.h
+          # # configValue MESH_MAX_Y "(Y_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
+          # ## TODO: Should we possibly use PROBIN_MARGIN_* here to offset instead?
+          # configValue MESH_MIN_X "X_MIN_POS + 20" Marlin/Configuration_adv.h
+          # configValue MESH_MIN_Y "Y_MIN_POS + 20" Marlin/Configuration_adv.h
+          # configValue MESH_MAX_X "X_MAX_POS" Marlin/Configuration_adv.h
+          # configValue MESH_MAX_Y "Y_MAX_POS" Marlin/Configuration_adv.h
 
           ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail when enabled?!
           ##        https://github.com/MarlinFirmware/Marlin/issues/23958
