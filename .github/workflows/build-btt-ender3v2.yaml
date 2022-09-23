@@ -327,12 +327,14 @@ jobs:
           # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # Bed size, probing and bed clip tweaks specific to this printer/build surface
-          configValue X_BED_SIZE 235 Marlin/Configuration.h
-          configValue Y_BED_SIZE 235 Marlin/Configuration.h
+          configValue X_BED_SIZE 225 Marlin/Configuration.h
+          configValue Y_BED_SIZE 215 Marlin/Configuration.h
           configValue X_MIN_POS 0 Marlin/Configuration.h
-          configValue Y_MIN_POS 0 Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
+          configValue Y_MIN_POS 5 Marlin/Configuration.h
+          # TODO: Test and tweak these!
+          configValue X_MAX_POS "X_BED_SIZE + 20" Marlin/Configuration.h
           configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+          #configValue Y_MAX_POS "Y_BED_SIZE - 5" Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
           #configValue X_BED_SIZE 235 Marlin/Configuration.h
