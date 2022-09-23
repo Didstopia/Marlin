@@ -753,13 +753,16 @@ jobs:
             # FIXME: Can we then use both SD cards and USB ports?
             # Configure serial ports for touch screem
             ## NOTE: This is for BTT TFT35 + USB
-            configValue SERIAL_PORT 2 Marlin/Configuration.h
-            configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
+            # configValue SERIAL_PORT 2 Marlin/Configuration.h
+            # configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
             ## NOTE: This is for USB + TFT35
-            # configValue SERIAL_PORT -1 Marlin/Configuration.h
-            # configValue SERIAL_PORT_2 2 Marlin/Configuration.h
-            configValue BAUDRATE 250000 Marlin/Configuration.h
-            configValue BAUDRATE_2 250000 Marlin/Configuration.h
+            configValue SERIAL_PORT -1 Marlin/Configuration.h
+            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+            ## TODO: Lowered baudrates back to 115200
+            # configValue BAUDRATE 250000 Marlin/Configuration.h
+            # configValue BAUDRATE_2 250000 Marlin/Configuration.h
+            configValue BAUDRATE 115200 Marlin/Configuration.h
+            configValue BAUDRATE_2 115200 Marlin/Configuration.h
 
             ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
             ##        so we're giving it a go without it, see how that pans out!
@@ -1053,11 +1056,12 @@ jobs:
           configEnable ADVANCED_OK Marlin/Configuration_adv.h
           # TODO: UPDATE: All of the values below seem unnecessary?
           #               May even want to bring our baud rates back to 115200?
-          configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h # Default 8/16
-          # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h # Default 96
-          configValue BUFSIZE 32 Marlin/Configuration_adv.h # Default 4
-          configValue TX_BUFFER_SIZE 256 Marlin/Configuration_adv.h # Default 0
-          configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h # Default <disabled>
+          ## TODO: Reverted buffer sizes back to defaults
+          # configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h # Default 8/16
+          # # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h # Default 96
+          # configValue BUFSIZE 32 Marlin/Configuration_adv.h # Default 4
+          # configValue TX_BUFFER_SIZE 256 Marlin/Configuration_adv.h # Default 0
+          # configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h # Default <disabled>
 
           # TODO: Leaving these alone for now
           # # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
