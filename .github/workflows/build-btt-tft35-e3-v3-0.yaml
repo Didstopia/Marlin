@@ -146,7 +146,7 @@ jobs:
               exit 1
             fi
           }
-          displayConfig serial_port "P1:7 P2:7 P3:7 P4:0" ${BTT_DIST_DIR}/config.ini
+          displayConfig serial_port "P1:6 P2:6 P3:0 P4:0" ${BTT_DIST_DIR}/config.ini
           displayConfig emulated_m600 "0" ${BTT_DIST_DIR}/config.ini
           displayConfig status_screen "0" ${BTT_DIST_DIR}/config.ini
           displayConfig ack_notification "2" ${BTT_DIST_DIR}/config.ini
@@ -155,7 +155,7 @@ jobs:
           displayConfig notification_m117 "1" ${BTT_DIST_DIR}/config.ini
           displayConfig prog_disp_type "1" ${BTT_DIST_DIR}/config.ini
           displayConfig layer_disp_type "1" ${BTT_DIST_DIR}/config.ini
-          displayConfig serial_always_on "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig serial_always_on "0" ${BTT_DIST_DIR}/config.ini
           displayConfig marlin_font_color "2" ${BTT_DIST_DIR}/config.ini
           displayConfig marlin_title "RASPUTIN" ${BTT_DIST_DIR}/config.ini
           displayConfig fan_count "3" ${BTT_DIST_DIR}/config.ini
