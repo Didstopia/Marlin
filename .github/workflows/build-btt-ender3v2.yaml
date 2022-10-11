@@ -986,7 +986,7 @@ jobs:
           # Enable showing remaining time (disabled by default, enabled in Jyers)
           configEnable SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
           configEnable SHOW_REMAINING_TIME Marlin/Configuration_adv.h
-          configEnable USE_M73_REMAINING_TIME Marlin/Configuration_adv.h
+          configEnable SET_REMAINING_TIME Marlin/Configuration_adv.h
           configEnable ROTATE_PROGRESS_DISPLAY Marlin/Configuration_adv.h
 
           # TODO: Not sure if this only applies to MarlinUI or something?
