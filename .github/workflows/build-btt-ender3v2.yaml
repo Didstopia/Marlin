@@ -501,7 +501,8 @@ jobs:
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
             # Adjust e-steps for direct drive
-            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415.0 }" Marlin/Configuration.h
+            # configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415.0 }" Marlin/Configuration.h
+            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 410.85 }" Marlin/Configuration.h
 
             # Limit maximum Z position when using a direct drive
             # configValue Z_MAX_POS 230 Marlin/Configuration.h # Default is 250
