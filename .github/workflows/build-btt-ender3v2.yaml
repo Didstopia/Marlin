@@ -984,7 +984,7 @@ jobs:
           configEnable CONTROLLER_FAN_EDITABLE Marlin/Configuration_adv.h
 
           # Enable showing remaining time (disabled by default, enabled in Jyers)
-          configEnable LCD_SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
+          configEnable SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
           configEnable SHOW_REMAINING_TIME Marlin/Configuration_adv.h
           configEnable USE_M73_REMAINING_TIME Marlin/Configuration_adv.h
           configEnable ROTATE_PROGRESS_DISPLAY Marlin/Configuration_adv.h
