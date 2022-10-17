@@ -1226,7 +1226,8 @@ jobs:
               
               ## FIXME: Re-calibrate K again! The value below is currently NOT accurate anymore!
               # configValue ADVANCE_K 0.11 Marlin/Configuration_adv.h
-              configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
+              # configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
+              configValue ADVANCE_K 0.06 Marlin/Configuration_adv.h
               ## NOTE: We set linear advance K value to zero, so that it's effectively disabled by default!
               #configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
 
