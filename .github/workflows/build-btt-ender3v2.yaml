@@ -67,9 +67,9 @@ jobs:
         # grid: [4]
         # grid: [5]
         grid: [5, 10]
-        high-speed: [true, false]
+        # high-speed: [true, false]
         #high-speed: [false]
-        #high-speed: [true]
+        high-speed: [true]
         #direct-drive: [true, false]
         direct-drive: [true]
         ## FIXME: Add support for UBL alternatives
@@ -79,10 +79,12 @@ jobs:
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
         # touch-screen: [false]
-        linear-advance: [true, false]
+        # linear-advance: [true, false]
         # linear-advance: [false]
-        junction-deviation: [true, false]
+        linear-advance: [true]
+        # junction-deviation: [true, false]
         # junction-deviation: [false]
+        junction-deviation: [true]
         #hybrid-threshold: [true, false]
         hybrid-threshold: [false]
         # mpc: [true, false]
@@ -91,6 +93,7 @@ jobs:
         # TODO: Enable this once we have time to test out the BTT's BIGTREE_TFT35_E3_V3_0 display
         # ui: ["MarlinUI", "BIGTREE_TFT35_E3_V3_0"]
         ui: ["BIGTREE_TFT35_E3_V3_0"]
+        # ui: ["MarlinUI"]
     steps:
 
       - name: Prepare Target Branch
@@ -230,6 +233,11 @@ jobs:
 
           ## BEGIN CONFIGURATION.H
 
+          # Adjust min/max temperatures
+          configValue HEATER_0_MINTEMP 5 Marlin/Configuration.h
+          configValue BED_MINTEMP 5 Marlin/Configuration.h
+          configValue BED_MAXTEMP 150 Marlin/Configuration.h
+
           # TODO: Leaving this alone for now (default is 180)
           # Set minimum extruder temperature when extruding
           # configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
@@ -292,14 +300,14 @@ jobs:
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
           # TODO: Trying a _very_ low speed for improved probing
-          # configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(150*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # TODO: Increased probing travel speeds to Marlin defaults (133x60)
-          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
           
           # Decrease the amount of Z travel when moving between probing points (default is 5)
-          configValue Z_CLEARANCE_BETWEEN_PROBES 3 Marlin/Configuration.h
+          # configValue Z_CLEARANCE_BETWEEN_PROBES 3 Marlin/Configuration.h
 
           # TODO: Leaving these alone for now
           # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
@@ -307,19 +315,23 @@ jobs:
           #configValue Z_PROBE_OFFSET_RANGE_MAX 20 Marlin/Configuration.h
 
           # Enable multiple probings (for BLTouch/UBL)
-          # configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
-          configDisable MULTIPLE_PROBING Marlin/Configuration.h
+          configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
+          # configDisable MULTIPLE_PROBING Marlin/Configuration.h
 
           # Enable extra probing
-          # configValue EXTRA_PROBING 1 Marlin/Configuration.h
-
-          # Require heated bed and nozzle when auto-leveling
-          configEnable PREHEAT_BEFORE_LEVELING Marlin/Configuration.h
-          configValue LEVELING_NOZZLE_TEMP 200 Marlin/Configuration.h
-          configValue LEVELING_BED_TEMP 60 Marlin/Configuration.h
+          configValue EXTRA_PROBING 1 Marlin/Configuration.h
 
           # Enable Z probe testing (for BLTouch/UBL)
           configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
+
+          ## FIXME: This might not be a good idea?!
+          # Require heated bed and nozzle when probing
+          # configEnable PREHEAT_BEFORE_PROBING Marlin/Configuration.h
+
+          # Require heated bed and nozzle when auto-leveling
+          configEnable PREHEAT_BEFORE_LEVELING Marlin/Configuration.h
+          configValue LEVELING_NOZZLE_TEMP 120 Marlin/Configuration.h
+          configValue LEVELING_BED_TEMP 50 Marlin/Configuration.h
 
           # TODO: Do we want these enabled or not? Because sometimes they just get in the way..
           # Require homing after steppers have deactivated/unlocked (and before trying to move)
@@ -327,13 +339,13 @@ jobs:
           # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # Bed size, probing and bed clip tweaks specific to this printer/build surface
-          configValue X_BED_SIZE 225 Marlin/Configuration.h
-          configValue Y_BED_SIZE 220 Marlin/Configuration.h
-          configValue X_MIN_POS 0 Marlin/Configuration.h
-          configValue Y_MIN_POS 5 Marlin/Configuration.h
+          configValue X_BED_SIZE 230 Marlin/Configuration.h
+          configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          # configValue X_MIN_POS 0 Marlin/Configuration.h
+          # configValue Y_MIN_POS 5 Marlin/Configuration.h
           # TODO: Test and tweak these!
-          configValue X_MAX_POS "X_BED_SIZE + 20" Marlin/Configuration.h
-          configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE + 20" Marlin/Configuration.h
+          # configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
           # configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
@@ -411,15 +423,8 @@ jobs:
           # Enable print counting statistics (disabled by default, enabled in Jyers)
           configEnable PRINTCOUNTER Marlin/Configuration.h
 
-          # FIXME: Not sure if important, but BTT (and Jyers) have this disabled while Creality has it enabled, but we need this, right?
           # Enable software PWM fan control
           configEnable FAN_SOFT_PWM Marlin/Configuration.h
-
-          # TODO: Leaving these alone for now
-          # Adjust min/max temperatures
-          configValue HEATER_0_MINTEMP 5 Marlin/Configuration.h
-          configValue BED_MINTEMP 5 Marlin/Configuration.h
-          configValue BED_MAXTEMP 150 Marlin/Configuration.h
 
           # TODO: Leaving this alone for now
           # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
@@ -481,8 +486,11 @@ jobs:
             # TODO: Lowered mesh inset back to default 1
             # configValue MESH_INSET 1 Marlin/Configuration.h
 
+            # Enable Hilbert Curve for UBL (reduces travel)
+            configEnable UBL_HILBERT_CURVE Marlin/Configuration.h
+
             # Disable UBL automatic mesh saving
-            configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
+            # configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
 
             ## FIXME: Can this cause our print head crashing into the bed when probing?!
             ## TODO: Not sure if we can use this or not? And what it actually does?
@@ -598,7 +606,7 @@ jobs:
             ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.36 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.38 }" Marlin/Configuration.h
 
             # Override mesh insets to be lower
             # configValue MESH_INSET 0 Marlin/Configuration.h
@@ -655,7 +663,8 @@ jobs:
             # Calibrated JD with LIN_ADV enabled
             # NOTE: 0.01-0.03 looks like the ideal value, while 0.04-0.05 and above cause bulging edges?
             # configValue JUNCTION_DEVIATION_MM 0.03 Marlin/Configuration.h
-            configValue JUNCTION_DEVIATION_MM 0.005 Marlin/Configuration.h
+            # configValue JUNCTION_DEVIATION_MM 0.005 Marlin/Configuration.h ## FIXME: Calculate a new JD value!
+            configValue JUNCTION_DEVIATION_MM 0.06 Marlin/Configuration.h
           else
             # Disable junction deviation by enabling classic jerk handling
             configEnable CLASSIC_JERK Marlin/Configuration.h
@@ -680,32 +689,23 @@ jobs:
             configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
           fi
 
-          ## FIXME: This doesn't yet work with Jyers, however if we go with the BTT display,
-          ##        we should be able to use this with eg. Marlin UI, right?
           # NOTE: MPC is still HIGHLY experimental, proceed with caution!
           if ($MPC); then
-            if [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then
-              # Disable PID and enable MPC
-              configDisable PIDTEMP Marlin/Configuration.h
-              configEnable MPCTEMP Marlin/Configuration.h
+            # Disable PID and enable MPC
+            configDisable PIDTEMP Marlin/Configuration.h
+            configEnable MPCTEMP Marlin/Configuration.h
 
-              # Configure MPC
-              # NOTE: Use "M306 T" G-Code to autotune MPC for the hotend
-              ## TODO: How do we MPC autotune the bed temperature?
-              configEnable MPC_EDIT_MENU Marlin/Configuration.h
-              configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
+            # Configure MPC
+            # NOTE: Use "M306 T" G-Code to autotune MPC for the hotend
+            configEnable MPC_EDIT_MENU Marlin/Configuration.h
+            configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
 
-              # Customize MPC
-              configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.7500f }" Marlin/Configuration.h
-              configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2213f }" Marlin/Configuration.h
-              configValue MPC_AMBIENT_XFER_COEFF "{ 0.1350f }" Marlin/Configuration.h
-              configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1473f }" Marlin/Configuration.h
-              configValue FILAMENT_HEAT_CAPACITY_PERMM "{ 0.0056f}" Marlin/Configuration.h
-            else
-              # Enable PID and disable MPC
-              configEnable PIDTEMP Marlin/Configuration.h
-              configDisable MPCTEMP Marlin/Configuration.h
-            fi
+            # Customize MPC
+            configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.7500f }" Marlin/Configuration.h
+            configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2213f }" Marlin/Configuration.h
+            configValue MPC_AMBIENT_XFER_COEFF "{ 0.1350f }" Marlin/Configuration.h
+            configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1473f }" Marlin/Configuration.h
+            configValue FILAMENT_HEAT_CAPACITY_PERMM "{ 0.0056f}" Marlin/Configuration.h
           else
             # Enable PID and disable MPC
             configEnable PIDTEMP Marlin/Configuration.h
@@ -713,21 +713,11 @@ jobs:
           fi
 
           # Switch between the different UI options
-          if [ $UI == "MarlinUI" ]; then
+          if [ $UI == "MarlinUI" ]; then # MarlinUI
             # Enable the Marlin UI
             configEnable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
             configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
-
-            # Disable Jyers UI
-            # configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
-          # elif [ $UI == "JyersUI" ]; then
-          #   # Enable the Jyers UI
-          #   configEnable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
-
-          #   # Disable Marlin UI
-          #   configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-          #   configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
-          elif [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then
+          elif [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then # BTT TFT35
             configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
             configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
@@ -877,7 +867,7 @@ jobs:
           configEnable SOUND_MENU_ITEM Marlin/Configuration_adv.h
 
           # Disable the speaker by default
-          configDisable SOUND_ON_DEFAULT Marlin/Configuration_adv.h
+          # configDisable SOUND_ON_DEFAULT Marlin/Configuration_adv.h
 
           # Enable additional display features (some are useful when used with OctoPrint for example)
           configEnable STATUS_MESSAGE_SCROLLING Marlin/Configuration_adv.h
@@ -1155,7 +1145,7 @@ jobs:
           # configEnable POWER_MONITOR_VOLTAGE Marlin/Configuration_adv.h
 
           ## TODO: Test if this improves the host actions/prompts?
-          configEnable HOST_STATUS_NOTIFICATIONS Marlin/Configuration_adv.h
+          # configEnable HOST_STATUS_NOTIFICATIONS Marlin/Configuration_adv.h # NOTE: This is too spammy..
 
           ## FIXME: We can't use this due to "M100 - unsupported CPU" error
           ## TODO: Temporarily enable, so we can monitor our memory usage/free memory with the M100 g-code!
@@ -1275,6 +1265,7 @@ jobs:
             ## FIXME: According to a review on Amazon, ULTIPANEL_FEEDMULTIPLY needs to be disabled,
             ##        otherwise the display's encoder gets triggered by even the slightest vibrations of the printer,
             ##        which is immediately apparent when the display is mounted on the printer.
+            ## NOTE: The above IS true, for the most part anyway, eg. it drastically reduces the issue
             configDisable ULTIPANEL_FEEDMULTIPLY Marlin/Configuration_adv.h
           fi
 
