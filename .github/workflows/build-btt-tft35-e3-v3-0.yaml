@@ -158,7 +158,8 @@ jobs:
           displayConfig default_mode "0" ${BTT_DIST_DIR}/config.ini
           displayConfig serial_always_on "0" ${BTT_DIST_DIR}/config.ini
           displayConfig marlin_font_color "2" ${BTT_DIST_DIR}/config.ini
-          displayConfig marlin_fullscreen "1" ${BTT_DIST_DIR}/config.ini
+          displayConfig marlin_fullscreen "0" ${BTT_DIST_DIR}/config.ini
+          # displayConfig marlin_fullscreen "1" ${BTT_DIST_DIR}/config.ini
           displayConfig marlin_show_title "0" ${BTT_DIST_DIR}/config.ini
           displayConfig marlin_title "RASPUTIN" ${BTT_DIST_DIR}/config.ini
           displayConfig fan_count "3" ${BTT_DIST_DIR}/config.ini

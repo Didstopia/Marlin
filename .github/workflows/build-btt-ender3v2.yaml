@@ -90,6 +90,7 @@ jobs:
         # mpc: [true, false]
         # mpc: [false]
         mpc: [true]
+        input-shaping: [true, false]
         # TODO: Enable this once we have time to test out the BTT's BIGTREE_TFT35_E3_V3_0 display
         # ui: ["MarlinUI", "BIGTREE_TFT35_E3_V3_0"]
         ui: ["BIGTREE_TFT35_E3_V3_0"]
@@ -339,8 +340,8 @@ jobs:
           # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # Bed size, probing and bed clip tweaks specific to this printer/build surface
-          configValue X_BED_SIZE 230 Marlin/Configuration.h
-          configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          # configValue X_BED_SIZE 220 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 220 Marlin/Configuration.h
           # configValue X_MIN_POS 0 Marlin/Configuration.h
           # configValue Y_MIN_POS 5 Marlin/Configuration.h
           # TODO: Test and tweak these!
@@ -465,6 +466,12 @@ jobs:
           # configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
           # configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
           # configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
+
+          # Enable center point for bed tramming
+          configEnable BED_TRAMMING_INCLUDE_CENTER Marlin/Configuration.h
+
+          # Enable bed tramming audio feedback
+          configEnable BED_TRAMMING_AUDIO_FEEDBACK Marlin/Configuration.h
 
           ## TODO: Testing fan PWM dithering
           ## TODO: UPDATE: This only works with scaling, and seems to affect heaters too, so not going deeper into this right now..
@@ -710,6 +717,9 @@ jobs:
             # Enable PID and disable MPC
             configEnable PIDTEMP Marlin/Configuration.h
             configDisable MPCTEMP Marlin/Configuration.h
+
+            configEnable PID_EDIT_MENU Marlin/Configuration.h
+            configEnable PID_AUTOTUNE_MENU Marlin/Configuration.h
           fi
 
           # Switch between the different UI options
@@ -782,6 +792,16 @@ jobs:
 
 
           ## BEGIN CONFIGURATION_ADV.H
+
+          # Configure input shaping (experimental!)
+          if ($INPUT_SHAPING); then
+            configEnable INPUT_SHAPING Marlin/Configuration_adv.h
+            configEnable SHAPING_MENU Marlin/Configuration_adv.h
+            ## TODO: Supply tuned values for the input shaping
+          else
+            configDisable INPUT_SHAPING Marlin/Configuration_adv.h
+            configDisable SHAPING_MENU Marlin/Configuration_adv.h
+          fi
 
           # Enable mainboard/controller fan control
           configEnable USE_CONTROLLER_FAN Marlin/Configuration_adv.h
@@ -1095,13 +1115,16 @@ jobs:
           # Disable stealthchopping for the Z axis
           #configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
 
+          # Enable probe offset wizard
+          configEnable PROBE_OFFSET_WIZARD Marlin/Configuration_adv.h
+
           # Disable Z axis idling when inactive, while still allowing for fans to be disabled
           configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
           configEnable CONTROLLER_FAN_IGNORE_Z Marlin/Configuration_adv.h
 
           # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # Enable assisted tramming
-          # configEnable ASSISTED_TRAMMING Marlin/Configuration_adv.h
+          configEnable ASSISTED_TRAMMING Marlin/Configuration_adv.h
 
           # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # FIXME: Calculate/calibrate this for our specific printer?!
@@ -1110,7 +1133,7 @@ jobs:
           
           # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # Enable the assisted tramming wizard (likely not usable without an LCD)
-          # configEnable ASSISTED_TRAMMING_WIZARD Marlin/Configuration_adv.h
+          configEnable ASSISTED_TRAMMING_WIZARD Marlin/Configuration_adv.h
 
           # TODO: This is a MarlinUI or TFT feature, so don't need it (yet at least)
           # Enable moving the nozzle out of the way for adjusting when assisted tramming is enabled
@@ -1227,7 +1250,7 @@ jobs:
               ## FIXME: Re-calibrate K again! The value below is currently NOT accurate anymore!
               # configValue ADVANCE_K 0.11 Marlin/Configuration_adv.h
               # configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
-              configValue ADVANCE_K 0.06 Marlin/Configuration_adv.h
+              configValue ADVANCE_K 0.6 Marlin/Configuration_adv.h
               ## NOTE: We set linear advance K value to zero, so that it's effectively disabled by default!
               #configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
 
@@ -1283,6 +1306,7 @@ jobs:
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
           HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
           MPC: ${{ matrix.mpc }}
+          INPUT_SHAPING: ${{ matrix.input-shaping }}
           UI: ${{ matrix.ui }}
 
       - name: Compile Marlin Firmware (${{ matrix.board }})
@@ -1300,7 +1324,8 @@ jobs:
           if ($JUNCTION_DEVIATION); then JUNCTION_DEVIATION_LABEL=-JUNCTION_DEVIATION; else JUNCTION_DEVIATION_LABEL=-CLASSIC_JERK; fi;
           if ($HYBRID_THRESHOLD); then HYBRID_THRESHOLD_LABEL=-HYBRID_THRESHOLD; else HYBRID_THRESHOLD_LABEL=; fi;
           if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=-PID; fi;
-          FIRMWARE_NAME="ENDER_E3_V2-${BOARD}${UI_LABEL}${BLTOUCH_LABEL}${UBL_LABEL}-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}-${VERSION}"
+          if ($INPUT_SHAPING); then INPUT_SHAPING_LABEL=-INPUT_SHAPING; else INPUT_SHAPING_LABEL=; fi;
+          FIRMWARE_NAME="ENDER_E3_V2-${BOARD}${UI_LABEL}${BLTOUCH_LABEL}${UBL_LABEL}-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}${INPUT_SHAPING_LABEL}-${VERSION}"
           echo "::set-output name=name::${FIRMWARE_NAME}"
           echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
 
@@ -1348,6 +1373,7 @@ jobs:
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
           HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
           MPC: ${{ matrix.mpc }}
+          INPUT_SHAPING: ${{ matrix.input-shaping }}
           UI: ${{ matrix.ui }}
 
       # ## FIXME: !!! Why do we need to compile the display firmware for EVERY single matrix build, when we could just build it ONCE? !!!
