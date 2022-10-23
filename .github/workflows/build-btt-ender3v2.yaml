@@ -563,11 +563,10 @@ jobs:
             # Customized and optimized speed and acceleration values for this particular printer/firmware setup
             # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
             configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
-            configValue DEFAULT_MAX_ACCELERATION "{ 10000, 10000, 100, 5000 }" Marlin/Configuration.h
-            configValue DEFAULT_ACCELERATION 1500 Marlin/Configuration.h
-            ## TODO: 2000 seems very aggressive, so trying 1000 for now
-            # configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
-            configValue DEFAULT_TRAVEL_ACCELERATION 1500 Marlin/Configuration.h
+            configValue DEFAULT_MAX_ACCELERATION "{ 1500, 1500, 100, 3000 }" Marlin/Configuration.h
+            configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
+            configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
+            configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
