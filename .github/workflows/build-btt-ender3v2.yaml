@@ -559,14 +559,15 @@ jobs:
             # TODO: Trying with default accelerations for now
             # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
             # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
-            
+
             # Customized and optimized speed and acceleration values for this particular printer/firmware setup
             # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
             configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
-            configValue DEFAULT_MAX_ACCELERATION "{ 1500, 1500, 100, 3000 }" Marlin/Configuration.h
-            configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
-            configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
-            configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
+            # configValue DEFAULT_MAX_ACCELERATION "{ 1500, 1500, 100, 3000 }" Marlin/Configuration.h
+            configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
+            configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
+            configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
+            configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
@@ -1249,9 +1250,9 @@ jobs:
               ## FIXME: Re-calibrate K again! The value below is currently NOT accurate anymore!
               # configValue ADVANCE_K 0.11 Marlin/Configuration_adv.h
               # configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
-              configValue ADVANCE_K 0.6 Marlin/Configuration_adv.h
+              # configValue ADVANCE_K 0.6 Marlin/Configuration_adv.h ## FIXME: Re-calibrate linear advance
               ## NOTE: We set linear advance K value to zero, so that it's effectively disabled by default!
-              #configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
+              configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
 
               ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
               ##        so we're giving it a go without it, see how that pans out!
