@@ -792,6 +792,9 @@ jobs:
             configEnable NEOPIXEL_STARTUP_TEST Marlin/Configuration.h
             configValue NEOPIXEL_BKGD_INDEX_FIRST 0 Marlin/Configuration.h
             configValue NEOPIXEL_BKGD_COLOR "{ 0, 255, 0, 0 }" Marlin/Configuration.h
+
+            # Disable custom cable warnings
+            echo -e "#define NO_CONTROLLER_CUSTOM_WIRING_WARNING" >> Marlin/Configuration.h
           fi
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
