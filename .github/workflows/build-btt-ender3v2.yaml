@@ -66,7 +66,8 @@ jobs:
         #grid: [3, 5, 10, 15]
         # grid: [4]
         # grid: [5]
-        grid: [5, 10]
+        grid: [7]
+        # grid: [5, 10]
         # high-speed: [true, false]
         #high-speed: [false]
         high-speed: [true]
@@ -79,12 +80,12 @@ jobs:
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
         # touch-screen: [false]
-        # linear-advance: [true, false]
+        linear-advance: [true, false]
         # linear-advance: [false]
-        linear-advance: [true]
-        # junction-deviation: [true, false]
+        # linear-advance: [true]
+        junction-deviation: [true, false]
         # junction-deviation: [false]
-        junction-deviation: [true]
+        # junction-deviation: [true]
         #hybrid-threshold: [true, false]
         hybrid-threshold: [false]
         # mpc: [true, false]
@@ -93,7 +94,7 @@ jobs:
         input-shaping: [true, false]
         # TODO: Enable this once we have time to test out the BTT's BIGTREE_TFT35_E3_V3_0 display
         # ui: ["MarlinUI", "BIGTREE_TFT35_E3_V3_0"]
-        ui: ["BIGTREE_TFT35_E3_V3_0"]
+        ui: ["BIGTREE_TFT35_E3_V3_0", "FYSETC_MINI_12864_2_1"]
         # ui: ["MarlinUI"]
     steps:
 
@@ -732,8 +733,11 @@ jobs:
             configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
             # Disable other UIs
+            configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
+            configDisable DWIN_LCD_PROUI Marlin/Configuration.h
+            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
             configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            # configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
 
             # Configure speaker
             configEnable SPEAKER Marlin/Configuration.h
@@ -768,6 +772,26 @@ jobs:
             ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
             ##        so we're giving it a go without it, see how that pans out!
             # configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
+          elif [ $UI == "FYSETC_MINI_12864_2_1" ]; then # FYSETC_MINI_12864_2_1
+            # Disable other UIs
+            configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
+            configDisable DWIN_LCD_PROUI Marlin/Configuration.h
+            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
+
+            # Enable the FYSETC_MINI_12864_2_1 LCD display
+            configEnable FYSETC_MINI_12864_2_1 Marlin/Configuration.h
+
+            # Enable and configure Neopixel LED support
+            configEnable NEOPIXEL_LED Marlin/Configuration.h
+            configValue NEOPIXEL_TYPE NEO_GRBW Marlin/Configuration.h
+            configDisable NEOPIXEL_PIN Marlin/Configuration.h
+            configDisable NEOPIXEL_PIXELS Marlin/Configuration.h
+            configDisable NEOPIXEL_BRIGHTNESS Marlin/Configuration.h
+            configEnable NEOPIXEL_STARTUP_TEST Marlin/Configuration.h
+            configValue NEOPIXEL_BKGD_INDEX_FIRST 0 Marlin/Configuration.h
+            configValue NEOPIXEL_BKGD_COLOR "{ 0, 255, 0, 0 }" Marlin/Configuration.h
           fi
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
@@ -1291,6 +1315,9 @@ jobs:
             ##        which is immediately apparent when the display is mounted on the printer.
             ## NOTE: The above IS true, for the most part anyway, eg. it drastically reduces the issue
             configDisable ULTIPANEL_FEEDMULTIPLY Marlin/Configuration_adv.h
+          elif [ $UI == "FYSETC_MINI_12864_2_1" ]; then # FYSETC_MINI_12864_2_1
+            # Enable LCD control menu
+            configEnable LED_CONTROL_MENU Marlin/Configuration_adv.h
           fi
 
           ## END OF CONFIGURATION_ADV.H
