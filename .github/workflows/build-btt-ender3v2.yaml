@@ -292,7 +292,8 @@ jobs:
           # configValue PROBING_MARGIN 10 Marlin/Configuration.h
           # configValue PROBING_MARGIN 0 Marlin/Configuration.h
           # TODO: Reverted back to default for now
-          configValue PROBING_MARGIN 10 Marlin/Configuration.h
+          # configValue PROBING_MARGIN 10 Marlin/Configuration.h
+          configValue PROBING_MARGIN 20 Marlin/Configuration.h
 
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
@@ -302,7 +303,8 @@ jobs:
           #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
           # TODO: Trying a _very_ low speed for improved probing
-          configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(150*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # TODO: Increased probing travel speeds to Marlin defaults (133x60)
@@ -321,7 +323,7 @@ jobs:
           # configDisable MULTIPLE_PROBING Marlin/Configuration.h
 
           # Enable extra probing
-          configValue EXTRA_PROBING 1 Marlin/Configuration.h
+          # configValue EXTRA_PROBING 1 Marlin/Configuration.h
 
           # Enable Z probe testing (for BLTouch/UBL)
           configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
@@ -343,11 +345,11 @@ jobs:
           # Bed size, probing and bed clip tweaks specific to this printer/build surface
           # configValue X_BED_SIZE 220 Marlin/Configuration.h
           # configValue Y_BED_SIZE 220 Marlin/Configuration.h
-          # configValue X_MIN_POS 0 Marlin/Configuration.h
-          # configValue Y_MIN_POS 5 Marlin/Configuration.h
+          configValue X_BED_SIZE 230 Marlin/Configuration.h
+          configValue Y_BED_SIZE 230 Marlin/Configuration.h
           # TODO: Test and tweak these!
-          # configValue X_MAX_POS "X_BED_SIZE + 20" Marlin/Configuration.h
-          # configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
           # configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
@@ -400,11 +402,11 @@ jobs:
 
           # TODO: Ensure that X_CENTER and Y_CENTER actually exist?
           # Tweak Z homing position
-          configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
-          configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
           # TODO: Using values from Jyers instead
-          # configValue Z_SAFE_HOMING_X_POINT "\(\(X_BED_SIZE - 10) \/ 2\)" Marlin/Configuration.h
-          # configValue Z_SAFE_HOMING_Y_POINT "\(\(Y_BED_SIZE - 10\) \/ 2\)" Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_X_POINT "\(\(X_BED_SIZE - 10) \/ 2\)" Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_Y_POINT "\(\(Y_BED_SIZE - 10\) \/ 2\)" Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (defaults are higher)
           # Reduce homing feed rates (homing speeds)
@@ -562,13 +564,16 @@ jobs:
             # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
 
             # Customized and optimized speed and acceleration values for this particular printer/firmware setup
-            # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
-            configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
-            # configValue DEFAULT_MAX_ACCELERATION "{ 1500, 1500, 100, 3000 }" Marlin/Configuration.h
-            configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
-            configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
-            configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
-            configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
+            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+            # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
+            configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 1000 }" Marlin/Configuration.h
+            # configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
+            configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
+            configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
+            configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
+            # configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
 
             # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
             # TODO: Increased Z homing from 4mm/s to 25mm/s
@@ -603,6 +608,7 @@ jobs:
 
             # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
+            configValue Z_PROBE_FEEDRATE_SLOW "\(Z_PROBE_FEEDRATE_FAST \/ 2\)" Marlin/Configuration.h
 
             # FIXME: !!! This needs to be HEAVILY tested, as with our new probe offsets, the margins have changed! !!!
             # configValue PROBING_MARGIN 15 Marlin/Configuration.h # Default is 20
@@ -614,7 +620,8 @@ jobs:
             ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
+            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, 0.00 }" Marlin/Configuration.h
 
             # Override mesh insets to be lower
             # configValue MESH_INSET 0 Marlin/Configuration.h
@@ -785,13 +792,22 @@ jobs:
 
             # Enable and configure Neopixel LED support
             configEnable NEOPIXEL_LED Marlin/Configuration.h
-            configValue NEOPIXEL_TYPE NEO_GRBW Marlin/Configuration.h
-            configDisable NEOPIXEL_PIN Marlin/Configuration.h
-            configDisable NEOPIXEL_PIXELS Marlin/Configuration.h
-            configDisable NEOPIXEL_BRIGHTNESS Marlin/Configuration.h
+            # configValue NEOPIXEL_TYPE NEO_GRBW Marlin/Configuration.h
+            configValue NEOPIXEL_TYPE NEO_RGB Marlin/Configuration.h
+            # configDisable NEOPIXEL_PIN Marlin/Configuration.h
+            # configDisable NEOPIXEL_PIXELS Marlin/Configuration.h
+            # configDisable NEOPIXEL_BRIGHTNESS Marlin/Configuration.h
             configEnable NEOPIXEL_STARTUP_TEST Marlin/Configuration.h
             configValue NEOPIXEL_BKGD_INDEX_FIRST 0 Marlin/Configuration.h
             configValue NEOPIXEL_BKGD_COLOR "{ 0, 255, 0, 0 }" Marlin/Configuration.h
+
+            # Configure serial
+            configValue SERIAL_PORT -1 Marlin/Configuration.h
+            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+
+            # Configure baudrates
+            configValue BAUDRATE 115200 Marlin/Configuration.h
+            configValue BAUDRATE_2 115200 Marlin/Configuration.h
 
             # Disable custom cable warnings
             echo -e "#define NO_CONTROLLER_CUSTOM_WIRING_WARNING" >> Marlin/Configuration.h
@@ -819,6 +835,12 @@ jobs:
 
 
           ## BEGIN CONFIGURATION_ADV.H
+
+          # Configure thermal protection
+          configValue WATCH_TEMP_PERIOD 30 Marlin/Configuration_adv.h
+          configValue WATCH_TEMP_INCREASE 3 Marlin/Configuration_adv.h
+          configValue THERMAL_PROTECTION_BED_PERIOD 120 Marlin/Configuration_adv.h
+          configValue WATCH_BED_TEMP_PERIOD 120 Marlin/Configuration_adv.h
 
           # Configure input shaping (experimental!)
           if ($INPUT_SHAPING); then
@@ -953,10 +975,10 @@ jobs:
           #configDisable NO_SD_HOST_DRIVE Marlin/Configuration_adv.h
                   
           # Configure babystepping
-          configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
-          configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
-          #configEnable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
-          configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
+          # configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
+          # configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
+          configDisable DOUBLECLICK_FOR_Z_BABYSTEPPING Marlin/Configuration_adv.h
+          # configEnable BABYSTEP_DISPLAY_TOTAL Marlin/Configuration_adv.h
 
           # Enable emergency parser
           configEnable EMERGENCY_PARSER Marlin/Configuration_adv.h
@@ -967,7 +989,8 @@ jobs:
           # TODO: Disabling for now to use the defaults instead
           # TODO: This may need adjusting
           # Configure filament unload length (default is 100)
-          #configValue FILAMENT_CHANGE_UNLOAD_LENGTH 400 Marlin/Configuration_adv.h
+          configValue FILAMENT_CHANGE_UNLOAD_LENGTH 0 Marlin/Configuration_adv.h
+          configValue FILAMENT_CHANGE_FAST_LOAD_FEEDRATE 10 Marlin/Configuration_adv.h
 
           # TODO: Disabling for now to use the defaults instead
           # TODO: This may need adjusting
@@ -988,9 +1011,12 @@ jobs:
           # Enable display and g-code support for filament loading and unloading (disabled by default, enabled in Jyers)
           configEnable FILAMENT_LOAD_UNLOAD_GCODES Marlin/Configuration_adv.h
 
-          # TODO: Leaving this alone for now
+          ## FIXME: Enabling hybrid threshold, this WILL need to be tuned -> M913 X/Y/Z/E to live tune the setting
+          configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
+
+          ## FIXME: This is 3 by default, which means it probably gets triggered too easily, right?
           # Configure hybrid threshold (still disabled by default)
-          configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h
+          # configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now
           # Configure sensorless homing (still disably by default)
@@ -1086,7 +1112,7 @@ jobs:
 
           # TODO: I think this only affects LCDs, not DWIN displays, so might be redundant?
           # Lower the bootscreen timeout
-          configValue BOOTSCREEN_TIMEOUT 0 Marlin/Configuration_adv.h
+          # configValue BOOTSCREEN_TIMEOUT 0 Marlin/Configuration_adv.h
 
           # TODO: Leaving these alone for now (all defaults seem fine/same, these would just be unnecessarily high)
           # Increase buffers etc.
@@ -1120,8 +1146,9 @@ jobs:
           # Enable integrated babystepping (experimental)
           # configEnable INTEGRATED_BABYSTEPPING Marlin/Configuration_adv.h
 
+          ## FIXME: Do we gain anything from having this enabled?
           # Combine babystepping with the initial Z probe height
-          configEnable BABYSTEP_ZPROBE_OFFSET Marlin/Configuration_adv.h
+          # configEnable BABYSTEP_ZPROBE_OFFSET Marlin/Configuration_adv.h
 
           # TODO: Leaving this alone for now, especially with INTEGRATED_BABYSTEPPING now disabled
           # Override default minimum steppper direction change delays (changes both post and pre dir delays)
@@ -1189,6 +1216,9 @@ jobs:
           ## TODO: Check if Cura support bezier curves and have this enabled, as this should benefit ARC massively!
           configEnable BEZIER_CURVE_SUPPORT Marlin/Configuration_adv.h
 
+          # Enable additional ARC support
+          configEnable ARC_P_CIRCLES Marlin/Configuration_adv.h
+
           ## FIXME: "POWER_MONITOR_CURRENT requires a valid POWER_MONITOR_CURRENT_PIN."
           ## TODO: Test if we can utilize these or not
           # configEnable POWER_MONITOR_CURRENT Marlin/Configuration_adv.h
@@ -1212,8 +1242,8 @@ jobs:
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
             # Set both to the full height of the nozzle (8.2mm)
-            configValue FILAMENT_CHANGE_UNLOAD_LENGTH 8 Marlin/Configuration_adv.h
-            configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 8 Marlin/Configuration_adv.h
+            # configValue FILAMENT_CHANGE_UNLOAD_LENGTH 8 Marlin/Configuration_adv.h
+            # configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 8 Marlin/Configuration_adv.h
 
             # FIXME: This will likely need more tweaking, as it's specific to the Bondtech extruder motor + 3:1 gear ratio!
             # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
