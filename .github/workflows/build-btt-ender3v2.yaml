@@ -461,9 +461,9 @@ jobs:
           configValue TOUCH_IDLE_SLEEP_MINS 5 Marlin/Configuration.h
 
           # Configure PID for the bed
-          configValue DEFAULT_bedKp 89.2660 Marlin/Configuration.h
-          configValue DEFAULT_bedKi 16.1714 Marlin/Configuration.h
-          configValue DEFAULT_bedKd 328.4990 Marlin/Configuration.h
+          configValue DEFAULT_bedKp 68.4903 Marlin/Configuration.h
+          configValue DEFAULT_bedKi 13.1712 Marlin/Configuration.h
+          configValue DEFAULT_bedKd 237.4331 Marlin/Configuration.h
 
           # Configure PID for the hotend
           # configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
@@ -716,10 +716,10 @@ jobs:
             configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
 
             # Customize MPC
-            configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.7500f }" Marlin/Configuration.h
-            configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2213f }" Marlin/Configuration.h
-            configValue MPC_AMBIENT_XFER_COEFF "{ 0.1350f }" Marlin/Configuration.h
-            configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1473f }" Marlin/Configuration.h
+            configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.8300f }" Marlin/Configuration.h
+            configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2342f }" Marlin/Configuration.h
+            configValue MPC_AMBIENT_XFER_COEFF "{ 0.1307f }" Marlin/Configuration.h
+            configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1429f }" Marlin/Configuration.h
             configValue FILAMENT_HEAT_CAPACITY_PERMM "{ 0.0056f}" Marlin/Configuration.h
           else
             # Enable PID and disable MPC
@@ -771,9 +771,9 @@ jobs:
             configValue SERIAL_PORT -1 Marlin/Configuration.h
             configValue SERIAL_PORT_2 2 Marlin/Configuration.h
             ## TODO: Lowered baudrates back to 115200
-            # configValue BAUDRATE 250000 Marlin/Configuration.h
+            configValue BAUDRATE 250000 Marlin/Configuration.h
             # configValue BAUDRATE_2 250000 Marlin/Configuration.h
-            configValue BAUDRATE 115200 Marlin/Configuration.h
+            # configValue BAUDRATE 115200 Marlin/Configuration.h
             configValue BAUDRATE_2 115200 Marlin/Configuration.h
 
             ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
@@ -806,7 +806,7 @@ jobs:
             configValue SERIAL_PORT_2 2 Marlin/Configuration.h
 
             # Configure baudrates
-            configValue BAUDRATE 115200 Marlin/Configuration.h
+            configValue BAUDRATE 250000 Marlin/Configuration.h
             configValue BAUDRATE_2 115200 Marlin/Configuration.h
 
             # Disable custom cable warnings
@@ -1012,7 +1012,11 @@ jobs:
           configEnable FILAMENT_LOAD_UNLOAD_GCODES Marlin/Configuration_adv.h
 
           ## FIXME: Enabling hybrid threshold, this WILL need to be tuned -> M913 X/Y/Z/E to live tune the setting
+          ## FIXME: !!! Testing temporarily this "0.9 degree stepper" option, which might improve the resonancy/vibration issues! !!!
+          configValue CHOPPER_TIMING CHOPPER_09STEP_24V Marlin/Configuration_adv.h
           configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
+          configValue X_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
+          configValue Y_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
 
           ## FIXME: This is 3 by default, which means it probably gets triggered too easily, right?
           # Configure hybrid threshold (still disabled by default)
@@ -1050,7 +1054,9 @@ jobs:
           # Enable showing remaining time (disabled by default, enabled in Jyers)
           configEnable SET_PROGRESS_MANUALLY Marlin/Configuration_adv.h
           configEnable SHOW_REMAINING_TIME Marlin/Configuration_adv.h
+          configEnable SET_PROGRESS_PERCENT Marlin/Configuration_adv.h
           configEnable SET_REMAINING_TIME Marlin/Configuration_adv.h
+          configEnable M73_REPORT Marlin/Configuration_adv.h
 
           # TODO: Not sure if this only applies to MarlinUI or something?
           #       Either way, keeping it disabled for now
@@ -1120,11 +1126,11 @@ jobs:
           # TODO: UPDATE: All of the values below seem unnecessary?
           #               May even want to bring our baud rates back to 115200?
           ## TODO: Reverted buffer sizes back to defaults
-          # configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h # Default 8/16
+          configValue BLOCK_BUFFER_SIZE 64 Marlin/Configuration_adv.h # Default 8/16
           # # configValue MAX_CMD_SIZE 96 Marlin/Configuration_adv.h # Default 96
-          # configValue BUFSIZE 32 Marlin/Configuration_adv.h # Default 4
-          # configValue TX_BUFFER_SIZE 256 Marlin/Configuration_adv.h # Default 0
-          # configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h # Default <disabled>
+          configValue BUFSIZE 32 Marlin/Configuration_adv.h # Default 4
+          configValue TX_BUFFER_SIZE 32 Marlin/Configuration_adv.h # Default 0
+          configValue RX_BUFFER_SIZE 2048 Marlin/Configuration_adv.h # Default <disabled>
 
           # TODO: Leaving these alone for now
           # # Set temperature watcher intervals (defaults are 40/180/180, Jyers uses 30/120/120)
@@ -1338,10 +1344,11 @@ jobs:
             configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
             configEnable M115_GEOMETRY_REPORT Marlin/Configuration_adv.h
             configEnable M114_DETAIL Marlin/Configuration_adv.h
-            # configEnable M114_REALTIME Marlin/Configuration_adv.h
+            configEnable M114_REALTIME Marlin/Configuration_adv.h
             configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
             configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
             configValue SERIAL_FLOAT_PRECISION 4 Marlin/Configuration_adv.h
+            configEnable M20_TIMESTAMP_SUPPORT Marlin/Configuration_adv.h
 
             ## FIXME: According to a review on Amazon, ULTIPANEL_FEEDMULTIPLY needs to be disabled,
             ##        otherwise the display's encoder gets triggered by even the slightest vibrations of the printer,
