@@ -304,7 +304,8 @@ jobs:
           # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
           # TODO: Trying a _very_ low speed for improved probing
           # configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
-          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+          configValue XY_PROBE_FEEDRATE "(200*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(150*60)" Marlin/Configuration.h
           # configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
           # TODO: Increased probing travel speeds to Marlin defaults (133x60)
@@ -315,18 +316,28 @@ jobs:
 
           # TODO: Leaving these alone for now
           # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
-          #configValue Z_PROBE_OFFSET_RANGE_MIN -20 Marlin/Configuration.h
-          #configValue Z_PROBE_OFFSET_RANGE_MAX 20 Marlin/Configuration.h
+          configValue Z_PROBE_OFFSET_RANGE_MIN -5 Marlin/Configuration.h
+          configValue Z_PROBE_OFFSET_RANGE_MAX 10 Marlin/Configuration.h
 
+          # TODO: Disabling multi-probing for now, as it just takes too long..
           # Enable multiple probings (for BLTouch/UBL)
           configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
           # configDisable MULTIPLE_PROBING Marlin/Configuration.h
 
           # Enable extra probing
-          # configValue EXTRA_PROBING 1 Marlin/Configuration.h
+          configValue EXTRA_PROBING 1 Marlin/Configuration.h
 
           # Enable Z probe testing (for BLTouch/UBL)
           configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
+
+          # Decrease electrical noise etc. by turning heaters off before probing,
+          # and wait for bed/hotend to heat back up between probes to increase probing accuracy
+          configEnable PROBING_HEATERS_OFF Marlin/Configuration.h
+          configEnable WAIT_FOR_BED_HEATER Marlin/Configuration.h
+          configEnable WAIT_FOR_HOTEND Marlin/Configuration.h
+
+          # Enable/increase Z clearance
+          configValue Z_HOMING_HEIGHT 10 Marlin/Configuration.h
 
           ## FIXME: This might not be a good idea?!
           # Require heated bed and nozzle when probing
@@ -337,19 +348,22 @@ jobs:
           configValue LEVELING_NOZZLE_TEMP 120 Marlin/Configuration.h
           configValue LEVELING_BED_TEMP 50 Marlin/Configuration.h
 
+          # Enable experimental nozzle cleaning feature (G12)
+          configEnable NOZZLE_CLEAN_FEATURE Marlin/Configuration.h
+
           # TODO: Do we want these enabled or not? Because sometimes they just get in the way..
           # Require homing after steppers have deactivated/unlocked (and before trying to move)
           # configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
           # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
 
           # Bed size, probing and bed clip tweaks specific to this printer/build surface
-          # configValue X_BED_SIZE 220 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 220 Marlin/Configuration.h
-          configValue X_BED_SIZE 230 Marlin/Configuration.h
-          configValue Y_BED_SIZE 230 Marlin/Configuration.h
+          configValue X_BED_SIZE 220 Marlin/Configuration.h
+          configValue Y_BED_SIZE 220 Marlin/Configuration.h
+          # configValue X_BED_SIZE 230 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 230 Marlin/Configuration.h
           # TODO: Test and tweak these!
           configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
-          configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+          # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
           # configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
 
           # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
@@ -369,7 +383,7 @@ jobs:
           # Lower maximum Z position for better mechanical gantry calibration
           # NOTE: We can't go higher than 250 without breaking something!
           ## TODO: 235 is pretty much close to comfort already, with the timing belt setup anyway..
-          # configValue Z_MAX_POS 235 Marlin/Configuration.h # Default is 250
+          configValue Z_MAX_POS 235 Marlin/Configuration.h # Default is 250
 
           # Enable filament runout sensor
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
@@ -402,11 +416,11 @@ jobs:
 
           # TODO: Ensure that X_CENTER and Y_CENTER actually exist?
           # Tweak Z homing position
-          # configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
-          # configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
           # TODO: Using values from Jyers instead
-          configValue Z_SAFE_HOMING_X_POINT "\(\(X_BED_SIZE - 10) \/ 2\)" Marlin/Configuration.h
-          configValue Z_SAFE_HOMING_Y_POINT "\(\(Y_BED_SIZE - 10\) \/ 2\)" Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_X_POINT "\(\(X_BED_SIZE - 10) \/ 2\)" Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_Y_POINT "\(\(Y_BED_SIZE - 10\) \/ 2\)" Marlin/Configuration.h
 
           # TODO: Leaving this alone for now (defaults are higher)
           # Reduce homing feed rates (homing speeds)
@@ -430,9 +444,8 @@ jobs:
           # Enable software PWM fan control
           configEnable FAN_SOFT_PWM Marlin/Configuration.h
 
-          # TODO: Leaving this alone for now
           # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
-          #configEnable THERMAL_PROTECTION_CHAMBER Marlin/Configuration.h
+          configEnable THERMAL_PROTECTION_CHAMBER Marlin/Configuration.h
 
           ## FIXME: Our print head is crashing into our bed when probing, was this being enabled the cause?!
           ## TODO: This is enabled in Marlin's example firmware, so we could try using this again?
@@ -492,9 +505,9 @@ jobs:
             configDisable MESH_BED_LEVELING Marlin/Configuration.h
 
             # Increase default mesh inset for UBL
-            configValue MESH_INSET 10 Marlin/Configuration.h
+            # configValue MESH_INSET 10 Marlin/Configuration.h
             # TODO: Lowered mesh inset back to default 1
-            # configValue MESH_INSET 1 Marlin/Configuration.h
+            configValue MESH_INSET 1 Marlin/Configuration.h
 
             # Enable Hilbert Curve for UBL (reduces travel)
             configEnable UBL_HILBERT_CURVE Marlin/Configuration.h
@@ -505,6 +518,8 @@ jobs:
             ## FIXME: Can this cause our print head crashing into the bed when probing?!
             ## TODO: Not sure if we can use this or not? And what it actually does?
             configEnable UBL_MESH_WIZARD Marlin/Configuration.h
+            
+            configEnable MESH_EDIT_MENU Marlin/Configuration.h
           else
             # Enable Automatic Bed Leveling (ABL)
             configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
@@ -515,6 +530,8 @@ jobs:
             configDisable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
             configDisable MESH_BED_LEVELING Marlin/Configuration.h
           fi
+
+          configEnable BED_TRAMMING_USE_PROBE Marlin/Configuration.h
 
           # Configure direct drive specific options
           if ($DIRECT_DRIVE); then
@@ -564,13 +581,15 @@ jobs:
             # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
 
             # Customized and optimized speed and acceleration values for this particular printer/firmware setup
+            # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
             configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 20, 50}" Marlin/Configuration.h
             # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
             configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 5000 }" Marlin/Configuration.h
             # configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
             configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
             # configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
-            configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
+            configValue DEFAULT_RETRACT_ACCELERATION 800 Marlin/Configuration.h
             # configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
             configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
             # configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
@@ -605,6 +624,8 @@ jobs:
             # configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
             # TODO: Lowered Z homing from 8*60 to 4*60 (DEFAULT!), as otherwise the probe hits the bed quite hard
             configValue Z_PROBE_FEEDRATE_FAST "\(4\*60\)" Marlin/Configuration.h
+            # FIXME: WARNING! This may hit our bed REALLY fast!
+            # configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
 
             # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
             #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
@@ -621,7 +642,7 @@ jobs:
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
             # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, 0.00 }" Marlin/Configuration.h
+            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.20 }" Marlin/Configuration.h
 
             # Override mesh insets to be lower
             # configValue MESH_INSET 0 Marlin/Configuration.h
@@ -725,10 +746,11 @@ jobs:
             # Enable PID and disable MPC
             configEnable PIDTEMP Marlin/Configuration.h
             configDisable MPCTEMP Marlin/Configuration.h
-
-            configEnable PID_EDIT_MENU Marlin/Configuration.h
-            configEnable PID_AUTOTUNE_MENU Marlin/Configuration.h
           fi
+
+          # Enable PID menus even when using MPC
+          configEnable PID_EDIT_MENU Marlin/Configuration.h
+          configEnable PID_AUTOTUNE_MENU Marlin/Configuration.h
 
           # Switch between the different UI options
           if [ $UI == "MarlinUI" ]; then # MarlinUI
@@ -892,7 +914,8 @@ jobs:
           # Decreate probing delay for BLTouch
           # WARNING: Requires a BLTouch 3.0 or later
           # configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
-          configValue BLTOUCH_DELAY 300 Marlin/Configuration_adv.h
+          # configValue BLTOUCH_DELAY 300 Marlin/Configuration_adv.h
+          configValue BLTOUCH_DELAY 350 Marlin/Configuration_adv.h
 
           ## FIXME: Can this cause our print head crashing into the bed when probing when NOT set?!
           # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
@@ -1013,10 +1036,12 @@ jobs:
 
           ## FIXME: Enabling hybrid threshold, this WILL need to be tuned -> M913 X/Y/Z/E to live tune the setting
           ## FIXME: !!! Testing temporarily this "0.9 degree stepper" option, which might improve the resonancy/vibration issues! !!!
+          ## FIXME: UPDATE -> This does seem to be less noisier and aggressive sounding, but there's still a bit of noise, so not sure if it's okay as is?
           configValue CHOPPER_TIMING CHOPPER_09STEP_24V Marlin/Configuration_adv.h
           configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
-          configValue X_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
-          configValue Y_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
+          ## TODO: 100 seems very noisy, but 110 is still noisy?!
+          # configValue X_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
+          # configValue Y_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
 
           ## FIXME: This is 3 by default, which means it probably gets triggered too easily, right?
           # Configure hybrid threshold (still disabled by default)
@@ -1177,6 +1202,10 @@ jobs:
 
           # Enable probe offset wizard
           configEnable PROBE_OFFSET_WIZARD Marlin/Configuration_adv.h
+          configValue PROBE_OFFSET_WIZARD_START_Z "0.0" Marlin/Configuration_adv.h
+
+          configEnable LCD_INFO_MENU Marlin/Configuration_adv.h
+          configValue BOOTSCREEN_TIMEOUT 2000 Marlin/Configuration_adv.h
 
           # Disable Z axis idling when inactive, while still allowing for fans to be disabled
           configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
@@ -1211,6 +1240,10 @@ jobs:
           # Disable meatpack when using binary file transfer and/or custom firmware upload
           configDisable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
           configDisable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
+
+          configEnable USE_BIG_EDIT_FONT Marlin/Configuration_adv.h
+          configEnable USE_SMALL_INFOFONT Marlin/Configuration_adv.h
+          configValue DISPLAY_SLEEP_MINUTES 2 Marlin/Configuration_adv.h
 
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
@@ -1312,10 +1345,10 @@ jobs:
               
               ## FIXME: Re-calibrate K again! The value below is currently NOT accurate anymore!
               # configValue ADVANCE_K 0.11 Marlin/Configuration_adv.h
-              # configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
+              configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
               # configValue ADVANCE_K 0.6 Marlin/Configuration_adv.h ## FIXME: Re-calibrate linear advance
               ## NOTE: We set linear advance K value to zero, so that it's effectively disabled by default!
-              configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
+              # configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
 
               ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
               ##        so we're giving it a go without it, see how that pans out!

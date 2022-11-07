@@ -250,6 +250,17 @@ setupConfigs() {
 
   cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration.h" Marlin/Configuration.h
   cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
+
+  # Apply custom boot screen stuff
+  cp -f ".github/resources/_Bootscreen.h" "Marlin/_Bootscreen.h"
+  configEnable SHOW_CUSTOM_BOOTSCREEN Marlin/Configuration.h
+  configEnable BOOT_MARLIN_LOGO_ANIMATED Marlin/Configuration_adv.h
+
+  # Enable games
+  configEnable MARLIN_BRICKOUT Marlin/Configuration_adv.h
+  configEnable MARLIN_INVADERS Marlin/Configuration_adv.h
+  configEnable MARLIN_SNAKE Marlin/Configuration_adv.h
+  configEnable GAMES_EASTER_EGG Marlin/Configuration_adv.h
 }
 
 # Function for patching the build details
