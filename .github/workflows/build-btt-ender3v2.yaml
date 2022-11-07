@@ -186,6 +186,12 @@ jobs:
           wget \
             https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/scripts/configure_build_script.sh \
             -O .github/workflows/scripts/configure_build_script.sh
+          
+          # Download custom resources
+          mkdir -p .github/workflows/resources
+          wget \
+            https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/resources/_Bootscreen.h \
+            -O .github/workflows/resources/_Bootscreen.h
 
       - name: Cache pip
         if: success()
