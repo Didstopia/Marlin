@@ -336,11 +336,12 @@ jobs:
           # Enable Z probe testing (for BLTouch/UBL)
           configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
 
+          ## FIXME: Something with this is causing massive delays between individual probes..
           # Decrease electrical noise etc. by turning heaters off before probing,
           # and wait for bed/hotend to heat back up between probes to increase probing accuracy
           configEnable PROBING_HEATERS_OFF Marlin/Configuration.h
-          configEnable WAIT_FOR_BED_HEATER Marlin/Configuration.h
-          configEnable WAIT_FOR_HOTEND Marlin/Configuration.h
+          # configEnable WAIT_FOR_BED_HEATER Marlin/Configuration.h
+          # configEnable WAIT_FOR_HOTEND Marlin/Configuration.h
 
           # Enable/increase Z clearance
           configValue Z_HOMING_HEIGHT 10 Marlin/Configuration.h
