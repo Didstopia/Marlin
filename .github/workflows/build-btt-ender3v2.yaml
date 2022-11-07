@@ -65,8 +65,8 @@ jobs:
         bltouch: [true]
         #grid: [3, 5, 10, 15]
         # grid: [4]
-        # grid: [5]
-        grid: [7]
+        grid: [5]
+        # grid: [7]
         # grid: [5, 10]
         # high-speed: [true, false]
         #high-speed: [false]
@@ -80,18 +80,20 @@ jobs:
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
         # touch-screen: [false]
-        linear-advance: [true, false]
+        # linear-advance: [true, false]
         # linear-advance: [false]
-        # linear-advance: [true]
-        junction-deviation: [true, false]
+        linear-advance: [true]
+        # junction-deviation: [true, false]
         # junction-deviation: [false]
-        # junction-deviation: [true]
+        junction-deviation: [true]
         #hybrid-threshold: [true, false]
         hybrid-threshold: [false]
         # mpc: [true, false]
         # mpc: [false]
         mpc: [true]
-        input-shaping: [true, false]
+        # input-shaping: [true, false]
+        input-shaping: [false]
+        # input-shaping: [true]
         # TODO: Enable this once we have time to test out the BTT's BIGTREE_TFT35_E3_V3_0 display
         # ui: ["MarlinUI", "BIGTREE_TFT35_E3_V3_0"]
         ui: ["BIGTREE_TFT35_E3_V3_0", "FYSETC_MINI_12864_2_1"]
@@ -298,8 +300,9 @@ jobs:
           # configValue PROBING_MARGIN 10 Marlin/Configuration.h
           # configValue PROBING_MARGIN 0 Marlin/Configuration.h
           # TODO: Reverted back to default for now
-          # configValue PROBING_MARGIN 10 Marlin/Configuration.h
-          configValue PROBING_MARGIN 20 Marlin/Configuration.h
+          configValue PROBING_MARGIN 10 Marlin/Configuration.h
+          # configValue PROBING_MARGIN 15 Marlin/Configuration.h
+          # configValue PROBING_MARGIN 20 Marlin/Configuration.h
 
           ## FIXME: Something is causing our print head to crash to our bed when homing!
           ##        Probing is failing, which probably happens due to too fast of a probing speed?!
@@ -327,11 +330,11 @@ jobs:
 
           # TODO: Disabling multi-probing for now, as it just takes too long..
           # Enable multiple probings (for BLTouch/UBL)
-          configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
-          # configDisable MULTIPLE_PROBING Marlin/Configuration.h
+          # configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
+          # # configDisable MULTIPLE_PROBING Marlin/Configuration.h
 
           # Enable extra probing
-          configValue EXTRA_PROBING 1 Marlin/Configuration.h
+          # configValue EXTRA_PROBING 1 Marlin/Configuration.h
 
           # Enable Z probe testing (for BLTouch/UBL)
           configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
@@ -339,9 +342,9 @@ jobs:
           ## FIXME: Something with this is causing massive delays between individual probes..
           # Decrease electrical noise etc. by turning heaters off before probing,
           # and wait for bed/hotend to heat back up between probes to increase probing accuracy
-          configEnable PROBING_HEATERS_OFF Marlin/Configuration.h
-          # configEnable WAIT_FOR_BED_HEATER Marlin/Configuration.h
-          # configEnable WAIT_FOR_HOTEND Marlin/Configuration.h
+          # configEnable PROBING_HEATERS_OFF Marlin/Configuration.h
+          # # configEnable WAIT_FOR_BED_HEATER Marlin/Configuration.h
+          # # configEnable WAIT_FOR_HOTEND Marlin/Configuration.h
 
           # Enable/increase Z clearance
           configValue Z_HOMING_HEIGHT 10 Marlin/Configuration.h
@@ -352,7 +355,7 @@ jobs:
 
           # Require heated bed and nozzle when auto-leveling
           configEnable PREHEAT_BEFORE_LEVELING Marlin/Configuration.h
-          configValue LEVELING_NOZZLE_TEMP 120 Marlin/Configuration.h
+          configValue LEVELING_NOZZLE_TEMP 150 Marlin/Configuration.h
           configValue LEVELING_BED_TEMP 50 Marlin/Configuration.h
 
           # Enable experimental nozzle cleaning feature (G12)
@@ -369,6 +372,7 @@ jobs:
           # configValue X_BED_SIZE 230 Marlin/Configuration.h
           # configValue Y_BED_SIZE 230 Marlin/Configuration.h
           # TODO: Test and tweak these!
+          # configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
           configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
           # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
           # configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
@@ -478,7 +482,7 @@ jobs:
 
           # Turn off display after 5 minutes
           # configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
-          configValue TOUCH_IDLE_SLEEP_MINS 5 Marlin/Configuration.h
+          configValue TOUCH_IDLE_SLEEP_MINS 1 Marlin/Configuration.h
 
           # Configure PID for the bed
           configValue DEFAULT_bedKp 68.4903 Marlin/Configuration.h
@@ -593,7 +597,9 @@ jobs:
             # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
             configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 5000 }" Marlin/Configuration.h
             # configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
-            configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
+            # configValue DEFAULT_ACCELERATION 600 Marlin/Configuration.h
+            configValue DEFAULT_ACCELERATION 750 Marlin/Configuration.h
             # configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
             # configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
             configValue DEFAULT_RETRACT_ACCELERATION 800 Marlin/Configuration.h
