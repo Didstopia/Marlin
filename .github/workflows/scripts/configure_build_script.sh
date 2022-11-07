@@ -252,7 +252,7 @@ setupConfigs() {
   cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
 
   # Apply custom boot screen stuff
-  cp -f ".github/resources/_Bootscreen.h" "Marlin/_Bootscreen.h"
+  cp -f ".github/workflows/resources/_Bootscreen.h" "Marlin/_Bootscreen.h"
   configEnable SHOW_CUSTOM_BOOTSCREEN Marlin/Configuration.h
   configEnable BOOT_MARLIN_LOGO_ANIMATED Marlin/Configuration_adv.h
 
