@@ -254,7 +254,8 @@ setupConfigs() {
   # Apply custom boot screen stuff
   cp -f ".github/workflows/resources/_Bootscreen.h" Marlin/_Bootscreen.h
   configEnable SHOW_CUSTOM_BOOTSCREEN Marlin/Configuration.h
-  configEnable BOOT_MARLIN_LOGO_ANIMATED Marlin/Configuration_adv.h
+  ## FIXME: This requires more work and research, as it requires "frames" of bitmaps setup in a specific way
+  # configEnable BOOT_MARLIN_LOGO_ANIMATED Marlin/Configuration_adv.h
 
   # Enable games
   configEnable MARLIN_BRICKOUT Marlin/Configuration_adv.h

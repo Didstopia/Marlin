@@ -1249,7 +1249,8 @@ jobs:
 
           configEnable USE_BIG_EDIT_FONT Marlin/Configuration_adv.h
           configEnable USE_SMALL_INFOFONT Marlin/Configuration_adv.h
-          configValue DISPLAY_SLEEP_MINUTES 2 Marlin/Configuration_adv.h
+          ## NOTE: Not supported on our display at the moment (not sure about the FYSETC one though?)
+          # configValue DISPLAY_SLEEP_MINUTES 2 Marlin/Configuration_adv.h
 
           # FIXME: Set this to 30 for M3 screws, 40 for M4 screws, 50 for M5 screws, etc.
           # Set the bed screw thread size (M3, M4, M5 etc.)
