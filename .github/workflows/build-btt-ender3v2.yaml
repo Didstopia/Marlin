@@ -42,8 +42,8 @@ jobs:
     timeout-minutes: 15
     strategy:
       # Fail early when possible (only applies to matrix jobs)
-      # fail-fast: true
-      fail-fast: false # NOTE: We do NOT want to fail early, because one configuration might fail where others might not, right?
+      fail-fast: true
+      # fail-fast: false # NOTE: We do NOT want to fail early, because one configuration might fail where others might not, right?
       # FIXME: Somehow only set this when running locally?
       #        The issue when running locally seems to be multiple
       #        containers trying to access/install the tool cache,
@@ -346,8 +346,8 @@ jobs:
           configValue THERMAL_PROTECTION_BED_PERIOD 120 Marlin/Configuration_adv.h
           configValue WATCH_BED_TEMP_PERIOD 120 Marlin/Configuration_adv.h
 
-           # Enable S-Curve Acceleration (default is disabled)
-          configEnable S_CURVE_ACCELERATION Marlin/Configuration.h
+          # Enable S-Curve Acceleration (default is disabled)
+          # configEnable S_CURVE_ACCELERATION Marlin/Configuration.h
 
           # Enable filament runout sensor support
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
@@ -398,6 +398,7 @@ jobs:
           configEnable PID_EDIT_MENU Marlin/Configuration.h
           configEnable PID_AUTOTUNE_MENU Marlin/Configuration.h
 
+          ## FIXME: There's an active issue on Marlin's repository regarding this, so we MAY get this working eventually!
           # Disable adaptive step smoothing
           configDisable ADAPTIVE_STEP_SMOOTHING Marlin/Configuration_adv.h
 
@@ -649,12 +650,16 @@ jobs:
           # Disable stealthchopping for the Z axis
           #configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
 
+          ## TODO: This is a test! Revert if it doesn't work out for us!
+          # Set LCD info screen style between Marlin (0) and Prusa (1)
+          configValue LCD_INFO_SCREEN_STYLE 1 Marlin/Configuration_adv.h
+
           # Enable probe offset wizard
           configEnable PROBE_OFFSET_WIZARD Marlin/Configuration_adv.h
           configValue PROBE_OFFSET_WIZARD_START_Z "0.0" Marlin/Configuration_adv.h
 
+          # Enable the LCD info menu
           configEnable LCD_INFO_MENU Marlin/Configuration_adv.h
-          configValue BOOTSCREEN_TIMEOUT 2000 Marlin/Configuration_adv.h
 
           # Disable Z axis idling when inactive, while still allowing for fans to be disabled
           configValue DISABLE_INACTIVE_Z false Marlin/Configuration_adv.h
@@ -1132,7 +1137,7 @@ jobs:
           # else
           #   configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
           # fi
-          configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+          # configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
 
           configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
 

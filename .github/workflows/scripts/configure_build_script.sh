@@ -238,7 +238,7 @@ configValue() {
   # Check if the option is already enabled
   if grep -Eiq "[\/]+#define ${key}( +)" ${config}; then
     # Forcibly enable the option
-    notice "Option ${COLOR_GREEN}${key}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET} is disabled, forcibly enabling"
+    debug "Option ${COLOR_GREEN}${key}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET} is disabled, forcibly enabling"
     configEnable ${key} ${config}
   fi
 }
@@ -265,6 +265,12 @@ setupConfigs() {
   configEnable SHOW_CUSTOM_BOOTSCREEN Marlin/Configuration.h
   ## FIXME: This requires more work and research, as it requires "frames" of bitmaps setup in a specific way
   # configEnable BOOT_MARLIN_LOGO_ANIMATED Marlin/Configuration_adv.h
+
+  # Disable Marlin boot screen when using a custom boot screen
+  configDisable SHOW_BOOTSCREEN Marlin/Configuration.h
+
+  # Adjust the boot screen timeout
+  configValue BOOTSCREEN_TIMEOUT 2000 Marlin/Configuration_adv.h
 
   # Enable games
   configEnable MARLIN_BRICKOUT Marlin/Configuration_adv.h
