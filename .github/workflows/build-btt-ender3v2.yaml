@@ -36,8 +36,8 @@ jobs:
     # name: Build Marlin Firmware
     name: Build
     ## TODO: Test running on self-hosted runners instead
-    runs-on: ubuntu-latest
-    # runs-on: self-hosted
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     # runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 15
     strategy:
@@ -61,15 +61,15 @@ jobs:
         grid: [5]
         ubl: [true]
         direct-drive: [true]
-        linear-advance: [true]
+        # linear-advance: [true]
         # linear-advance: [false]
-        # linear-advance: [true, false]
-        junction-deviation: [true]
+        linear-advance: [true, false]
+        # junction-deviation: [true]
         # junction-deviation: [false]
-        # junction-deviation: [true, false]
-        hybrid-threshold: [true]
+        junction-deviation: [true, false]
+        # hybrid-threshold: [true]
         # hybrid-threshold: [false]
-        # hybrid-threshold: [true, false]
+        hybrid-threshold: [true, false]
         input-shaping: [false]
         mpc: [true]
         display: ["BTT_TFT35_V3_0", "FYSETC_MINI_12864_2_1"]
