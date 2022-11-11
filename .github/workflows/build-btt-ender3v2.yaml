@@ -1271,4 +1271,4 @@ jobs:
       - name: Compile ${{ matrix.display }} Firmware
         if: ${{ success() && matrix.display == 'BTT_TFT35_V3_0' }}
         id: compile_display_firmware
-        uses: Didstopia/Marlin/.github/workflows/build-display-firmware-action@skr-mini-e3-v3-0
+        uses: Didstopia/Marlin/.github/actions/build-display-firmware@skr-mini-e3-v3-0
