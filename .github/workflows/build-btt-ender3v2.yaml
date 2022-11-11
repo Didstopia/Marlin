@@ -29,7 +29,7 @@ jobs:
 
   # build-display-firmware:
   #   name: Compile Display Firmware
-  #   if: ${{ success() && matrix.display = 'BTT_TFT35_V3_0' }}
+  #   if: ${{ success() && contains(matrix.display, 'BTT_TFT35_V3_0') }}
   #   uses: Didstopia/Marlin/.github/workflows/build-btt-tft35-e3-v3-0.yaml@skr-mini-e3-v3-0
 
   build-marlin-firmware:
@@ -72,7 +72,7 @@ jobs:
         # hybrid-threshold: [true, false]
         input-shaping: [false]
         mpc: [true]
-        display: ['BTT_TFT35_V3_0', 'FYSETC_MINI_12864_2_1']
+        display: [BTT_TFT35_V3_0, FYSETC_MINI_12864_2_1]
         dwin: [false]
 
         ## FIXME: These don't append, they replace the entire matrix, so naturally won't work as-is..
@@ -151,6 +151,25 @@ jobs:
         #     dwin: true
 
     steps:
+
+      - name: Print Build Info
+        run: |-
+
+          echo "Build Info:"
+          echo "  Target Branch: ${{inputs.target-branch || github.event.inputs.target-branch || github.ref }}"
+          echo "  Board: ${{ matrix.board }}"
+          echo "  BLTouch: ${{ matrix.bltouch }}"
+          echo "  High Speed: ${{ matrix.high-speed }}"
+          echo "  Grid: ${{ matrix.grid }}"
+          echo "  UBL: ${{ matrix.ubl }}"
+          echo "  Direct Drive: ${{ matrix.direct-drive }}"
+          echo "  Linear Advance: ${{ matrix.linear-advance }}"
+          echo "  Junction Deviation: ${{ matrix.junction-deviation }}"
+          echo "  Hybrid Threshold: ${{ matrix.hybrid-threshold }}"
+          echo "  Input Shaping: ${{ matrix.input-shaping }}"
+          echo "  MPC: ${{ matrix.mpc }}"
+          echo "  Display: ${{ matrix.display }}"
+          echo "  DWIN: ${{ matrix.dwin }}"
 
       - name: Prepare Target Branch
         run: |-
@@ -1120,7 +1139,7 @@ jobs:
 
 
       - name: 'Configure: BIGTREE_TFT35_E3_V3_0'
-        if: ${{ success() && matrix.display == 'BIGTREE_TFT35_E3_V3_0' }}
+        if: ${{ success() && contains(matrix.display, 'BIGTREE_TFT35_E3_V3_0') }}
         id: configure_bigtree_tft35_e3_v3_0
         run: |-
 
@@ -1190,7 +1209,7 @@ jobs:
 
 
       - name: 'Configure: FYSETC_MINI_12864_2_1'
-        if: ${{ success() && matrix.display == 'FYSETC_MINI_12864_2_1' }}
+        if: ${{ success() && contains(matrix.display, 'FYSETC_MINI_12864_2_1') }}
         id: configure_fysetc_mini_12864_2_1
         run: |-
 
@@ -1330,6 +1349,6 @@ jobs:
 
 
       - name: Compile ${{ matrix.display }} Firmware
-        if: ${{ success() && matrix.display == 'BTT_TFT35_V3_0' }}
+        if: ${{ success() && contains(matrix.display, 'BTT_TFT35_V3_0') }}
         id: compile_display_firmware
         uses: Didstopia/Marlin/.github/actions/build-display-firmware@skr-mini-e3-v3-0
