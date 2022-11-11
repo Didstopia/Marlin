@@ -55,7 +55,7 @@ jobs:
       matrix:
 
         # Set global defaults
-        board: [STM32G0B1RE_btt]
+        board: ["STM32G0B1RE_btt"]
         bltouch: [true]
         high-speed: [true]
         grid: [5]
@@ -72,7 +72,7 @@ jobs:
         # hybrid-threshold: [true, false]
         input-shaping: [false]
         mpc: [true]
-        display: [BTT_TFT35_V3_0, FYSETC_MINI_12864_2_1]
+        display: ["BTT_TFT35_V3_0", "FYSETC_MINI_12864_2_1"]
         dwin: [false]
 
         ## FIXME: These don't append, they replace the entire matrix, so naturally won't work as-is..
@@ -1140,7 +1140,7 @@ jobs:
 
 
       - name: 'Configure: BIGTREE_TFT35_E3_V3_0'
-        if: ${{ matrix.display == "BTT_TFT35_V3_0" }}
+        if: ${{ contains(matrix.display, 'BTT_TFT35_V3_0') }}
         id: configure_bigtree_tft35_e3_v3_0
         run: |-
 
@@ -1210,7 +1210,7 @@ jobs:
 
 
       - name: 'Configure: FYSETC_MINI_12864_2_1'
-        if: ${{ matrix.display == "FYSETC_MINI_12864_2_1" }}
+        if: ${{ contains(matrix.display, 'FYSETC_MINI_12864_2_1') }}
         id: configure_fysetc_mini_12864_2_1
         run: |-
 
@@ -1350,6 +1350,6 @@ jobs:
 
 
       - name: Compile ${{ matrix.display }} Firmware
-        if: ${{ matrix.display == "BTT_TFT35_V3_0" }}
+        if: ${{ contains(matrix.display, 'BTT_TFT35_V3_0') }}
         id: compile_display_firmware
         uses: Didstopia/Marlin/.github/actions/build-display-firmware@skr-mini-e3-v3-0
