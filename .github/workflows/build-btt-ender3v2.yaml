@@ -55,7 +55,7 @@ jobs:
       matrix:
 
         # Set global defaults
-        board: ['STM32G0B1RE_btt']
+        board: [STM32G0B1RE_btt]
         bltouch: [true]
         high-speed: [true]
         grid: [5]
@@ -72,7 +72,7 @@ jobs:
         # hybrid-threshold: [true, false]
         input-shaping: [false]
         mpc: [true]
-        display: ["BTT_TFT35_V3_0", "FYSETC_MINI_12864_2_1"]
+        display: [BTT_TFT35_V3_0, FYSETC_MINI_12864_2_1]
         dwin: [false]
 
         ## FIXME: These don't append, they replace the entire matrix, so naturally won't work as-is..
