@@ -650,9 +650,9 @@ jobs:
           # Disable stealthchopping for the Z axis
           #configDisable STEALTHCHOP_Z Marlin/Configuration_adv.h
 
-          ## TODO: This is a test! Revert if it doesn't work out for us!
+          # "Alternative LCD_INFO_SCREEN_STYLE requires 20x4 Character LCD."
           # Set LCD info screen style between Marlin (0) and Prusa (1)
-          configValue LCD_INFO_SCREEN_STYLE 1 Marlin/Configuration.h
+          # configValue LCD_INFO_SCREEN_STYLE 1 Marlin/Configuration.h
 
           # Enable probe offset wizard
           configEnable PROBE_OFFSET_WIZARD Marlin/Configuration_adv.h
