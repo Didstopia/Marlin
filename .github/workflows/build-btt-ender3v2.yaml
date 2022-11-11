@@ -60,87 +60,88 @@ jobs:
         grid: [5]
         ubl: [true]
         direct-drive: [true]
-        linear-advance: [true]
-        junction-deviation: [true]
-        hybrid-threshold: [true]
+        linear-advance: [true, false]
+        junction-deviation: [true, false]
+        hybrid-threshold: [true, false]
         input-shaping: [false]
         mpc: [true]
-        display: ['']
+        display: [BTT_TFT35_V3_0, FYSETC_MINI_12864_2_1]
         dwin: [false]
 
-        # Specify additional build configurations
-        include:
+        ## FIXME: These don't append, they replace the entire matrix, so naturally won't work as-is..
+        # # Specify additional build configurations
+        # include:
 
 
 
-          ## Test configurations for BLTouch
+        #   ## Test configurations for BLTouch
 
-          # Default probing speed
-          - bltouch: true
-            high-speed: false
+        #   # Default probing speed
+        #   - bltouch: true
+        #     high-speed: false
 
-          ## Test configurations for no BLTouch
+        #   ## Test configurations for no BLTouch
 
-          # No BLTouch + ABL
-          - bltouch: false
-            high-speed: false
-            ubl: false
-
-
-
-          ## Test configurations for Direct Drive
-
-          # Direct Drive enabled
-          - direct-drive: true
-
-          # Direct Drive disabled
-          - direct-drive: false
+        #   # No BLTouch + ABL
+        #   - bltouch: false
+        #     high-speed: false
+        #     ubl: false
 
 
 
-          ## Test configurations for Linear Advance + Junction Deviation
+        #   ## Test configurations for Direct Drive
 
-          # Linear Advance + Junction Deviation enabled
-          - linear-advance: true
-            junction-deviation: true
+        #   # Direct Drive enabled
+        #   - direct-drive: true
 
-          # Linear Advance + Junction Deviation disabled
-          - linear-advance: false
-            junction-deviation: false
-
-          # Linear Advance enabled + Junction Deviation disabled
-          - linear-advance: true
-            junction-deviation: false
-
-          # Linear Advance disabled + Junction Deviation enabled
-          - linear-advance: false
-            junction-deviation: true
+        #   # Direct Drive disabled
+        #   - direct-drive: false
 
 
 
-          ## Test configurations for PID vs. MPC
+        #   ## Test configurations for Linear Advance + Junction Deviation
 
-          # PID enabled
-          - mpc: false
+        #   # Linear Advance + Junction Deviation enabled
+        #   - linear-advance: true
+        #     junction-deviation: true
 
-          # MPC enabled
-          - mpc: true
+        #   # Linear Advance + Junction Deviation disabled
+        #   - linear-advance: false
+        #     junction-deviation: false
+
+        #   # Linear Advance enabled + Junction Deviation disabled
+        #   - linear-advance: true
+        #     junction-deviation: false
+
+        #   # Linear Advance disabled + Junction Deviation enabled
+        #   - linear-advance: false
+        #     junction-deviation: true
 
 
 
-          ## Test configurations for different displays
+        #   ## Test configurations for PID vs. MPC
 
-          # BTT TFT35 E3 V3.0
-          - display: BTT_TFT35_V3_0
-            dwin: false
+        #   # PID enabled
+        #   - mpc: false
 
-          # FYSETC Mini 12864 V2.1
-          - display: FYSETC_MINI_12864_2_1
-            dwin: false
+        #   # MPC enabled
+        #   - mpc: true
 
-          # Stock Ender 3 V2 display
-          - display: 'STOCK'
-            dwin: true
+
+
+        #   ## Test configurations for different displays
+
+        #   # BTT TFT35 E3 V3.0
+        #   - display: BTT_TFT35_V3_0
+        #     dwin: false
+
+        #   # FYSETC Mini 12864 V2.1
+        #   - display: FYSETC_MINI_12864_2_1
+        #     dwin: false
+
+        #   # Stock Ender 3 V2 display
+        #   - display: 'STOCK'
+        #     dwin: true
 
     steps:
 
