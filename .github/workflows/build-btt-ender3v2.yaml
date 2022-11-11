@@ -49,7 +49,7 @@ jobs:
       #        containers trying to access/install the tool cache,
       #        so not entirely sure what else to do, than to limit this?
       # max-parallel: 1
-      max-parallel: 3 ## TODO: Limiting to the amount of self-hosted runners we have right now, just to see if that improves things at all?!
+      # max-parallel: 3 ## TODO: Limiting to the amount of self-hosted runners we have right now, just to see if that improves things at all?!
       ## TODO: Use include/exclude to create more specific builds?
       ##       https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations
       matrix:
@@ -61,9 +61,15 @@ jobs:
         grid: [5]
         ubl: [true]
         direct-drive: [true]
-        linear-advance: [true, false]
-        junction-deviation: [true, false]
-        hybrid-threshold: [true, false]
+        linear-advance: [true]
+        # linear-advance: [false]
+        # linear-advance: [true, false]
+        junction-deviation: [true]
+        # junction-deviation: [false]
+        # junction-deviation: [true, false]
+        hybrid-threshold: [true]
+        # hybrid-threshold: [false]
+        # hybrid-threshold: [true, false]
         input-shaping: [false]
         mpc: [true]
         display: [BTT_TFT35_V3_0, FYSETC_MINI_12864_2_1]
@@ -734,7 +740,7 @@ jobs:
 
 
       - name: 'Configure: PID'
-        if: ${{ success() && !matrix.mpc }}
+        if: ${{ success() && matrix.mpc != 'true' }}
         id: configure_pid
         run: |-
 
@@ -756,7 +762,7 @@ jobs:
 
 
       - name: 'Configure: MPC'
-        if: ${{ success() && matrix.mpc }}
+        if: ${{ success() && matrix.mpc == 'true' }}
         id: configure_mpc
         run: |-
 
@@ -789,7 +795,7 @@ jobs:
 
 
       - name: 'Configure: BLTouch'
-        if: ${{ success() && matrix.bltouch }}
+        if: ${{ success() && matrix.bltouch == 'true' }}
         id: configure_bltouch
         env:
           HIGH_SPEED: ${{ matrix.high-speed }}
@@ -857,7 +863,7 @@ jobs:
 
 
       - name: 'Configure: UBL'
-        if: ${{ success() && matrix.ubl }}
+        if: ${{ success() && matrix.ubl == 'true' }}
         id: configure_ubl
         env:
           GRID: ${{ matrix.grid }}
@@ -905,7 +911,7 @@ jobs:
 
 
       - name: 'Configure: Bed Leveling'
-        if: ${{ success() && !matrix.ubl }}
+        if: ${{ success() && matrix.ubl != 'true' }}
         id: configure_bed_leveling
         run: |-
 
@@ -924,7 +930,7 @@ jobs:
 
 
       - name: 'Configure: Bondtech DDX v3'
-        if: ${{ success() && matrix.direct-drive }}
+        if: ${{ success() && matrix.direct-drive == 'true' }}
         id: configure_bondtech_ddx_v3
         run: |-
 
@@ -1005,7 +1011,7 @@ jobs:
 
 
       - name: 'Configure: Hybrid Threshold'
-        if: ${{ success() && matrix.hybrid-threshold }}
+        if: ${{ success() && matrix.hybrid-threshold == 'true' }}
         id: configure_hybrid_threshold
         run: |-
 
@@ -1021,7 +1027,7 @@ jobs:
 
 
       - name: 'Configure: Junction Deviation'
-        if: ${{ success() && matrix.junction-deviation }}
+        if: ${{ success() && matrix.junction-deviation == 'true' }}
         id: configure_junction_deviation
         run: |-
 
@@ -1050,7 +1056,7 @@ jobs:
 
 
       - name: 'Configure: Linear Advance'
-        if: ${{ success() && matrix.linear-advance }}
+        if: ${{ success() && matrix.linear-advance == 'true' }}
         id: configure_linear_advance
         env:
           DISPLAY: ${{ matrix.display }}
@@ -1099,7 +1105,7 @@ jobs:
 
 
       - name: 'Configure: DWIN'
-        if: ${{ success() && matrix.dwin }}
+        if: ${{ success() && matrix.dwin == 'true' }}
         id: configure_dwin
         run: |-
 
@@ -1109,6 +1115,8 @@ jobs:
 
           ## TODO: Configure DWIN for eg. Creality stock display
 
+          # Disable custom cable warnings
+          echo -e "#define NO_CONTROLLER_CUSTOM_WIRING_WARNING" >> Marlin/Configuration.h
 
 
       - name: 'Configure: BIGTREE_TFT35_E3_V3_0'
@@ -1228,7 +1236,7 @@ jobs:
 
 
       - name: 'Configure: Input Shaping'
-        if: ${{ success() && matrix.input-shaping }}
+        if: ${{ success() && matrix.input-shaping == 'true' }}
         id: configure_input_shaping
         run: |-
 
