@@ -49,6 +49,7 @@ jobs:
       #        containers trying to access/install the tool cache,
       #        so not entirely sure what else to do, than to limit this?
       # max-parallel: 1
+      max-parallel: 3 ## TODO: Limiting to the amount of self-hosted runners we have right now, just to see if that improves things at all?!
       ## TODO: Use include/exclude to create more specific builds?
       ##       https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations
       matrix:
