@@ -652,7 +652,7 @@ jobs:
 
           ## TODO: This is a test! Revert if it doesn't work out for us!
           # Set LCD info screen style between Marlin (0) and Prusa (1)
-          configValue LCD_INFO_SCREEN_STYLE 1 Marlin/Configuration_adv.h
+          configValue LCD_INFO_SCREEN_STYLE 1 Marlin/Configuration.h
 
           # Enable probe offset wizard
           configEnable PROBE_OFFSET_WIZARD Marlin/Configuration_adv.h
