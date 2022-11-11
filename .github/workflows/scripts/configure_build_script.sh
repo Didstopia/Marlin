@@ -266,11 +266,13 @@ setupConfigs() {
   ## FIXME: This requires more work and research, as it requires "frames" of bitmaps setup in a specific way
   # configEnable BOOT_MARLIN_LOGO_ANIMATED Marlin/Configuration_adv.h
 
+  ## FIXME: Can't disable this, Marlin just wants to show dual boot screens with double the timeout..
   # Disable Marlin boot screen when using a custom boot screen
-  configDisable SHOW_BOOTSCREEN Marlin/Configuration.h
+  # configDisable SHOW_BOOTSCREEN Marlin/Configuration.h
 
   # Adjust the boot screen timeout
-  configValue BOOTSCREEN_TIMEOUT 2000 Marlin/Configuration_adv.h
+  # configValue BOOTSCREEN_TIMEOUT 2000 Marlin/Configuration_adv.h
+  configValue BOOTSCREEN_TIMEOUT 1000 Marlin/Configuration_adv.h
 
   # Enable games
   configEnable MARLIN_BRICKOUT Marlin/Configuration_adv.h
