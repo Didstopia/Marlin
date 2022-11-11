@@ -52,45 +52,96 @@ jobs:
       ## TODO: Use include/exclude to create more specific builds?
       ##       https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations
       matrix:
+
+        # Set global defaults
         board: [STM32G0B1RE_btt]
-        ## FIXME: Add support for no probe/manual leveling
-        # bltouch: [true, false]
         bltouch: [true]
-        #grid: [3, 5, 10, 15]
-        # grid: [4]
-        grid: [5]
-        # grid: [7]
-        # grid: [5, 10]
-        # high-speed: [true, false]
-        #high-speed: [false]
         high-speed: [true]
-        direct-drive: [true, false]
-        # direct-drive: [true]
-        ## FIXME: Add support for UBL alternatives
-        ubl: [true, false]
-        # ubl: [true]
-        # touch-screen: [true, false]
-        ## FIXME: Enabling touch screen support requires a bit more work and effort,
-        ##        so disabling for now until we have the time to properly implement it.
-        # touch-screen: [false]
-        linear-advance: [true, false]
-        # linear-advance: [false]
-        # linear-advance: [true]
-        junction-deviation: [true, false]
-        # junction-deviation: [false]
-        # junction-deviation: [true]
-        hybrid-threshold: [true, false]
-        # hybrid-threshold: [false]
-        mpc: [true, false]
-        # mpc: [false]
-        # mpc: [true]
-        input-shaping: [true, false]
-        # input-shaping: [false]
-        # input-shaping: [true]
-        display: ["BIGTREE_TFT35_E3_V3_0", "FYSETC_MINI_12864_2_1"]
-        dwin: [true, false]
-        # dwin: [false]
-        # dwin: [true]
+        grid: [5]
+        ubl: [true]
+        direct-drive: [true]
+        linear-advance: [true]
+        junction-deviation: [true]
+        hybrid-threshold: [true]
+        input-shaping: [false]
+        mpc: [true]
+        display: ['']
+        dwin: [false]
+
+        # Specify additional build configurations
+        include:
+
+
+
+          ## Test configurations for BLTouch
+
+          # Default probing speed
+          - bltouch: true
+            high-speed: false
+
+          ## Test configurations for no BLTouch
+
+          # No BLTouch + ABL
+          - bltouch: false
+            high-speed: false
+            ubl: false
+
+
+
+          ## Test configurations for Direct Drive
+
+          # Direct Drive enabled
+          - direct-drive: true
+
+          # Direct Drive disabled
+          - direct-drive: false
+
+
+
+          ## Test configurations for Linear Advance + Junction Deviation
+
+          # Linear Advance + Junction Deviation enabled
+          - linear-advance: true
+            junction-deviation: true
+
+          # Linear Advance + Junction Deviation disabled
+          - linear-advance: false
+            junction-deviation: false
+
+          # Linear Advance enabled + Junction Deviation disabled
+          - linear-advance: true
+            junction-deviation: false
+
+          # Linear Advance disabled + Junction Deviation enabled
+          - linear-advance: false
+            junction-deviation: true
+
+
+
+          ## Test configurations for PID vs. MPC
+
+          # PID enabled
+          - mpc: false
+
+          # MPC enabled
+          - mpc: true
+
+
+
+          ## Test configurations for different displays
+
+          # BTT TFT35 E3 V3.0
+          - display: BTT_TFT35_V3_0
+            dwin: false
+
+          # FYSETC Mini 12864 V2.1
+          - display: FYSETC_MINI_12864_2_1
+            dwin: false
+
+          # Stock Ender 3 V2 display
+          - display: 'STOCK'
+            dwin: true
+
     steps:
 
       - name: Prepare Target Branch
