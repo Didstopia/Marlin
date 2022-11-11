@@ -27,8 +27,10 @@ on:
 
 jobs:
 
-  ## TODO: "github.base_ref" is ONLY available for pull request events, NOT for push events
-  ##       https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+  build-display-firmware:
+    name: Compile ${{ matrix.display }} Firmware (${{ matrix.board }})
+    if: ${{ success() && matrix.display == 'BTT_TFT35_V3_0' }}
+    uses: Didstopia/Marlin/.github/workflows/build-btt-tft35-e3-v3-0.yaml@skr-mini-e3-v3-0
 
   build-marlin-firmware:
     # name: Build Marlin Firmware
@@ -1184,13 +1186,6 @@ jobs:
           # Enable input shaping and its menu item(s)
           configEnable INPUT_SHAPING Marlin/Configuration_adv.h
           configEnable SHAPING_MENU Marlin/Configuration_adv.h
-
-
-
-      - name: Compile Display Firmware
-        if: ${{ success() && matrix.display == 'BTT_TFT35_V3_0' }}
-        id: compile_display_firmware
-        uses: Didstopia/Marlin/.github/workflows/build-btt-tft35-e3-v3-0.yaml@skr-mini-e3-v3-0
 
 
 
