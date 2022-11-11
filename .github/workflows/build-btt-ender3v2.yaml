@@ -740,7 +740,7 @@ jobs:
 
 
       - name: 'Configure: PID'
-        if: ${{ success() && matrix.mpc != 'true' }}
+        if: ${{ success() && !matrix.mpc }}
         id: configure_pid
         run: |-
 
@@ -762,7 +762,7 @@ jobs:
 
 
       - name: 'Configure: MPC'
-        if: ${{ success() && matrix.mpc == 'true' }}
+        if: ${{ success() && matrix.mpc }}
         id: configure_mpc
         run: |-
 
@@ -795,7 +795,7 @@ jobs:
 
 
       - name: 'Configure: BLTouch'
-        if: ${{ success() && matrix.bltouch == 'true' }}
+        if: ${{ success() && matrix.bltouch }}
         id: configure_bltouch
         env:
           HIGH_SPEED: ${{ matrix.high-speed }}
@@ -863,7 +863,7 @@ jobs:
 
 
       - name: 'Configure: UBL'
-        if: ${{ success() && matrix.ubl == 'true' }}
+        if: ${{ success() && matrix.ubl }}
         id: configure_ubl
         env:
           GRID: ${{ matrix.grid }}
@@ -911,7 +911,7 @@ jobs:
 
 
       - name: 'Configure: Bed Leveling'
-        if: ${{ success() && matrix.ubl != 'true' }}
+        if: ${{ success() && !matrix.ubl }}
         id: configure_bed_leveling
         run: |-
 
@@ -930,7 +930,7 @@ jobs:
 
 
       - name: 'Configure: Bondtech DDX v3'
-        if: ${{ success() && matrix.direct-drive == 'true' }}
+        if: ${{ success() && matrix.direct-drive }}
         id: configure_bondtech_ddx_v3
         run: |-
 
@@ -1011,7 +1011,7 @@ jobs:
 
 
       - name: 'Configure: Hybrid Threshold'
-        if: ${{ success() && matrix.hybrid-threshold == 'true' }}
+        if: ${{ success() && matrix.hybrid-threshold }}
         id: configure_hybrid_threshold
         run: |-
 
@@ -1027,7 +1027,7 @@ jobs:
 
 
       - name: 'Configure: Junction Deviation'
-        if: ${{ success() && matrix.junction-deviation == 'true' }}
+        if: ${{ success() && matrix.junction-deviation }}
         id: configure_junction_deviation
         run: |-
 
@@ -1056,7 +1056,7 @@ jobs:
 
 
       - name: 'Configure: Linear Advance'
-        if: ${{ success() && matrix.linear-advance == 'true' }}
+        if: ${{ success() && matrix.linear-advance }}
         id: configure_linear_advance
         env:
           DISPLAY: ${{ matrix.display }}
@@ -1105,7 +1105,7 @@ jobs:
 
 
       - name: 'Configure: DWIN'
-        if: ${{ success() && matrix.dwin == 'true' }}
+        if: ${{ success() && matrix.dwin }}
         id: configure_dwin
         run: |-
 
@@ -1236,7 +1236,7 @@ jobs:
 
 
       - name: 'Configure: Input Shaping'
-        if: ${{ success() && matrix.input-shaping == 'true' }}
+        if: ${{ success() && matrix.input-shaping }}
         id: configure_input_shaping
         run: |-
 
