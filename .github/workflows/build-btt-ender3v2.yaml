@@ -3,19 +3,15 @@
 
 name: "Build BTT SKR Mini E3 V3.0 (Ender 3 V2)"
 
-## FIXME: Fix proper build support for various branches AND tags/releases!
 on:
   # Trigger custom firmwares builds only in specific situations
   push:
-    ## TODO: How do we ensure that we always build the "bugfix-2.1.x" branch on updated to the "skr-mini-e3-v3-0" branch?
     # When the following branches are pushed
     branches:
-      # FIXME: Disabled until Marlin's configs can be reliably used with the main branch again
       - 2.1.x
       - bugfix-2.1.x
       - skr-mini-e3-v3-0
 
-    ## TODO: How do we ensure that we always build the "2.1.x" branch on new tags?
     # When the following tags are pushed
     tags:
       - 2*
@@ -23,9 +19,10 @@ on:
   # Allow manual builds with a configurable target branch
   workflow_dispatch:
     inputs:
-      targetBranch:
+      target-branch:
         description: "Target Branch"
         required: true
+        type: string
         default: "bugfix-2.1.x"
 
 jobs:
@@ -34,14 +31,11 @@ jobs:
   ##       https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
 
   build-marlin-firmware:
-    ## TODO: Ensure that this works as expected
-    # # if: ${{ github.base_ref == 'bugfix-2.1.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
-    # if: ${{ github.ref == 'refs/heads/bugfix-2.1.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
     # name: Build Marlin Firmware
     name: Build
     ## TODO: Test running on self-hosted runners instead
-    runs-on: ubuntu-latest
-    # runs-on: self-hosted
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     # runs-on: [self-hosted, ubuntu-latest]
     timeout-minutes: 15
     strategy:
@@ -56,9 +50,6 @@ jobs:
       ## TODO: Use include/exclude to create more specific builds?
       ##       https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations
       matrix:
-        ## FIXME: These don't work, but ideally we'd want something in the matrix to easily identify the source and target branches, tags etc. ?
-        # currentBranch: ${{ github.base_ref }}
-        # targetBranch: ${{ github.event.inputs.targetBranch }}
         board: [STM32G0B1RE_btt]
         ## FIXME: Add support for no probe/manual leveling
         # bltouch: [true, false]
@@ -71,33 +62,33 @@ jobs:
         # high-speed: [true, false]
         #high-speed: [false]
         high-speed: [true]
-        #direct-drive: [true, false]
-        direct-drive: [true]
+        direct-drive: [true, false]
+        # direct-drive: [true]
         ## FIXME: Add support for UBL alternatives
-        #ubl: [true, false]
-        ubl: [true]
+        ubl: [true, false]
+        # ubl: [true]
         # touch-screen: [true, false]
         ## FIXME: Enabling touch screen support requires a bit more work and effort,
         ##        so disabling for now until we have the time to properly implement it.
         # touch-screen: [false]
-        # linear-advance: [true, false]
+        linear-advance: [true, false]
         # linear-advance: [false]
-        linear-advance: [true]
-        # junction-deviation: [true, false]
+        # linear-advance: [true]
+        junction-deviation: [true, false]
         # junction-deviation: [false]
-        junction-deviation: [true]
-        #hybrid-threshold: [true, false]
-        hybrid-threshold: [false]
-        # mpc: [true, false]
+        # junction-deviation: [true]
+        hybrid-threshold: [true, false]
+        # hybrid-threshold: [false]
+        mpc: [true, false]
         # mpc: [false]
-        mpc: [true]
-        # input-shaping: [true, false]
-        input-shaping: [false]
+        # mpc: [true]
+        input-shaping: [true, false]
+        # input-shaping: [false]
         # input-shaping: [true]
-        # TODO: Enable this once we have time to test out the BTT's BIGTREE_TFT35_E3_V3_0 display
-        # ui: ["MarlinUI", "BIGTREE_TFT35_E3_V3_0"]
-        ui: ["BIGTREE_TFT35_E3_V3_0", "FYSETC_MINI_12864_2_1"]
-        # ui: ["MarlinUI"]
+        display: ["BIGTREE_TFT35_E3_V3_0", "FYSETC_MINI_12864_2_1"]
+        dwin: [true, false]
+        # dwin: [false]
+        # dwin: [true]
     steps:
 
       - name: Prepare Target Branch
@@ -225,217 +216,62 @@ jobs:
           pio upgrade --dev
           pio pkg update --global
 
-      - name: Configure Firmware (${{ matrix.board }})
+
+
+      - name: 'Configure: Core'
         if: success()
-        id: configure_firmware
+        id: configure_core
         run: |-
 
-          # Enable script debugging
-          # set -x
-
-          # Ensure we're always in the project root
-          cd ${GITHUB_WORKSPACE}
-
           # Source the helper build script
+          cd ${GITHUB_WORKSPACE}
           source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh
 
+          # Set default/custom steps per unit, per axis
+          configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 95.1 }" Marlin/Configuration.h
 
+          # Bed size, probing and bed clip tweaks specific to this printer/build surface
+          configValue X_BED_SIZE 220 Marlin/Configuration.h
+          configValue Y_BED_SIZE 220 Marlin/Configuration.h
+          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+          configValue Z_MAX_POS 235 Marlin/Configuration.h
 
-          ## BEGIN CONFIGURATION.H
+          ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
+          # configValue X_BED_SIZE 235 Marlin/Configuration.h
+          # configValue Y_BED_SIZE 235 Marlin/Configuration.h
+          # configValue X_MIN_POS 0 Marlin/Configuration.h
+          # configValue Y_MIN_POS 0 Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
+          # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+
+          # FIXME: Reverted these changes for now, other issues to solve first!
+          # Calibrated bed and position values
+          # configValue X_BED_SIZE "235 - 2" Marlin/Configuration.h
+          # configValue Y_BED_SIZE "235 - 5" Marlin/Configuration.h
+          # configValue X_MIN_POS 0 Marlin/Configuration.h
+          # configValue Y_MIN_POS 0 Marlin/Configuration.h
+          # configValue X_MAX_POS "245 - 5" Marlin/Configuration.h
+          # configValue Y_MAX_POS "235 - 5" Marlin/Configuration.h
 
           # Adjust min/max temperatures
           configValue HEATER_0_MINTEMP 5 Marlin/Configuration.h
           configValue BED_MINTEMP 5 Marlin/Configuration.h
           configValue BED_MAXTEMP 150 Marlin/Configuration.h
 
-          # TODO: Leaving this alone for now (default is 180)
-          # Set minimum extruder temperature when extruding
-          # configValue EXTRUDE_MINTEMP 170 Marlin/Configuration.h
+          # Configure thermal protection
+          configValue WATCH_TEMP_PERIOD 30 Marlin/Configuration_adv.h
+          configValue WATCH_TEMP_INCREASE 3 Marlin/Configuration_adv.h
+          configValue THERMAL_PROTECTION_BED_PERIOD 120 Marlin/Configuration_adv.h
+          configValue WATCH_BED_TEMP_PERIOD 120 Marlin/Configuration_adv.h
 
-          # TODO: Leaving this alone for now (default is 1000)
-          # TODO: Wouldn't something like 200 make more sense?
-          # Set maximum length to extrude within a single extrusion
-          # configValue EXTRUDE_MAXLENGTH 600 Marlin/Configuration.h
-
-          # Set default/custom steps per unit, per axis
-          configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 95.1 }" Marlin/Configuration.h
-
-          # TODO: Leaving this alone for now (defaults are higher)
-          # TODO: UPDATE: Lowering feedrates again as per BTT config (and increasing acceleration)
-          # Set default/custom maximum feedrate (movement speed)
-          # configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 25}" Marlin/Configuration.h
-
-          # TODO: Leaving this alone for now (defaults are lower)
-          # FIXME: Maybe the max acceleration for the extruder is causing the varying sample sizes?
-          # TODO: UPDATE: Increasing acceleration again as per BTT config (and lowering feedrates)
-          # Set default/custom maximum acceleration
-          # configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
-
-          # TODO: Leaving this alone for now (default is 1000)
-          # TODO: UPDATE: Increasing travel acceleration again as per BTT config (and lowering feedrates)
-          # Set default/custom maximum acceleration while moving/traveling
-          # configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
-
-          # Enable S-Curve Acceleration (default is disabled)
+           # Enable S-Curve Acceleration (default is disabled)
           configEnable S_CURVE_ACCELERATION Marlin/Configuration.h
 
-          # Disable Z axis endstop switch support (we use BLTouch/CRTouch instead, default is enabled)
-          configDisable Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN Marlin/Configuration.h
-
-          # Enable Z homing using a probe (default is disabled)
-          configEnable USE_PROBE_FOR_Z_HOMING Marlin/Configuration.h
-
-          # Ensure manual probing is always disabled when using BLTouch/CRTouch
-          configDisable PROBE_MANUALLY Marlin/Configuration.h
-
-          # Enable BLTouch/CRTouch support
-          configEnable BLTOUCH Marlin/Configuration.h
-
-          # Set default/custom nozzle offsets
-          # configValue NOZZLE_TO_PROBE_OFFSET "{ -45.8, -5.4, 0 }" Marlin/Configuration.
-
-          # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
-          # configValue PROBING_MARGIN 20 Marlin/Configuration.h
-          ## NOTE: Decrease it back to 10, so we can reach more probable points?
-          # configValue PROBING_MARGIN 10 Marlin/Configuration.h
-          # configValue PROBING_MARGIN 0 Marlin/Configuration.h
-          # TODO: Reverted back to default for now
-          configValue PROBING_MARGIN 10 Marlin/Configuration.h
-          # configValue PROBING_MARGIN 15 Marlin/Configuration.h
-          # configValue PROBING_MARGIN 20 Marlin/Configuration.h
-
-          ## FIXME: Something is causing our print head to crash to our bed when homing!
-          ##        Probing is failing, which probably happens due to too fast of a probing speed?!
-          # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
-          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
-          # TODO: Lowered from 133mm/s to 100mm/s, however some say the BLTouch is more reliable at 60mm/s!
-          #configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
-          # configValue XY_PROBE_FEEDRATE "(60*60)" Marlin/Configuration.h
-          # TODO: Trying a _very_ low speed for improved probing
-          # configValue XY_PROBE_FEEDRATE "(50*60)" Marlin/Configuration.h
-          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
-          configValue XY_PROBE_FEEDRATE "(200*60)" Marlin/Configuration.h
-          # configValue XY_PROBE_FEEDRATE "(150*60)" Marlin/Configuration.h
-          # configValue XY_PROBE_FEEDRATE "(100*60)" Marlin/Configuration.h
-          # TODO: Increased probing travel speeds to Marlin defaults (133x60)
-          # configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
-          
-          # Decrease the amount of Z travel when moving between probing points (default is 5)
-          # configValue Z_CLEARANCE_BETWEEN_PROBES 3 Marlin/Configuration.h
-
-          # TODO: Leaving these alone for now
-          # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
-          configValue Z_PROBE_OFFSET_RANGE_MIN -5 Marlin/Configuration.h
-          configValue Z_PROBE_OFFSET_RANGE_MAX 10 Marlin/Configuration.h
-
-          # TODO: Disabling multi-probing for now, as it just takes too long..
-          # Enable multiple probings (for BLTouch/UBL)
-          # configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
-          # # configDisable MULTIPLE_PROBING Marlin/Configuration.h
-
-          # Enable extra probing
-          # configValue EXTRA_PROBING 1 Marlin/Configuration.h
-
-          # Enable Z probe testing (for BLTouch/UBL)
-          configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
-
-          ## FIXME: Something with this is causing massive delays between individual probes..
-          # Decrease electrical noise etc. by turning heaters off before probing,
-          # and wait for bed/hotend to heat back up between probes to increase probing accuracy
-          # configEnable PROBING_HEATERS_OFF Marlin/Configuration.h
-          # # configEnable WAIT_FOR_BED_HEATER Marlin/Configuration.h
-          # # configEnable WAIT_FOR_HOTEND Marlin/Configuration.h
-
-          # Enable/increase Z clearance
-          configValue Z_HOMING_HEIGHT 10 Marlin/Configuration.h
-
-          ## FIXME: This might not be a good idea?!
-          # Require heated bed and nozzle when probing
-          # configEnable PREHEAT_BEFORE_PROBING Marlin/Configuration.h
-
-          # Require heated bed and nozzle when auto-leveling
-          configEnable PREHEAT_BEFORE_LEVELING Marlin/Configuration.h
-          configValue LEVELING_NOZZLE_TEMP 150 Marlin/Configuration.h
-          configValue LEVELING_BED_TEMP 50 Marlin/Configuration.h
-
-          # Enable experimental nozzle cleaning feature (G12)
-          configEnable NOZZLE_CLEAN_FEATURE Marlin/Configuration.h
-
-          # TODO: Do we want these enabled or not? Because sometimes they just get in the way..
-          # Require homing after steppers have deactivated/unlocked (and before trying to move)
-          # configEnable NO_MOTION_BEFORE_HOMING Marlin/Configuration.h
-          # configEnable HOME_AFTER_DEACTIVATE Marlin/Configuration.h
-
-          # Bed size, probing and bed clip tweaks specific to this printer/build surface
-          configValue X_BED_SIZE 220 Marlin/Configuration.h
-          configValue Y_BED_SIZE 220 Marlin/Configuration.h
-          # configValue X_BED_SIZE 230 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          # TODO: Test and tweak these!
-          # configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
-          # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
-          # configValue Y_MAX_POS "Y_BED_SIZE + 5" Marlin/Configuration.h
-
-          # Increase bed size for probing (for BLTouch/UBL/ABL, default is 220x220, Jyers uses 230x230)
-          #configValue X_BED_SIZE 235 Marlin/Configuration.h
-          #configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          # configValue X_BED_SIZE 230 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          # configValue X_BED_SIZE 220 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 220 Marlin/Configuration.h
-
-          # Extend maximum X position for better probe reachability (for BLTouch/UBL/ABL, default is X_BED_SIZE, Jyers uses X_BED_SIZE + 15)
-          # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
-          ## TODO: Bed size is now -10, so added 15 + 10 = +25 to adjust the max X pos accordingly
-          # configValue X_MAX_POS "X_BED_SIZE + 25" Marlin/Configuration.h
-
-          # TODO: This will need adjusting if we end up utilizing mechanical gantry calibration
-          # Lower maximum Z position for better mechanical gantry calibration
-          # NOTE: We can't go higher than 250 without breaking something!
-          ## TODO: 235 is pretty much close to comfort already, with the timing belt setup anyway..
-          configValue Z_MAX_POS 235 Marlin/Configuration.h # Default is 250
-
-          # Enable filament runout sensor
+          # Enable filament runout sensor support
           configEnable FILAMENT_RUNOUT_SENSOR Marlin/Configuration.h
-          
-          # TODO: Should we keep it disabled by default?
           configValue FIL_RUNOUT_ENABLED_DEFAULT false Marlin/Configuration.h
-          # configValue FIL_RUNOUT_ENABLED_DEFAULT true Marlin/Configuration.h
-
-          # TODO: Calculate this for our hardware once we have it all setup!
-          # Set the default/custom runout sensor filament distance
           configValue FILAMENT_RUNOUT_DISTANCE_MM 0 Marlin/Configuration.h
-
-          # Enable leveling after completion (for BLTouch/UBL/ABL)
-          ## NOTE: Only enable one of these, not both!
-          configEnable RESTORE_LEVELING_AFTER_G28 Marlin/Configuration.h
-
-          # TODO: Leaving this disabled, since it's the default anyway
-          # Set default fade height, which helps with warped beds and more uniform results (for BLTouch/UBL/ABL, default is 10 for Creality and Jyers)
-          #configValue DEFAULT_LEVELING_FADE_HEIGHT "10.0" Marlin/Configuration.h
-
-          # TODO: Leaving this disabled for now
-          # Enable leveling debugging
-          #configEnable DEBUG_LEVELING_FEATURE Marlin/Configuration.h
-
-          # Set the leveling grid size for the current firmware configuration
-          configValue GRID_MAX_POINTS_X $GRID Marlin/Configuration.h
-
-          # Enable safe homing on the Z axis (disabled by default, enabled in Jyers)
-          configEnable Z_SAFE_HOMING Marlin/Configuration.h
-
-          # TODO: Ensure that X_CENTER and Y_CENTER actually exist?
-          # Tweak Z homing position
-          configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
-          configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
-          # TODO: Using values from Jyers instead
-          # configValue Z_SAFE_HOMING_X_POINT "\(\(X_BED_SIZE - 10) \/ 2\)" Marlin/Configuration.h
-          # configValue Z_SAFE_HOMING_Y_POINT "\(\(Y_BED_SIZE - 10\) \/ 2\)" Marlin/Configuration.h
-
-          # TODO: Leaving this alone for now (defaults are higher)
-          # Reduce homing feed rates (homing speeds)
-          #configValue HOMING_FEEDRATE_MM_M "{ \(20\*60\), \(20\*60\), \(4\*60\) }" Marlin/Configuration.h
 
           # Enable EEPROM feedback (disabled by default, enabled in Jyers)
           configEnable EEPROM_CHITCHAT Marlin/Configuration.h
@@ -455,438 +291,6 @@ jobs:
           # Enable software PWM fan control
           configEnable FAN_SOFT_PWM Marlin/Configuration.h
 
-          # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
-          configEnable THERMAL_PROTECTION_CHAMBER Marlin/Configuration.h
-
-          ## FIXME: Our print head is crashing into our bed when probing, was this being enabled the cause?!
-          ## TODO: This is enabled in Marlin's example firmware, so we could try using this again?
-          # Disable endstops interrupt compatibility (required to be disabled for BTT boards, however enabled by default in most configs)
-          # configDisable ENDSTOP_INTERRUPTS_FEATURE Marlin/Configuration.h
-
-          # TODO: Leaving classic jerk alone for now
-          # TODO: Should we disable this due to potential issues with Junction Deviation still?
-          # Disable classic jerk
-          #configDisable CLASSIC_JERK Marlin/Configuration.h
-
-          # TODO: Leaving this alone for now
-          # Disable extrapolating beyond the grid (enabled by default)
-          #configDisable EXTRAPOLATE_BEYOND_GRID Marlin/Configuration.h
-
-          # FIXME: Test if this needs to be enabled to get the manual leveling option in JyersUI?
-          # Enable bed level corner adjustments
-          #configEnable LEVEL_BED_CORNERS Marlin/Configuration.h
-
-          # TODO: Leaving this alone for now
-          # Enable mesh validation support
-          #configEnable G26_MESH_VALIDATION Marlin/Configuration.h
-
-          # Turn off display after 5 minutes
-          # configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
-          configValue TOUCH_IDLE_SLEEP_MINS 1 Marlin/Configuration.h
-
-          # Configure PID for the bed
-          configValue DEFAULT_bedKp 68.4903 Marlin/Configuration.h
-          configValue DEFAULT_bedKi 13.1712 Marlin/Configuration.h
-          configValue DEFAULT_bedKd 237.4331 Marlin/Configuration.h
-
-          # Configure PID for the hotend
-          # configValue DEFAULT_Kp 23.26 Marlin/Configuration.h
-          # configValue DEFAULT_Ki 1.89 Marlin/Configuration.h
-          # configValue DEFAULT_Kd 71.41 Marlin/Configuration.h
-
-          # Enable center point for bed tramming
-          configEnable BED_TRAMMING_INCLUDE_CENTER Marlin/Configuration.h
-
-          # Enable bed tramming audio feedback
-          configEnable BED_TRAMMING_AUDIO_FEEDBACK Marlin/Configuration.h
-
-          ## TODO: Testing fan PWM dithering
-          ## TODO: UPDATE: This only works with scaling, and seems to affect heaters too, so not going deeper into this right now..
-          # configEnable SOFT_PWM_DITHER Marlin/Configuration.h
-
-          # Configure UBL/ABL specific options
-          if ($UBL); then
-            # Enable Universal Bed Leveling (UBL)
-            configEnable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
-
-            # Disable other bed leveling options
-            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
-            configDisable MESH_BED_LEVELING Marlin/Configuration.h
-
-            # Increase default mesh inset for UBL
-            # configValue MESH_INSET 10 Marlin/Configuration.h
-            # TODO: Lowered mesh inset back to default 1
-            configValue MESH_INSET 1 Marlin/Configuration.h
-
-            # Enable Hilbert Curve for UBL (reduces travel)
-            configEnable UBL_HILBERT_CURVE Marlin/Configuration.h
-
-            # Disable UBL automatic mesh saving
-            # configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
-
-            ## FIXME: Can this cause our print head crashing into the bed when probing?!
-            ## TODO: Not sure if we can use this or not? And what it actually does?
-            configEnable UBL_MESH_WIZARD Marlin/Configuration.h
-            
-            configEnable MESH_EDIT_MENU Marlin/Configuration.h
-          else
-            # Enable Automatic Bed Leveling (ABL)
-            configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
-
-            # Disable other bed leveling options
-            configDisable AUTO_BED_LEVELING_3POINT Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_LINEAR Marlin/Configuration.h
-            configDisable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
-            configDisable MESH_BED_LEVELING Marlin/Configuration.h
-          fi
-
-          configEnable BED_TRAMMING_USE_PROBE Marlin/Configuration.h
-
-          # Configure direct drive specific options
-          if ($DIRECT_DRIVE); then
-            # Adjust e-steps for direct drive
-            configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415.0 }" Marlin/Configuration.h
-            # configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 410.85 }" Marlin/Configuration.h
-
-            # Limit maximum Z position when using a direct drive
-            # configValue Z_MAX_POS 230 Marlin/Configuration.h # Default is 250
-
-            # FIXME: Adjust max feedrate for direct drive
-            #configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
-            # TODO: Trying to drastically bump up maximum values
-            #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 100}" Marlin/Configuration.h
-            #configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 25, 100}" Marlin/Configuration.h
-            # TODO: Trying with default feedrates for now
-            # TODO: Trying with doubled feedrates now, just to test it out
-            # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 10, 50}" Marlin/Configuration.h
-            # TODO: Increasing maximum extruder feedrates for direct drive
-            # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 50}" Marlin/Configuration.h
-            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration + higher extruder feedrate for direct drive
-            # configValue DEFAULT_MAX_FEEDRATE "{ 200, 200, 5, 50}" Marlin/Configuration.h
-
-            # TODO: Testing lowering Z travel acceleration from 1000 to 500,
-            #       in case this would not cause as much Z sync issues?
-            # configValue DEFAULT_TRAVEL_ACCELERATION 500 Marlin/Configuration.h
-            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
-
-            # Increase Z jerk from 0.3 to 0.4
-            #configValue DEFAULT_ZJERK 0.4 Marlin/Configuration.h
-
-            # TODO: These are currently set to the defaults, so may need to be adjusted?
-            # Adjust max acceleration for direct drive
-            #configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
-            # TODO: Trying to drastically bump up maximum values
-            #configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 10000 }" Marlin/Configuration.h
-            # TODO: Trying with default accelerations for now
-            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
-            # configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
-
-            # TODO: Trying to drastically bump up maximum values
-            #configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
-            #configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
-            #configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
-            # TODO: Trying with default accelerations for now
-            # TODO: UPDATE: We're back to using BTT default feedrates/acceleration
-            # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
-
-            # Customized and optimized speed and acceleration values for this particular printer/firmware setup
-            # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
-            configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 20, 50}" Marlin/Configuration.h
-            # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
-            configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 5000 }" Marlin/Configuration.h
-            # configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
-            # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
-            # configValue DEFAULT_ACCELERATION 600 Marlin/Configuration.h
-            configValue DEFAULT_ACCELERATION 750 Marlin/Configuration.h
-            # configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
-            # configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
-            configValue DEFAULT_RETRACT_ACCELERATION 800 Marlin/Configuration.h
-            # configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
-            configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
-            # configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
-
-            # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
-            # TODO: Increased Z homing from 4mm/s to 25mm/s
-            # Increase homing feed rates (homing speeds)
-            # DEFAULT: { (50*60), (50*60), (4*60) }
-            #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(25\*60\) }" Marlin/Configuration.h
-            #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
-            # configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
-            # TODO: Should we default back to BTT's homing speeds instead
-            # configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
-            # configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(8\*60\) }" Marlin/Configuration.h
-            # TODO: Lowered Z homing from 8*60 to 4*60, as otherwise the probe hits the bed quite hard
-            # configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(4\*60\) }" Marlin/Configuration.h
-            # TODO: Lowered homing rate back to defaults, in order to compensate for bed/mesh size and offsets after homing
-            configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
-
-            # FIXME: Turns out that the first probe ignores Z_PROBE_FEEDRATE_FAST entirely,
-            #        which means we will always hit the bed, unless we slow down the Z feedrate(s)
-
-            # FIXME: If 25mm/s isn't too fast, try that instead of 15mm/s?
-            #        But DO remember that Z_PROBE_FEEDRATE_SLOW is set to
-            #        exactly HALF of Z_PROBE_FEEDRATE_FAST, which means that
-            #        the higher the first approach probe, the higher the slow probes are!
-            # TODO: Increased from 4mm/s to 15mm/s
-            # Increase probing speed for the first approach when double-probing (MULTIPLE_PROBING is set to 2)
-            #configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
-            # TODO: Nozzle was hitting the bed, so trying to go a little bit slower here
-            #configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
-            # configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
-            # TODO: Lowered Z homing from 8*60 to 4*60 (DEFAULT!), as otherwise the probe hits the bed quite hard
-            configValue Z_PROBE_FEEDRATE_FAST "\(4\*60\)" Marlin/Configuration.h
-            # FIXME: WARNING! This may hit our bed REALLY fast!
-            # configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
-
-            # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
-            #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
-            configValue Z_PROBE_FEEDRATE_SLOW "\(Z_PROBE_FEEDRATE_FAST \/ 2\)" Marlin/Configuration.h
-
-            # FIXME: !!! This needs to be HEAVILY tested, as with our new probe offsets, the margins have changed! !!!
-            # configValue PROBING_MARGIN 15 Marlin/Configuration.h # Default is 20
-            # TODO: This works alright on the left, right and front sides, but the back is hitting the edge and/or holes on the bed plate!
-            # configValue PROBING_MARGIN 10 Marlin/Configuration.h # Default is 20
-            
-            # Adjust offsets for direct drive
-            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
-            ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
-            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
-            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
-            # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
-            configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.20 }" Marlin/Configuration.h
-
-            # Override mesh insets to be lower
-            # configValue MESH_INSET 0 Marlin/Configuration.h
-            # configValue MESH_INSET 15 Marlin/Configuration.h
-            
-            # # Configure PID for the bed (60C)
-            # configValue DEFAULT_bedKp 82.96 Marlin/Configuration.h
-            # configValue DEFAULT_bedKi 15.95 Marlin/Configuration.h
-            # configValue DEFAULT_bedKd 287.61 Marlin/Configuration.h
-
-            # Configure PID for the PEI bed (60C + Creality Smooth PEI)
-            # configValue DEFAULT_bedKp 112.39 Marlin/Configuration.h
-            # configValue DEFAULT_bedKi 21.61 Marlin/Configuration.h
-            # configValue DEFAULT_bedKd 389.63 Marlin/Configuration.h
-
-            # Configure PID for the PEI bed (60C + Biqu Magnetic Plate)
-            # configValue DEFAULT_bedKp 135.93 Marlin/Configuration.h
-            # configValue DEFAULT_bedKi 25.36 Marlin/Configuration.h
-            # configValue DEFAULT_bedKd 485.74 Marlin/Configuration.h
-
-            # # Configure PID for the hotend (215C + Micro Swiss All Metal Hotend)
-            # configValue DEFAULT_Kp 25.72 Marlin/Configuration.h
-            # configValue DEFAULT_Ki 2.51 Marlin/Configuration.h
-            # configValue DEFAULT_Kd 65.85 Marlin/Configuration.h
-
-            # # Configure PID for the hotend (205C + Micro Swiss All Metal Hotend)
-            # configValue DEFAULT_Kp 25.69 Marlin/Configuration.h
-            # configValue DEFAULT_Ki 2.55 Marlin/Configuration.h
-            # configValue DEFAULT_Kd 64.75 Marlin/Configuration.h
-
-            # Configure PID for the hotend (200C)
-            # configValue DEFAULT_Kp 23.63 Marlin/Configuration.h
-            # configValue DEFAULT_Ki 1.86 Marlin/Configuration.h
-            # configValue DEFAULT_Kd 75.13 Marlin/Configuration.h
-
-            # FIXME: Adjust home offsets for direct drive, since they're now wrong?!
-            #        But how/where? HOTEND_OFFSET_X/Y/Z?
-          fi
-
-          if ($JUNCTION_DEVIATION); then
-            # TODO: Trying to see if enabling Junction Deviation AND Linear Advance will cause issues or not
-            # Enable junction deviation by disabling classic jerk handling
-            configDisable CLASSIC_JERK Marlin/Configuration.h
-
-            # Tweak junction deviation
-            # NOTE: 0.013 is the default
-            # configValue JUNCTION_DEVIATION_MM 0.013 Marlin/Configuration.h
-            # TODO: Trying 0.08 as the default, as suggested by Teaching Tech
-            # configValue JUNCTION_DEVIATION_MM 0.08 Marlin/Configuration.h
-            # TODO: Supposedly calibrated to 0.15, but the differences are impossible to see?!
-            # configValue JUNCTION_DEVIATION_MM 0.15 Marlin/Configuration.h
-            # FIXME: Recalibrate this and check for bulging AND ringing! This is just a test value!
-            # configValue JUNCTION_DEVIATION_MM 0.10 Marlin/Configuration.h
-            # Calibrated JD with LIN_ADV enabled
-            # NOTE: 0.01-0.03 looks like the ideal value, while 0.04-0.05 and above cause bulging edges?
-            # configValue JUNCTION_DEVIATION_MM 0.03 Marlin/Configuration.h
-            # configValue JUNCTION_DEVIATION_MM 0.005 Marlin/Configuration.h ## FIXME: Calculate a new JD value!
-            configValue JUNCTION_DEVIATION_MM 0.06 Marlin/Configuration.h
-          else
-            # Disable junction deviation by enabling classic jerk handling
-            configEnable CLASSIC_JERK Marlin/Configuration.h
-          fi
-
-          ## FIXME: Linear Advance needs to be recalibrated! But we need to calibrate other stuff before that too, I think?
-          if ($LINEAR_ADVANCE); then
-            # TODO: Trying with a higher e-jerk again, just for good measure!
-            # Increase extruder jerk for linear advance + direct drive
-            # configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
-            # FIXME: I'm pretty sure jerk is a big part of our problem,
-            #        so keep trying and perhaps even try without linear advance and/or junction deviation?
-            configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
-
-            # if [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then
-            #   ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
-            #   ##        so we're giving it a go without it, see how that pans out!
-            #   configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
-            # fi
-          else
-            # Set default extruder jerk
-            configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
-          fi
-
-          # NOTE: MPC is still HIGHLY experimental, proceed with caution!
-          if ($MPC); then
-            # Disable PID and enable MPC
-            configDisable PIDTEMP Marlin/Configuration.h
-            configEnable MPCTEMP Marlin/Configuration.h
-
-            # Configure MPC
-            # NOTE: Use "M306 T" G-Code to autotune MPC for the hotend
-            configEnable MPC_EDIT_MENU Marlin/Configuration.h
-            configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
-
-            # Customize MPC
-            configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.8300f }" Marlin/Configuration.h
-            configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2342f }" Marlin/Configuration.h
-            configValue MPC_AMBIENT_XFER_COEFF "{ 0.1307f }" Marlin/Configuration.h
-            configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1429f }" Marlin/Configuration.h
-            configValue FILAMENT_HEAT_CAPACITY_PERMM "{ 0.0056f}" Marlin/Configuration.h
-          else
-            # Enable PID and disable MPC
-            configEnable PIDTEMP Marlin/Configuration.h
-            configDisable MPCTEMP Marlin/Configuration.h
-          fi
-
-          # Enable PID menus even when using MPC
-          configEnable PID_EDIT_MENU Marlin/Configuration.h
-          configEnable PID_AUTOTUNE_MENU Marlin/Configuration.h
-
-          # Switch between the different UI options
-          if [ $UI == "MarlinUI" ]; then # MarlinUI
-            # Enable the Marlin UI
-            configEnable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
-          elif [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then # BTT TFT35
-            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
-
-            # Disable other UIs
-            configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
-            configDisable DWIN_LCD_PROUI Marlin/Configuration.h
-            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
-            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
-
-            # Configure speaker
-            configEnable SPEAKER Marlin/Configuration.h
-            # FIXME: These produce a WAY too high pitched, "breaking" noise, so trying with defaults next!
-            # configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
-            # configValue LCD_FEEDBACK_FREQUENCY_HZ 1000 Marlin/Configuration.h
-            # TODO: Frequency of 5000 to 8000 seems fine, so long as duration isn't too high!
-            configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
-            configValue LCD_FEEDBACK_FREQUENCY_HZ 5000 Marlin/Configuration.h
-
-            ## TODO: Experimental options for enabling the BTT BIGTREE_TFT35_E3_V3_0 display
-            configEnable CR10_STOCKDISPLAY Marlin/Configuration.h
-            # configEnable TFT_COLOR_UI Marlin/Configuration.h
-            # configEnable TOUCH_SCREEN Marlin/Configuration.h
-
-            configEnable G26_MESH_VALIDATION Marlin/Configuration.h
-
-            # FIXME: Can we then use both SD cards and USB ports?
-            # Configure serial ports for touch screem
-            ## NOTE: This is for BTT TFT35 + USB
-            # configValue SERIAL_PORT 2 Marlin/Configuration.h
-            # configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
-            ## NOTE: This is for USB + TFT35
-            configValue SERIAL_PORT -1 Marlin/Configuration.h
-            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
-            ## TODO: Lowered baudrates back to 115200
-            configValue BAUDRATE 250000 Marlin/Configuration.h
-            # configValue BAUDRATE_2 250000 Marlin/Configuration.h
-            # configValue BAUDRATE 115200 Marlin/Configuration.h
-            configValue BAUDRATE_2 115200 Marlin/Configuration.h
-
-            ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
-            ##        so we're giving it a go without it, see how that pans out!
-            # configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
-          elif [ $UI == "FYSETC_MINI_12864_2_1" ]; then # FYSETC_MINI_12864_2_1
-            # Disable other UIs
-            configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
-            configDisable DWIN_LCD_PROUI Marlin/Configuration.h
-            configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
-            configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
-            configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
-
-            # Enable the FYSETC_MINI_12864_2_1 LCD display
-            configEnable FYSETC_MINI_12864_2_1 Marlin/Configuration.h
-
-            # Enable and configure Neopixel LED support
-            configEnable NEOPIXEL_LED Marlin/Configuration.h
-            # configValue NEOPIXEL_TYPE NEO_GRBW Marlin/Configuration.h
-            configValue NEOPIXEL_TYPE NEO_RGB Marlin/Configuration.h
-            # configDisable NEOPIXEL_PIN Marlin/Configuration.h
-            # configDisable NEOPIXEL_PIXELS Marlin/Configuration.h
-            # configDisable NEOPIXEL_BRIGHTNESS Marlin/Configuration.h
-            configEnable NEOPIXEL_STARTUP_TEST Marlin/Configuration.h
-            configValue NEOPIXEL_BKGD_INDEX_FIRST 0 Marlin/Configuration.h
-            configValue NEOPIXEL_BKGD_COLOR "{ 0, 255, 0, 0 }" Marlin/Configuration.h
-
-            # Configure serial
-            configValue SERIAL_PORT -1 Marlin/Configuration.h
-            configValue SERIAL_PORT_2 2 Marlin/Configuration.h
-
-            # Configure baudrates
-            configValue BAUDRATE 250000 Marlin/Configuration.h
-            configValue BAUDRATE_2 115200 Marlin/Configuration.h
-
-            # Disable custom cable warnings
-            echo -e "#define NO_CONTROLLER_CUSTOM_WIRING_WARNING" >> Marlin/Configuration.h
-          fi
-
-          ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
-          # configValue X_BED_SIZE 235 Marlin/Configuration.h
-          # configValue Y_BED_SIZE 235 Marlin/Configuration.h
-          # configValue X_MIN_POS 0 Marlin/Configuration.h
-          # configValue Y_MIN_POS 0 Marlin/Configuration.h
-          # configValue X_MAX_POS "X_BED_SIZE" Marlin/Configuration.h
-          # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
-
-          # FIXME: Reverted these changes for now, other issues to solve first!
-          # Calibrated bed and position values
-          # configValue X_BED_SIZE "235 - 2" Marlin/Configuration.h
-          # configValue Y_BED_SIZE "235 - 5" Marlin/Configuration.h
-          # configValue X_MIN_POS 0 Marlin/Configuration.h
-          # configValue Y_MIN_POS 0 Marlin/Configuration.h
-          # configValue X_MAX_POS "245 - 5" Marlin/Configuration.h
-          # configValue Y_MAX_POS "235 - 5" Marlin/Configuration.h
-
-          ## END OF CONFIGURATION.H
-
-
-
-          ## BEGIN CONFIGURATION_ADV.H
-
-          # Configure thermal protection
-          configValue WATCH_TEMP_PERIOD 30 Marlin/Configuration_adv.h
-          configValue WATCH_TEMP_INCREASE 3 Marlin/Configuration_adv.h
-          configValue THERMAL_PROTECTION_BED_PERIOD 120 Marlin/Configuration_adv.h
-          configValue WATCH_BED_TEMP_PERIOD 120 Marlin/Configuration_adv.h
-
-          # Configure input shaping (experimental!)
-          if ($INPUT_SHAPING); then
-            configEnable INPUT_SHAPING Marlin/Configuration_adv.h
-            configEnable SHAPING_MENU Marlin/Configuration_adv.h
-            ## TODO: Supply tuned values for the input shaping
-          else
-            configDisable INPUT_SHAPING Marlin/Configuration_adv.h
-            configDisable SHAPING_MENU Marlin/Configuration_adv.h
-          fi
-
           # Enable mainboard/controller fan control
           configEnable USE_CONTROLLER_FAN Marlin/Configuration_adv.h
           configValue CONTROLLER_FAN_PIN FAN2_PIN Marlin/Configuration_adv.h
@@ -896,79 +300,27 @@ jobs:
           configValue E0_AUTO_FAN_PIN FAN1_PIN Marlin/Configuration_adv.h
           configValue COOLER_AUTO_FAN_PIN FAN_PIN Marlin/Configuration_adv.h
 
-          # TODO: Leaving this alone for now (enabled in all configs)
-          # TODO: Why would we keep this disabled? It's quicker, what are the drawbacks?
-          # Disable quick homing
-          #configDisable QUICK_HOME Marlin/Configuration_adv.h
+          # Enable thermal protection for a heated chamber (which we don't have, so this is rather meaningless)
+          configEnable THERMAL_PROTECTION_CHAMBER Marlin/Configuration.h
 
-          # TODO: Leaving this alone for now (enabled in all configs)
-          # Disable power loss recovery
-          #configDisable POWER_LOSS_RECOVERY Marlin/Configuration_adv.h
+          # Turn off display after 5 minutes
+          # configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
+          configValue TOUCH_IDLE_SLEEP_MINS 1 Marlin/Configuration.h
 
-          # TODO: Leaving this alone for now (defaults are slightly higher)
-          # Lower homing bump
-          # configValue HOMING_BUMP_MM "{ 4, 4, 2 }" Marlin/Configuration_adv.h
+          # Enable center point for bed tramming
+          configEnable BED_TRAMMING_INCLUDE_CENTER Marlin/Configuration.h
 
-          # FIXME: There are still (rare) occasions where the X (and sometimes Y?) axis will no trigger the endstop
-          # Adjust homing bumping due to our higher homing speeds
-          # TODO: Reverted back to defaults for now, to compensate for bes/mesh size and offsets when homing
-          # configValue HOMING_BUMP_MM "{ 6, 6, 2 }" Marlin/Configuration_adv.h
-          # configValue HOMING_BUMP_DIVISOR "{ 4, 4, 4 }" Marlin/Configuration_adv.h
+          # Enable bed tramming audio feedback
+          configEnable BED_TRAMMING_AUDIO_FEEDBACK Marlin/Configuration.h
 
-          # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
-          if ($HIGH_SPEED); then
-            configValue BLTOUCH_HS_MODE true Marlin/Configuration_adv.h
-          else
-            configDisable BLTOUCH_HS_MODE Marlin/Configuration_adv.h
-          fi
+          # Always enable PID edit and autotune menus
+          configEnable PID_EDIT_MENU Marlin/Configuration.h
+          configEnable PID_AUTOTUNE_MENU Marlin/Configuration.h
 
-          ## FIXME: Can this cause our print head crashing into the bed when probing when NOT set?!
-          # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
-          # Decreate probing delay for BLTouch
-          # WARNING: Requires a BLTouch 3.0 or later
-          # configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
-          # configValue BLTOUCH_DELAY 300 Marlin/Configuration_adv.h
-          configValue BLTOUCH_DELAY 350 Marlin/Configuration_adv.h
-
-          ## FIXME: Can this cause our print head crashing into the bed when probing when NOT set?!
-          # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
-          # Enable 5V mode for BLTouch
-          # WARNING: Make sure your board _and_ BLTouch (3.0 and above) use +5V and not +3.3V!
-          # configEnable BLTOUCH_SET_5V_MODE Marlin/Configuration_adv.h
-
-          # Override probing margins
-          # # configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
-          # # configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
-          # # configValue PROBING_MARGIN_FRONT 6 Marlin/Configuration_adv.h
-          # # configValue PROBING_MARGIN_BACK 8 Marlin/Configuration_adv.h
-          # configValue PROBING_MARGIN_LEFT 6 Marlin/Configuration_adv.h
-          # configValue PROBING_MARGIN_RIGHT 0 Marlin/Configuration_adv.h
-          # configValue PROBING_MARGIN_FRONT 5 Marlin/Configuration_adv.h
-          # configValue PROBING_MARGIN_BACK 6 Marlin/Configuration_adv.h
-
-          # Override mesh insets
-          # # configValue MESH_MIN_X "UBL_MESH_INSET" Marlin/Configuration_adv.h
-          # # configValue MESH_MAX_X "(X_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
-          # # configValue MESH_MIN_Y "UBL_MESH_INSET" Marlin/Configuration_adv.h
-          # # configValue MESH_MAX_Y "(Y_BED_SIZE - (UBL_MESH_INSET))" Marlin/Configuration_adv.h
-          # ## TODO: Should we possibly use PROBIN_MARGIN_* here to offset instead?
-          # configValue MESH_MIN_X "X_MIN_POS + 20" Marlin/Configuration_adv.h
-          # configValue MESH_MIN_Y "Y_MIN_POS + 20" Marlin/Configuration_adv.h
-          # configValue MESH_MAX_X "X_MAX_POS" Marlin/Configuration_adv.h
-          # configValue MESH_MAX_Y "Y_MAX_POS" Marlin/Configuration_adv.h
-
-          ## FIXME: According to a GitHub issue, THIS is what causes the BLTouch to fail when enabled?!
-          ##        https://github.com/MarlinFirmware/Marlin/issues/23958
-          ## TODO: I'm still not 100% convinced on this, and wondering if this is actually _causing_ skipped steps, instead of fixing them?
-          # TODO: This needs testing and supposedly fixes high CPU issues with this specific board, causing skipped steps etc.
           # Disable adaptive step smoothing
           configDisable ADAPTIVE_STEP_SMOOTHING Marlin/Configuration_adv.h
 
-          # TODO: Leaving this alone for now (TODO: Needs testing, as supposedly related to disabling the above?)
-          # Adjust slowdown divisor when disabling adaptive step smoothing (default is 2)
-          #configValue SLOWDOWN_DIVISOR 8 Marlin/Configuration_adv.h
-
-          # Enable DWIN display beep mute option
+          # Enable display speaker mute option
           configEnable SOUND_MENU_ITEM Marlin/Configuration_adv.h
 
           # Disable the speaker by default
@@ -1009,7 +361,7 @@ jobs:
           # TODO: Leaving this alone for now (enabled by default)
           # Enable SD card host drive support
           #configDisable NO_SD_HOST_DRIVE Marlin/Configuration_adv.h
-                  
+
           # Configure babystepping
           # configEnable BABYSTEP_WITHOUT_HOMING Marlin/Configuration_adv.h
           # configEnable BABYSTEP_ALWAYS_AVAILABLE Marlin/Configuration_adv.h
@@ -1284,152 +636,586 @@ jobs:
           ## TODO: Temporarily enable, so we can monitor our memory usage/free memory with the M100 g-code!
           # configEnable M100_FREE_MEMORY_WATCHER Marlin/Configuration_adv.h
 
-          # TODO: This will likely cause A LOT of noise, but potentially benefits quality?
-          # Enable and configure Hybrid Threshold
-          if ($HYBRID_THRESHOLD); then
-            configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
-            configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
-            configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in Creality and BTT
-          fi
+          # Enable stepper motor driver status monitoring
+          # NOTE: This will monitor the TMC2209 drivers, drop the current
+          #       and eventually stop if something goes wrong!
+          configEnable MONITOR_DRIVER_STATUS Marlin/Configuration_adv.h
 
-          # Configure direct drive specific options
-          if ($DIRECT_DRIVE); then
-            # Set both to the full height of the nozzle (8.2mm)
-            # configValue FILAMENT_CHANGE_UNLOAD_LENGTH 8 Marlin/Configuration_adv.h
-            # configValue FILAMENT_CHANGE_FAST_LOAD_LENGTH 8 Marlin/Configuration_adv.h
+          # TODO: Disabling babystepping customizations for now
+          # TODO: Not specific to direct drive, but using this for debugging right now!
+          # Use millimeters instead of micro-steps for babystepping multiplicator
+          #configEnable BABYSTEP_MILLIMETER_UNITS Marlin/Configuration_adv.h
+          #configValue BABYSTEP_MULTIPLICATOR_Z 0.01 Marlin/Configuration_adv.h
+          #configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
 
-            # FIXME: This will likely need more tweaking, as it's specific to the Bondtech extruder motor + 3:1 gear ratio!
-            # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
-            #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
-            # TODO: Since 400 works well enough, trying with 450 again
-            configValue E0_CURRENT 450 Marlin/Configuration_adv.h
-            # TODO: UPDATE: 400 works pretty well, I feel like!
-            # configValue E0_CURRENT 400 Marlin/Configuration_adv.h
-            # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
-            #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
+          # TODO: Disabled these for now, just because I wanted to try how stock feels again!
+          # ## TODO: Why are we doing these babystep adjustments again?!
+          # # Increase the babystepping amount from 0.0025mm to 0.01mm
+          # configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
 
-            # Enable stepper motor driver status monitoring
-            # NOTE: This will monitor the TMC2209 drivers, drop the current
-            #       and eventually stop if something goes wrong!
-            configEnable MONITOR_DRIVER_STATUS Marlin/Configuration_adv.h
+          # # Set the X and Y axis babystepping to equal the Z axis
+          # configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
 
-            # TODO: Disabling babystepping customizations for now
-            # TODO: Not specific to direct drive, but using this for debugging right now!
-            # Use millimeters instead of micro-steps for babystepping multiplicator
-            #configEnable BABYSTEP_MILLIMETER_UNITS Marlin/Configuration_adv.h
-            #configValue BABYSTEP_MULTIPLICATOR_Z 0.01 Marlin/Configuration_adv.h
-            #configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
+          # # Increase fine manual move amount from 0.025mm to 0.005mm
+          # configValue FINE_MANUAL_MOVE 0.005 Marlin/Configuration_adv.h
 
-            # TODO: Disabled these for now, just because I wanted to try how stock feels again!
-            # ## TODO: Why are we doing these babystep adjustments again?!
-            # # Increase the babystepping amount from 0.0025mm to 0.01mm
-            # configValue BABYSTEP_MULTIPLICATOR_Z 4 Marlin/Configuration_adv.h
+          # TODO: Disable just to see if it reduces the sounds?!
+          # TODO: This needs HEAVY testing, as it may be too aggressive!
+          # Disable stealthschop for the extruder
+          #configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
 
-            # # Set the X and Y axis babystepping to equal the Z axis
-            # configValue BABYSTEP_MULTIPLICATOR_XY BABYSTEP_MULTIPLICATOR_Z Marlin/Configuration_adv.h
+          ## TODO: UPDATE: After we recalibrate firmware retraction, we should 100% try enabling this again!
+          # FIXME: Disabling firmware retraction for now, as it almost seems
+          #        like we're unable to disable it with g-code, as our stringing
+          #        issues are identical, no matter how much we adjust retraction!?
+          # Enable and configure firmware retraction
+          # TODO: Disabled firmware retract for now, continuing to let the slicer do its thing instead!
+          # configEnable FWRETRACT Marlin/Configuration_adv.h
+          # configValue MAX_AUTORETRACT 2.0 Marlin/Configuration_adv.h
+          # # # FIXME: Adjust retract length and feedrate to match known good values for the Bondtech extruder!
+          # configValue RETRACT_LENGTH 1 Marlin/Configuration_adv.h
+          # configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
 
-            # # Increase fine manual move amount from 0.025mm to 0.005mm
-            # configValue FINE_MANUAL_MOVE 0.005 Marlin/Configuration_adv.h
 
-            # TODO: Disable just to see if it reduces the sounds?!
-            # TODO: This needs HEAVY testing, as it may be too aggressive!
-            # Disable stealthschop for the extruder
-            #configDisable STEALTHCHOP_E Marlin/Configuration_adv.h
 
-            ## TODO: UPDATE: After we recalibrate firmware retraction, we should 100% try enabling this again!
-            # FIXME: Disabling firmware retraction for now, as it almost seems
-            #        like we're unable to disable it with g-code, as our stringing
-            #        issues are identical, no matter how much we adjust retraction!?
-            # Enable and configure firmware retraction
-            # TODO: Disabled firmware retract for now, continuing to let the slicer do its thing instead!
-            # configEnable FWRETRACT Marlin/Configuration_adv.h
-            # configValue MAX_AUTORETRACT 2.0 Marlin/Configuration_adv.h
-            # # # FIXME: Adjust retract length and feedrate to match known good values for the Bondtech extruder!
-            # configValue RETRACT_LENGTH 1 Marlin/Configuration_adv.h
-            # configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
+      - name: 'Configure: PID'
+        if: ${{ success() && !matrix.mpc }}
+        id: configure_pid
+        run: |-
 
-            if ($LINEAR_ADVANCE); then
-              # Enable linear advance for direct drive
-              configEnable LIN_ADVANCE Marlin/Configuration_adv.h
-              #configValue ADVANCE_K 0.15 Marlin/Configuration_adv.h
-              # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
-              #configValue ADVANCE_K 0.25 Marlin/Configuration_adv.h
-              # TODO: Re-calibrated and 0.15 now looks the best!
-              #configValue ADVANCE_K 0.15 Marlin/Configuration_adv.h
-              
-              ## FIXME: Re-calibrate K again! The value below is currently NOT accurate anymore!
-              # configValue ADVANCE_K 0.11 Marlin/Configuration_adv.h
-              configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
-              # configValue ADVANCE_K 0.6 Marlin/Configuration_adv.h ## FIXME: Re-calibrate linear advance
-              ## NOTE: We set linear advance K value to zero, so that it's effectively disabled by default!
-              # configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
 
-              ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
-              ##        so we're giving it a go without it, see how that pans out!
-              # if [$UI == "BIGTREE_TFT35_E3_V3_0"]; then
-              #   configDisable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
-              # else
-              #   configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
-              # fi
-              configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+          # Enable PID and disable MPC
+          configEnable PIDTEMP Marlin/Configuration.h
+          configDisable MPCTEMP Marlin/Configuration.h
 
-              configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
-            fi
-          fi
+          # Configure default PID for the bed
+          configValue DEFAULT_bedKp 68.4903 Marlin/Configuration.h
+          configValue DEFAULT_bedKi 13.1712 Marlin/Configuration.h
+          configValue DEFAULT_bedKd 237.4331 Marlin/Configuration.h
 
-          # Configure UBL/ABL specific options
-          if ($UBL); then
-            # Disable retrying bed leveling after a failed attempt
-            configDisable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
-          else
-            # Enable retrying bed leveling after a failed attempt
-            configEnable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
-          fi
+          ## TODO: Configure default PID for the hotend
 
-          if [ $UI == "BIGTREE_TFT35_E3_V3_0" ]; then
-            # Enable additional reporting etc. features
-            configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
-            configEnable M115_GEOMETRY_REPORT Marlin/Configuration_adv.h
-            configEnable M114_DETAIL Marlin/Configuration_adv.h
-            configEnable M114_REALTIME Marlin/Configuration_adv.h
-            configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
-            configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
-            configValue SERIAL_FLOAT_PRECISION 4 Marlin/Configuration_adv.h
-            configEnable M20_TIMESTAMP_SUPPORT Marlin/Configuration_adv.h
 
-            ## FIXME: According to a review on Amazon, ULTIPANEL_FEEDMULTIPLY needs to be disabled,
-            ##        otherwise the display's encoder gets triggered by even the slightest vibrations of the printer,
-            ##        which is immediately apparent when the display is mounted on the printer.
-            ## NOTE: The above IS true, for the most part anyway, eg. it drastically reduces the issue
-            configDisable ULTIPANEL_FEEDMULTIPLY Marlin/Configuration_adv.h
-          elif [ $UI == "FYSETC_MINI_12864_2_1" ]; then # FYSETC_MINI_12864_2_1
-            # Enable LCD control menu
-            configEnable LED_CONTROL_MENU Marlin/Configuration_adv.h
-          fi
 
-          ## END OF CONFIGURATION_ADV.H
+      - name: 'Configure: MPC'
+        if: ${{ success() && matrix.mpc }}
+        id: configure_mpc
+        run: |-
 
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Disable PID and enable MPC
+          configDisable PIDTEMP Marlin/Configuration.h
+          configEnable MPCTEMP Marlin/Configuration.h
+
+          # Configure MPC
+          # NOTE: Use "M306 T" G-Code to autotune MPC for the hotend
+          configEnable MPC_EDIT_MENU Marlin/Configuration.h
+          configEnable MPC_AUTOTUNE_MENU Marlin/Configuration.h
+
+          # Customize MPC
+          configValue MPC_BLOCK_HEAT_CAPACITY "{ 13.8300f }" Marlin/Configuration.h
+          configValue MPC_SENSOR_RESPONSIVENESS "{ 0.2342f }" Marlin/Configuration.h
+          configValue MPC_AMBIENT_XFER_COEFF "{ 0.1307f }" Marlin/Configuration.h
+          configValue MPC_AMBIENT_XFER_COEFF_FAN255 "{ 0.1429f }" Marlin/Configuration.h
+          configValue FILAMENT_HEAT_CAPACITY_PERMM "{ 0.0056f}" Marlin/Configuration.h
+
+          ## TODO: MPC only works for the hotend right now, so still need PID for the bed, I think?
+          # Configure default PID for the bed
+          configValue DEFAULT_bedKp 68.4903 Marlin/Configuration.h
+          configValue DEFAULT_bedKi 13.1712 Marlin/Configuration.h
+          configValue DEFAULT_bedKd 237.4331 Marlin/Configuration.h
+
+
+
+      - name: 'Configure: BLTouch'
+        if: ${{ success() && matrix.bltouch }}
+        id: configure_bltouch
         env:
+          HIGH_SPEED: ${{ matrix.high-speed }}
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Disable Z axis endstop switch support (we use BLTouch/CRTouch instead, default is enabled)
+          configDisable Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN Marlin/Configuration.h
+
+          # Enable Z homing using a probe (default is disabled)
+          configEnable USE_PROBE_FOR_Z_HOMING Marlin/Configuration.h
+
+          # Ensure manual probing is always disabled when using BLTouch/CRTouch
+          configDisable PROBE_MANUALLY Marlin/Configuration.h
+
+          # Enable safe homing on the Z axis (disabled by default, enabled in Jyers)
+          configEnable Z_SAFE_HOMING Marlin/Configuration.h
+
+          # Tweak Z homing position
+          configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
+
+          # Enable BLTouch/CRTouch support
+          configEnable BLTOUCH Marlin/Configuration.h
+
+          # Enable BLTouch High Speed mode (HS) depending on the firmware configuration
+          if ($HIGH_SPEED); then
+            configValue BLTOUCH_HS_MODE true Marlin/Configuration_adv.h
+          else
+            configDisable BLTOUCH_HS_MODE Marlin/Configuration_adv.h
+          fi
+
+          ## FIXME: Can this cause our print head crashing into the bed when probing when NOT set?!
+          # TODO: Pretty sure this isn't required for BLTouch v3.1, so disabling..
+          # Decreate probing delay for BLTouch
+          # WARNING: Requires a BLTouch 3.0 or later
+          # configValue BLTOUCH_DELAY 200 Marlin/Configuration_adv.h
+          # configValue BLTOUCH_DELAY 300 Marlin/Configuration_adv.h
+          configValue BLTOUCH_DELAY 350 Marlin/Configuration_adv.h
+
+          # Increase X/Y axis feed rate (travel speed) when probing (for BLTouch/UBL, default is 50x60, Jyers config uses 133x60)
+          configValue XY_PROBE_FEEDRATE "(133*60)" Marlin/Configuration.h
+
+          # Set min/max probe offsets (defaults are -10 and 10, same for Jyers)
+          configValue Z_PROBE_OFFSET_RANGE_MIN -5 Marlin/Configuration.h
+          configValue Z_PROBE_OFFSET_RANGE_MAX 10 Marlin/Configuration.h
+
+          # Enable Z probe testing (for BLTouch/UBL)
+          configEnable Z_MIN_PROBE_REPEATABILITY_TEST Marlin/Configuration.h
+
+          # Enable/increase Z clearance
+          configValue Z_HOMING_HEIGHT 10 Marlin/Configuration.h
+
+          # Require heated bed and nozzle when auto-leveling
+          configEnable PREHEAT_BEFORE_LEVELING Marlin/Configuration.h
+          configValue LEVELING_NOZZLE_TEMP 150 Marlin/Configuration.h
+          configValue LEVELING_BED_TEMP 50 Marlin/Configuration.h
+
+          # Enable bed tramming with a probe
+          configEnable BED_TRAMMING_USE_PROBE Marlin/Configuration.h
+
+
+
+      - name: 'Configure: UBL'
+        if: ${{ success() && matrix.ubl }}
+        id: configure_ubl
+        env:
+          GRID: ${{ matrix.grid }}
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Enable Universal Bed Leveling (UBL)
+          configEnable AUTO_BED_LEVELING_UBL Marlin/Configuration.h
+
+          # Disable bilinear leveling (enabled by default)
+          configDisable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
+
+          # Increase default mesh inset for UBL
+          # configValue MESH_INSET 10 Marlin/Configuration.h
+          # TODO: Lowered mesh inset back to default 1
+          configValue MESH_INSET 1 Marlin/Configuration.h
+
+          # Enable Hilbert Curve for UBL (reduces travel)
+          configEnable UBL_HILBERT_CURVE Marlin/Configuration.h
+
+          # Disable UBL automatic mesh saving
+          # configDisable UBL_SAVE_ACTIVE_ON_M500 Marlin/Configuration.h
+
+          # Enable Marlin's UBL mesh wizard
+          configEnable UBL_MESH_WIZARD Marlin/Configuration.h
+          
+          # Enable UBL mesh editing menu
+          configEnable MESH_EDIT_MENU Marlin/Configuration.h
+
+          # Set the leveling grid size for the current firmware configuration
+          configValue GRID_MAX_POINTS_X $GRID Marlin/Configuration.h
+
+          # Enable leveling after completion (for BLTouch/UBL/ABL)
+          configEnable RESTORE_LEVELING_AFTER_G28 Marlin/Configuration.h
+
+          # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
+          configValue PROBING_MARGIN 10 Marlin/Configuration.h
+
+          # Disable retrying bed leveling after a failed attempt
+          configDisable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
+
+
+
+      - name: 'Configure: Bed Leveling'
+        if: ${{ success() && !matrix.ubl }}
+        id: configure_bed_leveling
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Ensure bilinear leveling is enabled (default is enabled)
+          configEnable AUTO_BED_LEVELING_BILINEAR Marlin/Configuration.h
+
+          ## TODO: Do we need to specify anything else? Insets, probe offsets, etc?
+
+          # Enable retrying bed leveling after a failed attempt
+          configEnable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
+
+
+
+      - name: 'Configure: Bondtech DDX v3'
+        if: ${{ success() && matrix.direct-drive }}
+        id: configure_bondtech_ddx_v3
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Adjust e-steps for direct drive
+          configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415.0 }" Marlin/Configuration.h
+
+          # Customized and optimized speed and acceleration values for this particular printer/firmware setup
+          # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+          configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 20, 50}" Marlin/Configuration.h
+          # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
+          configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 5000 }" Marlin/Configuration.h
+          # configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
+          # configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
+          # configValue DEFAULT_ACCELERATION 600 Marlin/Configuration.h
+          configValue DEFAULT_ACCELERATION 750 Marlin/Configuration.h
+          # configValue DEFAULT_ACCELERATION 1000 Marlin/Configuration.h
+          # configValue DEFAULT_RETRACT_ACCELERATION 500 Marlin/Configuration.h
+          configValue DEFAULT_RETRACT_ACCELERATION 800 Marlin/Configuration.h
+          # configValue DEFAULT_RETRACT_ACCELERATION 1000 Marlin/Configuration.h
+          configValue DEFAULT_TRAVEL_ACCELERATION 1000 Marlin/Configuration.h
+          # configValue DEFAULT_TRAVEL_ACCELERATION 2000 Marlin/Configuration.h
+
+          # FIXME: X/Y/Z_CURRENT_HOME may need to be increased for faster homing!
+          # TODO: Increased Z homing from 4mm/s to 25mm/s
+          # Increase homing feed rates (homing speeds)
+          # DEFAULT: { (50*60), (50*60), (4*60) }
+          #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(25\*60\) }" Marlin/Configuration.h
+          #configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(10\*60\) }" Marlin/Configuration.h
+          # configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
+          # TODO: Should we default back to BTT's homing speeds instead
+          # configValue HOMING_FEEDRATE_MM_M "{ \(150\*60\), \(150\*60\), \(10\*60\) }" Marlin/Configuration.h
+          # configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(8\*60\) }" Marlin/Configuration.h
+          # TODO: Lowered Z homing from 8*60 to 4*60, as otherwise the probe hits the bed quite hard
+          # configValue HOMING_FEEDRATE_MM_M "{ \(80\*60\), \(80\*60\), \(4\*60\) }" Marlin/Configuration.h
+          # TODO: Lowered homing rate back to defaults, in order to compensate for bed/mesh size and offsets after homing
+          configValue HOMING_FEEDRATE_MM_M "{ \(50\*60\), \(50\*60\), \(4\*60\) }" Marlin/Configuration.h
+
+          # FIXME: If 25mm/s isn't too fast, try that instead of 15mm/s?
+          #        But DO remember that Z_PROBE_FEEDRATE_SLOW is set to
+          #        exactly HALF of Z_PROBE_FEEDRATE_FAST, which means that
+          #        the higher the first approach probe, the higher the slow probes are!
+          # TODO: Increased from 4mm/s to 15mm/s
+          # Increase probing speed for the first approach when double-probing (MULTIPLE_PROBING is set to 2)
+          #configValue Z_PROBE_FEEDRATE_FAST "\(15\*60\)" Marlin/Configuration.h
+          # TODO: Nozzle was hitting the bed, so trying to go a little bit slower here
+          #configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
+          # configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
+          # TODO: Lowered Z homing from 8*60 to 4*60 (DEFAULT!), as otherwise the probe hits the bed quite hard
+          configValue Z_PROBE_FEEDRATE_FAST "\(4\*60\)" Marlin/Configuration.h
+          # FIXME: WARNING! This may hit our bed REALLY fast!
+          # configValue Z_PROBE_FEEDRATE_FAST "\(8\*60\)" Marlin/Configuration.h
+
+          # TODO: Maybe we should speed up Z_PROBE_FEEDRATE_SLOW too,
+          #       instead of always being half of Z_PROBE_FEEDRATE_FAST?
+          configValue Z_PROBE_FEEDRATE_SLOW "\(Z_PROBE_FEEDRATE_FAST \/ 2\)" Marlin/Configuration.h
+
+          # Adjust offsets for direct drive
+          # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.24, -4.00, 0 }" Marlin/Configuration.h
+          ## TODO: Should this be -1.46 or -1.44, eg. minus the "safe offset" or whatever?
+          # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
+          # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
+          # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
+          configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.20 }" Marlin/Configuration.h
+
+          # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
+          #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
+          # TODO: Since 400 works well enough, trying with 450 again
+          configValue E0_CURRENT 450 Marlin/Configuration_adv.h
+          # TODO: UPDATE: 400 works pretty well, I feel like!
+          # configValue E0_CURRENT 400 Marlin/Configuration_adv.h
+          # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
+          #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
+
+
+
+      - name: 'Configure: Hybrid Threshold'
+        if: ${{ success() && matrix.hybrid-threshold }}
+        id: configure_hybrid_threshold
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Enable and configure Hybrid Threshold
+          configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
+          configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
+          configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in Creality and BTT
+
+
+
+      - name: 'Configure: Junction Deviation'
+        if: ${{ success() && matrix.junction-deviation }}
+        id: configure_junction_deviation
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Enable junction deviation by disabling classic jerk handling
+          configDisable CLASSIC_JERK Marlin/Configuration.h
+
+          # Tweak junction deviation
+          # NOTE: 0.013 is the default
+          # configValue JUNCTION_DEVIATION_MM 0.013 Marlin/Configuration.h
+          # TODO: Trying 0.08 as the default, as suggested by Teaching Tech
+          # configValue JUNCTION_DEVIATION_MM 0.08 Marlin/Configuration.h
+          # TODO: Supposedly calibrated to 0.15, but the differences are impossible to see?!
+          # configValue JUNCTION_DEVIATION_MM 0.15 Marlin/Configuration.h
+          # FIXME: Recalibrate this and check for bulging AND ringing! This is just a test value!
+          # configValue JUNCTION_DEVIATION_MM 0.10 Marlin/Configuration.h
+          # Calibrated JD with LIN_ADV enabled
+          # NOTE: 0.01-0.03 looks like the ideal value, while 0.04-0.05 and above cause bulging edges?
+          # configValue JUNCTION_DEVIATION_MM 0.03 Marlin/Configuration.h
+          # configValue JUNCTION_DEVIATION_MM 0.005 Marlin/Configuration.h ## FIXME: Calculate a new JD value!
+          configValue JUNCTION_DEVIATION_MM 0.06 Marlin/Configuration.h
+
+
+
+      - name: 'Configure: Linear Advance'
+        if: ${{ success() && matrix.linear-advance }}
+        id: configure_linear_advance
+        env:
+          DISPLAY: ${{ matrix.display }}
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Increase extruder jerk for linear advance
+          # configValue DEFAULT_EJERK 15.0 Marlin/Configuration.h
+          # FIXME: I'm pretty sure jerk is a big part of our problem,
+          #        so keep trying and perhaps even try without linear advance and/or junction deviation?
+          configValue DEFAULT_EJERK 5.0 Marlin/Configuration.h
+
+          ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
+          ##        so we're giving it a go without it, see how that pans out!
+          # configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
+
+          # Enable linear advance
+          configEnable LIN_ADVANCE Marlin/Configuration_adv.h
+          #configValue ADVANCE_K 0.15 Marlin/Configuration_adv.h
+          # TODO: Calibrated K factor to exactly 0.25 (0.20 is also good)
+          #configValue ADVANCE_K 0.25 Marlin/Configuration_adv.h
+          # TODO: Re-calibrated and 0.15 now looks the best!
+          #configValue ADVANCE_K 0.15 Marlin/Configuration_adv.h
+          
+          ## FIXME: Re-calibrate K again! The value below is currently NOT accurate anymore!
+          # configValue ADVANCE_K 0.11 Marlin/Configuration_adv.h
+          configValue ADVANCE_K 0.12 Marlin/Configuration_adv.h
+          # configValue ADVANCE_K 0.6 Marlin/Configuration_adv.h ## FIXME: Re-calibrate linear advance
+          ## NOTE: We set linear advance K value to zero, so that it's effectively disabled by default!
+          # configValue ADVANCE_K 0.0 Marlin/Configuration_adv.h
+
+          ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
+          ##        so we're giving it a go without it, see how that pans out!
+          # if [$DISPLAY == "BIGTREE_TFT35_E3_V3_0"]; then
+          #   configDisable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+          # else
+          #   configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+          # fi
+          configEnable EXPERIMENTAL_SCURVE Marlin/Configuration_adv.h
+
+          configEnable ALLOW_LOW_EJERK Marlin/Configuration_adv.h
+
+
+
+      - name: 'Configure: DWIN'
+        if: ${{ success() && matrix.dwin }}
+        id: configure_dwin
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          ## TODO: Configure DWIN for eg. Creality stock display
+
+
+
+      - name: 'Configure: BIGTREE_TFT35_E3_V3_0'
+        if: ${{ success() && matrix.display == 'BIGTREE_TFT35_E3_V3_0' }}
+        id: configure_bigtree_tft35_e3_v3_0
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Disable other UIs
+          configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+          configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
+          configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
+          configDisable DWIN_LCD_PROUI Marlin/Configuration.h
+          configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+          configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+          configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
+
+          # Configure speaker
+          configEnable SPEAKER Marlin/Configuration.h
+          # FIXME: These produce a WAY too high pitched, "breaking" noise, so trying with defaults next!
+          # configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
+          # configValue LCD_FEEDBACK_FREQUENCY_HZ 1000 Marlin/Configuration.h
+          # TODO: Frequency of 5000 to 8000 seems fine, so long as duration isn't too high!
+          configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
+          configValue LCD_FEEDBACK_FREQUENCY_HZ 5000 Marlin/Configuration.h
+
+          ## TODO: Experimental options for enabling the BTT BIGTREE_TFT35_E3_V3_0 display
+          configEnable CR10_STOCKDISPLAY Marlin/Configuration.h
+          # configEnable TFT_COLOR_UI Marlin/Configuration.h
+          # configEnable TOUCH_SCREEN Marlin/Configuration.h
+
+          configEnable G26_MESH_VALIDATION Marlin/Configuration.h
+
+          # FIXME: Can we then use both SD cards and USB ports?
+          # Configure serial ports for touch screem
+          ## NOTE: This is for BTT TFT35 + USB
+          # configValue SERIAL_PORT 2 Marlin/Configuration.h
+          # configValue SERIAL_PORT_2 -1 Marlin/Configuration.h
+          ## NOTE: This is for USB + TFT35
+          configValue SERIAL_PORT -1 Marlin/Configuration.h
+          configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+          ## TODO: Lowered baudrates back to 115200
+          configValue BAUDRATE 250000 Marlin/Configuration.h
+          # configValue BAUDRATE_2 250000 Marlin/Configuration.h
+          # configValue BAUDRATE 115200 Marlin/Configuration.h
+          configValue BAUDRATE_2 115200 Marlin/Configuration.h
+
+          ## FIXME: People are saying that S-Curve does NOT work well with linear advance,
+          ##        so we're giving it a go without it, see how that pans out!
+          # configDisable S_CURVE_ACCELERATION Marlin/Configuration.h
+
+          # Enable additional reporting etc. features
+          configEnable AUTO_REPORT_POSITION Marlin/Configuration_adv.h
+          configEnable M115_GEOMETRY_REPORT Marlin/Configuration_adv.h
+          configEnable M114_DETAIL Marlin/Configuration_adv.h
+          configEnable M114_REALTIME Marlin/Configuration_adv.h
+          configEnable REPORT_FAN_CHANGE Marlin/Configuration_adv.h
+          configEnable AUTO_REPORT_SD_STATUS Marlin/Configuration_adv.h
+          configValue SERIAL_FLOAT_PRECISION 4 Marlin/Configuration_adv.h
+          configEnable M20_TIMESTAMP_SUPPORT Marlin/Configuration_adv.h
+
+          ## FIXME: According to a review on Amazon, ULTIPANEL_FEEDMULTIPLY needs to be disabled,
+          ##        otherwise the display's encoder gets triggered by even the slightest vibrations of the printer,
+          ##        which is immediately apparent when the display is mounted on the printer.
+          ## NOTE: The above IS true, for the most part anyway, eg. it drastically reduces the issue
+          configDisable ULTIPANEL_FEEDMULTIPLY Marlin/Configuration_adv.h
+
+
+
+      - name: 'Configure: FYSETC_MINI_12864_2_1'
+        if: ${{ success() && matrix.display == 'FYSETC_MINI_12864_2_1' }}
+        id: configure_fysetc_mini_12864_2_1
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Disable other UIs
+          configDisable DWIN_CREALITY_LCD Marlin/Configuration.h
+          configDisable DWIN_LCD_PROUI Marlin/Configuration.h
+          configDisable DWIN_CREALITY_LCD_JYERSUI Marlin/Configuration.h
+          configDisable DWIN_MARLINUI_PORTRAIT Marlin/Configuration.h
+          configDisable DWIN_MARLINUI_LANDSCAPE Marlin/Configuration.h
+
+          # Enable the FYSETC_MINI_12864_2_1 LCD display
+          configEnable FYSETC_MINI_12864_2_1 Marlin/Configuration.h
+
+          # Enable and configure Neopixel LED support
+          configEnable NEOPIXEL_LED Marlin/Configuration.h
+          # configValue NEOPIXEL_TYPE NEO_GRBW Marlin/Configuration.h
+          configValue NEOPIXEL_TYPE NEO_RGB Marlin/Configuration.h
+          # configDisable NEOPIXEL_PIN Marlin/Configuration.h
+          # configDisable NEOPIXEL_PIXELS Marlin/Configuration.h
+          # configDisable NEOPIXEL_BRIGHTNESS Marlin/Configuration.h
+          configEnable NEOPIXEL_STARTUP_TEST Marlin/Configuration.h
+          configValue NEOPIXEL_BKGD_INDEX_FIRST 0 Marlin/Configuration.h
+          configValue NEOPIXEL_BKGD_COLOR "{ 0, 255, 0, 0 }" Marlin/Configuration.h
+
+          # Configure serial
+          configValue SERIAL_PORT -1 Marlin/Configuration.h
+          configValue SERIAL_PORT_2 2 Marlin/Configuration.h
+
+          # Configure baudrates
+          configValue BAUDRATE 250000 Marlin/Configuration.h
+          configValue BAUDRATE_2 115200 Marlin/Configuration.h
+
+          # Disable custom cable warnings
+          echo -e "#define NO_CONTROLLER_CUSTOM_WIRING_WARNING" >> Marlin/Configuration.h
+
+          # Enable LCD control menu
+          configEnable LED_CONTROL_MENU Marlin/Configuration_adv.h
+
+
+
+      - name: 'Configure: Input Shaping'
+        if: ${{ success() && matrix.input-shaping }}
+        id: configure_input_shaping
+        run: |-
+
+          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+          cd ${GITHUB_WORKSPACE}
+          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+          # Enable input shaping and its menu item(s)
+          configEnable INPUT_SHAPING Marlin/Configuration_adv.h
+          configEnable SHAPING_MENU Marlin/Configuration_adv.h
+
+
+
+      - name: Compile Display Firmware
+        if: ${{ success() && matrix.display == 'BTT_TFT35_V3_0' }}
+        id: compile_display_firmware
+        uses: Didstopia/Marlin/.github/workflows/build-btt-tft35-e3-v3-0.yaml@skr-mini-e3-v3-0
+
+
+
+      - name: Compile Marlin Firmware (${{ matrix.board }})
+        if: success() # Ensure we only run this step if the previous one succeeded
+        id: compile_marlin_firmware
+        env:
+          BOARD: ${{ matrix.board }}
           BLTOUCH: ${{ matrix.bltouch }}
           GRID: ${{ matrix.grid }}
           HIGH_SPEED: ${{ matrix.high-speed }}
           DIRECT_DRIVE: ${{ matrix.direct-drive }}
-          TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
+          VERSION: ${{ env.RELEASE_VERSION }}
           UBL: ${{ matrix.ubl }}
           LINEAR_ADVANCE: ${{ matrix.linear-advance }}
           JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
           HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
           MPC: ${{ matrix.mpc }}
           INPUT_SHAPING: ${{ matrix.input-shaping }}
-          UI: ${{ matrix.ui }}
-
-      - name: Compile Marlin Firmware (${{ matrix.board }})
-        if: success() # Ensure we only run this step if the previous one succeeded
-        id: compile_marlin_firmware
+          DISPLAY: ${{ matrix.display }}
+          DWIN: ${{ matrix.dwin }}
         run: |-
 
           # Generate a name for the firmware and export it as a step output
-          if [ ! -z "$UI" ]; then UI_LABEL=-$UI; else UI_LABEL=; fi;
+          if [ ! -z "$DISPLAY" ]; then DISPLAY_LABEL=-$DISPLAY; else DISPLAY_LABEL=; fi;
           if ($BLTOUCH); then BLTOUCH_LABEL=-BLTOUCH; else BLTOUCH_LABEL=-NOPROBE; fi;
           if ($HIGH_SPEED); then HS_LABEL=-HS; else HS_LABEL=; fi;
           if ($DIRECT_DRIVE); then DD_LABEL=-DD; else DD_LABEL=-BOWDEN; fi;
@@ -1439,9 +1225,9 @@ jobs:
           if ($HYBRID_THRESHOLD); then HYBRID_THRESHOLD_LABEL=-HYBRID_THRESHOLD; else HYBRID_THRESHOLD_LABEL=; fi;
           if ($MPC); then MPC_LABEL=-MPC; else MPC_LABEL=-PID; fi;
           if ($INPUT_SHAPING); then INPUT_SHAPING_LABEL=-INPUT_SHAPING; else INPUT_SHAPING_LABEL=; fi;
-          FIRMWARE_NAME="ENDER_E3_V2-${BOARD}${UI_LABEL}${BLTOUCH_LABEL}${UBL_LABEL}-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}${INPUT_SHAPING_LABEL}-${VERSION}"
-          echo "::set-output name=name::${FIRMWARE_NAME}"
-          echo "::set-output name=filename::${FIRMWARE_NAME}.bin"
+          FIRMWARE_NAME="ENDER_E3_V2-${BOARD}${DISPLAY_LABEL}${BLTOUCH_LABEL}${UBL_LABEL}-${GRID}x${GRID}${HS_LABEL}${DD_LABEL}${LINEAR_ADVANCE_LABEL}${JUNCTION_DEVIATION_LABEL}${HYBRID_THRESHOLD_LABEL}${MPC_LABEL}${INPUT_SHAPING_LABEL}-${VERSION}"
+          echo "name=${FIRMWARE_NAME}" >> $GITHUB_OUTPUT
+          echo "filename=${FIRMWARE_NAME}.bin" >> $GITHUB_OUTPUT
 
           ## TODO: Get the board env name dynamically instead?
           # Compile the firmware
@@ -1460,7 +1246,7 @@ jobs:
           ## TODO: Add DWIN customizations here?
 
           # Include the latest DWIN display firmware with all build artifacts
-          if [ $UI != "BIGTREE_TFT35_E3_V3_0" ]; then
+          if [ "$DWIN" = "true" ]; then
             cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/DWIN_SET" "temp/${FIRMWARE_NAME}/Configs/DWIN_SET"
             cp -R "Configurations/config/examples/Creality/Ender-3 V2/LCD Files/private" "temp/${FIRMWARE_NAME}/Configs/private"
           else
@@ -1472,120 +1258,15 @@ jobs:
             ## 
             ##       OR, what if, we had one more build job, which would bundle ALL the firmware files and deploy a SINGLE
             ##       build artifact, which would include ALL possible configurations of the firmwares + all extra files?
-            echo "::warning::BIGTREE_TFT35_E3_V3_0 UI detected, skipping DWIN files"
+            echo "::warning::DWIN not enabled, skipping DWIN files!"
           fi
 
-        env:
-          BOARD: ${{ matrix.board }}
-          BLTOUCH: ${{ matrix.bltouch }}
-          GRID: ${{ matrix.grid }}
-          HIGH_SPEED: ${{ matrix.high-speed }}
-          DIRECT_DRIVE: ${{ matrix.direct-drive }}
-          VERSION: ${{ env.RELEASE_VERSION }}
-          UBL: ${{ matrix.ubl }}
-          LINEAR_ADVANCE: ${{ matrix.linear-advance }}
-          JUNCTION_DEVIATION: ${{ matrix.junction-deviation }}
-          HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
-          MPC: ${{ matrix.mpc }}
-          INPUT_SHAPING: ${{ matrix.input-shaping }}
-          UI: ${{ matrix.ui }}
 
-      # ## FIXME: !!! Why do we need to compile the display firmware for EVERY single matrix build, when we could just build it ONCE? !!!
-      # - name: Compile BTT Display Firmware
-      #   if: matrix.ui == 'BIGTREE_TFT35_E3_V3_0'
-      #   id: compile_btt_firmware
-      #   run: |-
-
-      #     # Enable script debugging
-      #     set -x
-
-      #     ## TODO: Split or refactor configure_build_script.sh, so we can use its generic error handling
-      #     ##       and logging capabilities here, as well as in any other situation, without requiring us
-      #     ##       to always be at the Marlin source root.
-
-      #     # Fetch the source code for the BTT display firmware
-      #     git clone --depth 1 --branch master --single-branch --recurse-submodules https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware.git "/tmp/${UI}"
-
-      #     # Switch to the source directory
-      #     cd "/tmp/${UI}"
-
-      #     ## TODO: Store/set the board/display name in the matrix, so we can reuse it here (and elsewhere if necessary)
-      #     # Compile the firmware
-      #     platformio run --environment ${UI}
-
-      #     ## TODO: Any particular reason we'd even need this?
-      #     # Remove old binaries and configs
-      #     find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
-      #     find "Copy to SD Card root directory to update/" -name 'config.ini' -print -delete
-
-      #     ## TODO: Any particular reason we'd even need this?
-      #     # Copy new binaries and configs
-      #     find .pio/build/ -name '*.bin' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
-      #     find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "./Copy to SD Card root directory to update/" ";"
-
-      #     # Customize the firmware, config and/or theme(s)
-      #     shopt -s extglob
-      #     displayConfig() {
-      #       local option=$1
-      #       local value=$2
-      #       local config=$3
-      #       sed -E -i "s/([^ \n]*?)(${option})(\:)([^ ].*|$)/\2\:${value}/g w /tmp/btt_display_config_patch.log" "$config"
-      #       if [ ! -s /tmp/btt_display_config_patch.log ]; then
-      #         echo "::error title=ERROR::Failed to enable ${option} in ${config}"
-      #         exit 1
-      #       fi
-      #     }
-      #     cd "Copy to SD Card root directory to update"
-      #     displayConfig serial_port "P1:7 P2:0 P3:0 P4:0" config.ini
-      #     displayConfig emulated_m600 "0" config.ini
-      #     displayConfig ack_notification "2" config.ini
-      #     displayConfig files_list_mode "0" config.ini
-      #     displayConfig persistent_info "1" config.ini
-      #     displayConfig notification_m117 "1" config.ini
-      #     displayConfig prog_disp_type "1" config.ini
-      #     displayConfig layer_disp_type "1" config.ini
-      #     displayConfig serial_always_on "1" config.ini
-      #     displayConfig marlin_font_color "2" config.ini
-      #     displayConfig marlin_title "RASPUTIN" config.ini
-      #     displayConfig fan_count "3" config.ini
-      #     displayConfig controller_fan "1" config.ini
-      #     displayConfig toast_sound "0" config.ini
-      #     displayConfig lcd_idle_brightness "1" config.ini
-      #     displayConfig lcd_lock_on_idle "1" config.ini
-      #     displayConfig knob_led_color "2" config.ini
-      #     displayConfig custom_label_8 "MPC Autotune" config.ini
-      #     displayConfig custom_gcode_8 "M306 T \\\n" config.ini
-      #     cd ..
-
-      #     # Remove files unrelated specifically to the display model
-      #     rm -fr "Copy to SD Card root directory to update/THEME_*/!(${UI})"
-
-      #     # Prepare the build artifact directory
-      #     # BTT_DIST_DIR="${GITHUB_WORKSPACE}/temp/${{ steps.compile_marlin_firmware.outputs.name }}/${UI}"
-      #     BTT_DIST_DIR="${GITHUB_WORKSPACE}/temp/build/${UI}"
-      #     mkdir -p "${BTT_DIST_DIR}"
-
-      #     # Include built files with the build artifacts
-      #     cp -R "Copy to SD Card root directory to update/" "${BTT_DIST_DIR}"
-
-      #     ls -lah ${BTT_DIST_DIR}
-
-      #     ## FIXME: For some reason the artifact uploads are failing when including the BTT display files,
-      #     ##        but the HTTP requests also seem to set "itemPath" as the firmware name,
-      #     ##        except it includes the path TWICE for some reason?!
-
-      #   env:
-      #     UI: ${{ matrix.ui }}
-
-      # https://github.com/actions/upload-artifact/issues/39
-      # - name: Compress Build Files
-      #   run: zip -r /tmp/${{ steps.compile_marlin_firmware.outputs.name }}.zip temp/${{ steps.compile_marlin_firmware.outputs.name }}/*
 
       - name: Publish Artifacts
         if: success()
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.compile_marlin_firmware.outputs.name }}
-          # path: /tmp/${{ steps.compile_marlin_firmware.outputs.name }}.zip
           path: temp/${{ steps.compile_marlin_firmware.outputs.name }}/
           retention-days: 7

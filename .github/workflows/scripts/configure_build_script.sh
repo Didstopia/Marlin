@@ -5,6 +5,10 @@
 ## TODO
 # - Use more modern configuration files as a base?
 
+SOURCE_ONLY="${1:-false}"
+DISPLAY_TYPE="${2:-"MarlinUI"}"
+# DISPLAY_TYPE="${2:-"CrealityUI"}"
+
 # Define some colors for the terminal
 COLOR_RESET="\033[0m"
 COLOR_RED="\033[31m"
@@ -240,16 +244,9 @@ setupConfigs() {
     git clone --quiet --branch ${TARGET_BRANCH} --depth 1 https://github.com/MarlinFirmware/Configurations.git Configurations
   fi
 
-  ## FIXME: Use the BTT specific configuration files instead of the default Creality ones?
-  # cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration.h" Marlin/Configuration.h
-  # cp "Configurations/config/examples/Creality/Ender-3 V2/CrealityV422/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
-
-  ## FIXME: Take $UI into account here, so we can use either CrealityUI or MarlinUI configs as the base?
-  # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration.h" Marlin/Configuration.h
-  # cp "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/CrealityUI/Configuration_adv.h" Marlin/Configuration_adv.h
-
-  cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration.h" Marlin/Configuration.h
-  cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/MarlinUI/Configuration_adv.h" Marlin/Configuration_adv.h
+  debug "Applying display configuration files for ${COLOR_YELLOW}${DISPLAY_TYPE}${COLOR_RESET}"
+  cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/${DISPLAY_TYPE}/Configuration.h" Marlin/Configuration.h
+  cp -f "Configurations/config/examples/Creality/Ender-3 V2/BigTreeTech SKR Mini E3 v3/${DISPLAY_TYPE}/Configuration_adv.h" Marlin/Configuration_adv.h
 
   # Apply custom boot screen stuff
   cp -f ".github/workflows/resources/_Bootscreen.h" Marlin/_Bootscreen.h
@@ -410,13 +407,26 @@ patchDefaults() {
   configValue CHOPPER_TIMING CHOPPER_DEFAULT_24V Marlin/Configuration_adv.h
 }
 
-# Prepare the config files on startup
-setupConfigs
+if [ "$SOURCE_ONLY" = false ]; then
+  debug "Applying patches, source only option is disabled or not set"
 
-# Apply sane defaults on startup
-patchBuildDetails
-# patchDWIN
-# patchBuzzer
-## FIXME: Testing if this has been fixed yet
-# patchAdvancedPausePrompt
-patchDefaults
+  # Prepare the config files on startup
+  setupConfigs
+
+  # Apply sane defaults on startup
+  patchBuildDetails
+
+  # Patch the DWIN Jyers UI support
+  # patchDWIN
+
+  # Patch the ability to disable the buzzer on the LCD
+  # patchBuzzer
+
+  # Patch the advanced pause prompt UI hanging
+  # patchAdvancedPausePrompt
+
+  # Patch sane configuration defaults
+  patchDefaults
+else
+  debug "Skipping patching of configuration files, source only option enabled"
+fi

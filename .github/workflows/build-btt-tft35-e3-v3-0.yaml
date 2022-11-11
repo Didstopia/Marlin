@@ -1,54 +1,71 @@
 name: Build BTT TFT35 E3 V3.0
 
-## FIXME: Fix proper build support for various branches AND tags/releases!
 on:
-  # Trigger custom firmwares builds only in specific situations
-  push:
-    # When the following branches are pushed
-    branches:
-      - 2.1.x
-      - bugfix-2.1.x
-      - skr-mini-e3-v3-0
 
-    # When the following tags are pushed
-    tags:
-      - 2*
+  # Allow using as a reusable workflow
+  workflow_call:
+    inputs:
+      repository:
+        description: "BTT Display Firmware Repository"
+        required: true
+        type: string
+        default: "bigtreetech/BIGTREETECH-TouchScreenFirmware"
+      branch:
+        description: "BTT Display Firmware Repository Branch"
+        required: true
+        type: string
+        default: "master"
+      display-model:
+        description: "Display Model"
+        required: true
+        type: string
+        default: "BIGTREE_TFT35_E3_V3_0"
 
   # Allow manual builds
   workflow_dispatch:
     inputs:
-      targetBranch:
-        description: "Target Branch"
+      repository:
+        description: "BTT Display Firmware Repository"
         required: true
-        default: "bugfix-2.1.x"
+        type: string
+        default: "bigtreetech/BIGTREETECH-TouchScreenFirmware"
+      branch:
+        description: "BTT Display Firmware Repository Branch"
+        required: true
+        type: string
+        default: "master"
+      display-model:
+        description: "Display Model"
+        required: true
+        type: string
+        default: "BIGTREE_TFT35_E3_V3_0"
+
+env:
+  BTT_REPOSITORY: ${{ inputs.repository }}
+  BTT_BRANCH: ${{ inputs.branch }}
+  BTT_DISPLAY_MODEL: ${{ inputs.display-model }}
 
 jobs:
 
-  ## TODO: "github.base_ref" is ONLY available for pull request events, NOT for push events
-  ##       https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
-
   build-display-firmware:
-    ## TODO: Ensure that this works as expected
-    # # if: ${{ github.base_ref == 'bugfix-2.1.x' || github.base_ref == 'skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
-    # if: ${{ github.ref == 'refs/heads/bugfix-2.1.x' || github.ref == 'refs/heads/skr-mini-e3-v3-0' || github.event.inputs.targetBranch == 'bugfix-2.1.x' }}
-    ## TODO: Test running on self-hosted runners instead
-    runs-on: ubuntu-latest
-    # runs-on: self-hosted
-    # runs-on: [self-hosted, ubuntu-latest]
+    name: ${{ env.BTT_DISPLAY_MODEL }}
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        model: [ "BIGTREE_TFT35_E3_V3_0" ]
+    # env:
+    #   BTT_REPOSITORY: ${{ inputs.repository }}
+    #   BTT_BRANCH: ${{ inputs.branch }}
+    #   BTT_DISPLAY_MODEL: ${{ inputs.display-model }}
 
     steps:
-      - name: Checkout BTT Display Firmware Repository
+
+      - name: Checkout ${{ env.BTT_REPOSITORY }}@${{ env.BTT_BRANCH }}
         uses: actions/checkout@v3
         with:
-          # repository: bigtreetech/BIGTREETECH-TouchScreenFirmware
-          repository: Didstopia/BIGTREETECH-TouchScreenFirmware
-          # ref: master
-          ref: feature/language_fi
+          repository: ${{ env.BTT_REPOSITORY }}
+          # repository: Didstopia/BIGTREETECH-TouchScreenFirmware
+          ref: ${{ env.BTT_BRANCH }}
+          # ref: feature/language_fi
           fetch-depth: 1
           submodules: true
 
@@ -76,20 +93,14 @@ jobs:
         if: success()
         run: |-
 
-          # Enable script debugging
-          set -x
-
           python -m pip install --upgrade pip
           pip install --upgrade platformio
           pio upgrade --dev
           pio pkg update --global
 
-      - name: Compile BTT Display Firmware
+      - name: Compile ${{ env.BTT_DISPLAY_MODEL }} Firmware
         id: compile_btt_display_firmware
         run: |-
-
-          # Enable script debugging
-          # set -x
 
           # Enable glob/wildcard support
           shopt -s extglob
@@ -110,7 +121,7 @@ jobs:
           # Copy new freshly built binaries and configs
           BTT_DIST_DIR="/tmp/btt-display-firmware"
           mkdir -p "${BTT_DIST_DIR}"
-          echo "::set-output name=dist::${BTT_DIST_DIR}"
+          echo "dist=${BTT_DIST_DIR}" >> $GITHUB_OUTPUT
           find .pio/build/ -name '*.bin' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
           find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
 
@@ -185,21 +196,12 @@ jobs:
           VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}
           VERSION=${VERSION//\//_}
           BTT_DIST_NAME="${BTT_DISPLAY_MODEL}-${VERSION}"
-          echo "::set-output name=name::${BTT_DIST_NAME}"
+          echo "name=${BTT_DIST_NAME}" >> $GITHUB_OUTPUT
 
-        env:
-          BTT_DISPLAY_MODEL: ${{ matrix.model }}
-
-      # https://github.com/actions/upload-artifact/issues/39
-      # - name: Compress Build Files
-      #   run: zip -r /tmp/${{ matrix.model }}.zip ${{ steps.compile_btt_display_firmware.outputs.dist }}/*
-
-      - name: Upload BTT Display Firmware
+      - name: Upload ${{ env.BTT_DISPLAY_MODEL }} Firmware
         if: success() # Ensure we only run this step if the previous one succeeded
         uses: actions/upload-artifact@v3
         with:
-          # name: ${{ matrix.model }}
           name: ${{ steps.compile_btt_display_firmware.outputs.name }}
-          # path: /tmp/${{ matrix.model }}.zip
           path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
           retention-days: 7
