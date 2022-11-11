@@ -73,6 +73,18 @@ debug() {
   echo -e "  ${COLOR_DARK_GRAY}[DEBUG]${COLOR_RESET} $@"
 }
 
+# Function for logging "notice" messages
+notice() {
+  if [ "$CI" = true ]; then
+    msg=$(stripColors $@)
+    echo "::notice title=NOTICE::$msg"
+  # else
+  #   echo -e "  ${COLOR_WHITE}[NOTICE]${COLOR_RESET} $@"
+  fi
+  # Always print colored notice messages
+  echo -e "  ${COLOR_WHITE}[DEBUG]${COLOR_RESET} $@"
+}
+
 # Function for logging "warning" messages
 warning() {
   if [ "$CI" = true ]; then
@@ -226,7 +238,7 @@ configValue() {
   # Check if the option is already enabled
   if grep -Eiq "[\/]+#define ${key}( +)" ${config}; then
     # Forcibly enable the option
-    warning "Option ${COLOR_GREEN}${key}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET} is disabled, forcibly enabling"
+    notice "Option ${COLOR_GREEN}${key}${COLOR_RESET} in ${COLOR_CYAN}${config}${COLOR_RESET} is disabled, forcibly enabling"
     configEnable ${key} ${config}
   fi
 }
