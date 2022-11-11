@@ -1,0 +1,183 @@
+name: "Build Display Firmware"
+description: "Build Display Firmware"
+
+inputs:
+  repository:
+    description: "BTT Display Firmware Repository"
+    required: true
+    default: "bigtreetech/BIGTREETECH-TouchScreenFirmware"
+  branch:
+    description: "BTT Display Firmware Repository Branch"
+    required: true
+    default: "master"
+  display-model:
+    description: "Display Model"
+    required: true
+    default: "BIGTREE_TFT35_E3_V3_0"
+
+# outputs:
+#   targetBranch:
+#     description: "Target Branch"
+#     value: ${{ steps.prepare-target-branch.outputs.targetBranch }}
+#   targetTag:
+#     description: "Target Tag"
+#     value: ${{ steps.prepare-target-branch.outputs.targetTag }}
+#   releaseVersion:
+#     description: "Release Version"
+#     value: ${{ steps.prepare-environment.outputs.releaseVersion }}
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Checkout ${{ inputs.repository }}@${{ inputs.branch }}
+      shell: bash
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.branch }}
+        fetch-depth: 1
+        submodules: true
+
+    - name: Cache pip
+      shell: bash
+      if: success()
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Cache PlatformIO
+      shell: bash
+      if: success()
+      uses: actions/cache@v3
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+    - name: Setup Python
+      shell: bash
+      if: success()
+      uses: actions/setup-python@v3
+
+    - name: Install PlatformIO
+      shell: bash
+      if: success()
+      run: |-
+
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+        pio upgrade --dev
+        pio pkg update --global
+
+    - name: Compile ${{ inputs.display-model }} Firmware
+      shell: bash
+      id: compile_btt_display_firmware
+      run: |-
+
+        # Enable glob/wildcard support
+        shopt -s extglob
+
+        # Figure out the short display model name
+        BTT_DISPLAY_MODEL_SHORT=$(echo -n ${{ inputs.display-model }} | sed -E "s/([^_]*?)\_([^_]*)\_(.*)/\2/")
+
+        ## FIXME: Validate that we have both the display model and the short display model!
+
+        # Compile the firmware
+        platformio run --environment ${{ inputs.display-model }}
+
+        # Remove old binaries and configs
+        find "Copy to SD Card root directory to update/" -name '*.bin' -print -delete
+        # find "Copy to SD Card root directory to update/" -name '*.ini' -print -delete
+        find "Copy to SD Card root directory to update/" -name 'config*.ini' -print -delete
+
+        # Copy new freshly built binaries and configs
+        BTT_DIST_DIR="/tmp/btt-display-firmware"
+        mkdir -p "${BTT_DIST_DIR}"
+        echo "dist=${BTT_DIST_DIR}" >> $GITHUB_OUTPUT
+        find .pio/build/ -name '*.bin' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
+        find TFT/src/User/ -name 'config.ini' -exec cp -vf '{}' "${BTT_DIST_DIR}/" ";"
+
+        ## FIXME: THIS seems to be the main issue, where the "Copy..." directory is copied
+        ##        to BTT_DIST_DIR, and NOT its contents, which is what we're after!
+        # Copy extra files, such as themes and language packs
+        # cp -fr "Copy to SD Card root directory to update"/ $BTT_DIST_DIR/
+        cp -fR Copy\ to\ SD\ Card\ root\ directory\ to\ update/THEME_* $BTT_DIST_DIR/
+        cp -fR Copy\ to\ SD\ Card\ root\ directory\ to\ update/Language\ Packs $BTT_DIST_DIR/
+
+        # Bundle our custom logos
+        mkdir -p "${BTT_DIST_DIR}/CUSTOM"
+        wget \
+          https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/resources/logo.bmp \
+          -O $BTT_DIST_DIR/CUSTOM/logo.bmp
+        wget \
+          https://raw.githubusercontent.com/Didstopia/Marlin/skr-mini-e3-v3-0/.github/workflows/resources/logo_portrait.bmp \
+          -O $BTT_DIST_DIR/CUSTOM/logo_portrait.bmp
+
+        ## FIXME: This works fine locally, but ALWAYS fails on CI (never deletes anything)
+        ## UPDATE: Looks like it's still the copy command above that's the culprit!
+        # Remove files unrelated to the current display model
+        rm -fr $BTT_DIST_DIR/THEME_*/!($BTT_DISPLAY_MODEL_SHORT)/
+
+        # Customize the firmware, config and/or theme(s)
+        displayConfig() {
+          local option=$1
+          local value=$2
+          local config=$3
+          sed -E -i "s/([^ \n]*?)(${option})(\:)([^ ].*|$)/\2\:${value}/g w /tmp/btt_display_config_patch.log" "$config"
+          if [ ! -s /tmp/btt_display_config_patch.log ]; then
+            echo "::error title=ERROR::Failed to enable ${option} in ${config}"
+            exit 1
+          fi
+        }
+        displayConfig serial_port "P1:6 P2:0 P3:0 P4:0" ${BTT_DIST_DIR}/config.ini
+        displayConfig emulated_m600 "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig status_screen "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig ack_notification "2" ${BTT_DIST_DIR}/config.ini
+        displayConfig files_list_mode "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig persistent_info "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig notification_m117 "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig prog_disp_type "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig layer_disp_type "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig default_mode "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig serial_always_on "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig marlin_background_color "4" ${BTT_DIST_DIR}/config.ini
+        displayConfig marlin_font_color "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig marlin_fullscreen "0" ${BTT_DIST_DIR}/config.ini
+        # displayConfig marlin_fullscreen "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig marlin_show_title "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig marlin_title "RASPUTIN" ${BTT_DIST_DIR}/config.ini
+        displayConfig fan_count "3" ${BTT_DIST_DIR}/config.ini
+        displayConfig controller_fan "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig size_max "X220 Y200 Z250" ${BTT_DIST_DIR}/config.ini
+        displayConfig auto_load_leveling "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig level_edge_distance "10" ${BTT_DIST_DIR}/config.ini
+        displayConfig level_z_pos "0.0" ${BTT_DIST_DIR}/config.ini
+        # displayConfig preheat_name_2 "PLA 2" ${BTT_DIST_DIR}/config.ini
+        # displayConfig preheat_temp_2 "T180 B50" ${BTT_DIST_DIR}/config.ini
+        # displayConfig preheat_name_3 "PLA 3" ${BTT_DIST_DIR}/config.ini
+        # displayConfig preheat_temp_3 "T210 B50" ${BTT_DIST_DIR}/config.ini
+        displayConfig touch_sound "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig toast_sound "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig lcd_idle_brightness "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig lcd_lock_on_idle "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig knob_led_color "6" ${BTT_DIST_DIR}/config.ini
+        displayConfig custom_label_8 "MPC Autotune" ${BTT_DIST_DIR}/config.ini
+        displayConfig custom_gcode_8 "M306 T \\\n" ${BTT_DIST_DIR}/config.ini
+
+        # Create and export a filename for the build artifact
+        VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}
+        VERSION=${VERSION//\//_}
+        BTT_DIST_NAME="${{ inputs.display-model }}-${VERSION}"
+        echo "name=${BTT_DIST_NAME}" >> $GITHUB_OUTPUT
+
+    - name: Upload ${{ inputs.display-model }} Firmware
+      shell: bash
+      if: success() # Ensure we only run this step if the previous one succeeded
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.compile_btt_display_firmware.outputs.name }}
+        path: ${{ steps.compile_btt_display_firmware.outputs.dist }}/
+        retention-days: 7
