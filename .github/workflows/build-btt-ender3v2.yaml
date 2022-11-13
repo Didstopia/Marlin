@@ -700,8 +700,8 @@ jobs:
           configDisable MEATPACK_ON_SERIAL_PORT_1 Marlin/Configuration_adv.h
           configDisable MEATPACK_ON_SERIAL_PORT_2 Marlin/Configuration_adv.h
 
-          configEnable USE_BIG_EDIT_FONT Marlin/Configuration_adv.h
-          configEnable USE_SMALL_INFOFONT Marlin/Configuration_adv.h
+          # configEnable USE_BIG_EDIT_FONT Marlin/Configuration_adv.h
+          # configEnable USE_SMALL_INFOFONT Marlin/Configuration_adv.h
           ## NOTE: Not supported on our display at the moment (not sure about the FYSETC one though?)
           # configValue DISPLAY_SLEEP_MINUTES 2 Marlin/Configuration_adv.h
 
@@ -1064,8 +1064,9 @@ jobs:
           configValue ENCODER_100X_STEPS_PER_SEC 90 Marlin/Configuration_adv.h
 
           # Configure the LCD timeout for returning to the main menu/status screen
-          # configValue LCD_TIMEOUT_TO_STATUS 60000 Marlin/Configuration_adv.h
-          configValue LCD_TIMEOUT_TO_STATUS -1 Marlin/Configuration_adv.h
+          configValue LCD_TIMEOUT_TO_STATUS 60000 Marlin/Configuration_adv.h
+          ## FIXME: This seems to entirely break/disable all menu functionality?!
+          # configValue LCD_TIMEOUT_TO_STATUS -1 Marlin/Configuration_adv.h
 
 
 
