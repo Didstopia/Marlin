@@ -771,8 +771,9 @@ jobs:
           # configValue RETRACT_LENGTH 1 Marlin/Configuration_adv.h
           # configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
 
+          ## FIXME: This is Y+5, but this somehow broke tramming?!
           # Adjust our bed tramming positions to be more accurately over the bed screws
-          configValue TRAMMING_POINT_XY "{ {  20, 25 }, { 180, 25 }, { 180, 185 }, { 20, 185 } }" Marlin/Configuration_adv.h
+          # configValue TRAMMING_POINT_XY "{ {  20, 25 }, { 180, 25 }, { 180, 185 }, { 20, 185 } }" Marlin/Configuration_adv.h
 
 
 
@@ -1049,7 +1050,7 @@ jobs:
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
-          configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.20 }" Marlin/Configuration.h
+          configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.23 }" Marlin/Configuration.h
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.10 }" Marlin/Configuration.h
 
           # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
@@ -1063,8 +1064,8 @@ jobs:
 
           ## TODO: These need tweaking!
           # Configure encoder resolution, acceleration etc.
-          configValue ENCODER_10X_STEPS_PER_SEC 60 Marlin/Configuration_adv.h
-          configValue ENCODER_100X_STEPS_PER_SEC 90 Marlin/Configuration_adv.h
+          # configValue ENCODER_10X_STEPS_PER_SEC 60 Marlin/Configuration_adv.h
+          # configValue ENCODER_100X_STEPS_PER_SEC 90 Marlin/Configuration_adv.h
 
           # Configure the LCD timeout for returning to the main menu/status screen
           configValue LCD_TIMEOUT_TO_STATUS 60000 Marlin/Configuration_adv.h
