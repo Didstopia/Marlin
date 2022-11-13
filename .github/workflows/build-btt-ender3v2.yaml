@@ -301,6 +301,8 @@ jobs:
       - name: 'Configure: Core'
         if: success()
         id: configure_core
+        env:
+          HYBRID_THRESHOLD: ${{ matrix.hybrid-threshold }}
         run: |-
 
           # Source the helper build script
@@ -311,12 +313,14 @@ jobs:
           configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80, 80, 400, 95.1 }" Marlin/Configuration.h
 
           # Bed size, probing and bed clip tweaks specific to this printer/build surface
-          configValue X_BED_SIZE 230 Marlin/Configuration.h
-          configValue Y_BED_SIZE 230 Marlin/Configuration.h
-          configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
-          configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+          configValue X_BED_SIZE 220 Marlin/Configuration.h
+          configValue Y_BED_SIZE 220 Marlin/Configuration.h
+          # configValue X_MAX_POS "X_BED_SIZE + 15" Marlin/Configuration.h
+          configValue X_MAX_POS "245" Marlin/Configuration.h # Rough maximum X position before running into the frame
+          # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
+          configValue Y_MAX_POS "220" Marlin/Configuration.h # Rough maximum Y position before running into the bed clips
           # configValue Z_MAX_POS 235 Marlin/Configuration.h # NOTE: Lowered from 250 to prevent our specific printer from crashing
-          configValue Z_MAX_POS 250 Marlin/Configuration.h
+          configValue Z_MAX_POS 220 Marlin/Configuration.h # This is the safest maximum Z height for our printer
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
           # configValue X_BED_SIZE 235 Marlin/Configuration.h
@@ -481,21 +485,22 @@ jobs:
           # Enable display and g-code support for filament loading and unloading (disabled by default, enabled in Jyers)
           configEnable FILAMENT_LOAD_UNLOAD_GCODES Marlin/Configuration_adv.h
 
-          ## FIXME: Enabling hybrid threshold, this WILL need to be tuned -> M913 X/Y/Z/E to live tune the setting
-          ## FIXME: !!! Testing temporarily this "0.9 degree stepper" option, which might improve the resonancy/vibration issues! !!!
-          ## FIXME: UPDATE -> This does seem to be less noisier and aggressive sounding, but there's still a bit of noise, so not sure if it's okay as is?
+          ## TODO: If we don't use hybrid threshold/spreadcycle, is this "custom" chopper timing still fine?!
           configValue CHOPPER_TIMING CHOPPER_09STEP_24V Marlin/Configuration_adv.h
-          configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
-          ## TODO: 100 seems very noisy, but 110 is still noisy?!
-          configValue X_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
-          configValue Y_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
-          ## TODO: Test 120 next, if our latest changes don't sound good enough at 110?
-          # configValue X_HYBRID_THRESHOLD 120 Marlin/Configuration_adv.h
-          # configValue Y_HYBRID_THRESHOLD 120 Marlin/Configuration_adv.h
+          if ($HYBRID_THRESHOLD); then
+            # configValue CHOPPER_TIMING CHOPPER_09STEP_24V Marlin/Configuration_adv.h
+            configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
+            ## TODO: 100 seems very noisy, but 110 is still noisy?!
+            configValue X_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
+            configValue Y_HYBRID_THRESHOLD 110 Marlin/Configuration_adv.h
+            ## TODO: Test 120 next, if our latest changes don't sound good enough at 110?
+            # configValue X_HYBRID_THRESHOLD 120 Marlin/Configuration_adv.h
+            # configValue Y_HYBRID_THRESHOLD 120 Marlin/Configuration_adv.h
 
-          ## FIXME: This is 3 by default, which means it probably gets triggered too easily, right?
-          # Configure hybrid threshold (still disabled by default)
-          # configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h
+            ## FIXME: This is 3 by default, which means it probably gets triggered too easily, right?
+            # Configure hybrid threshold (still disabled by default)
+            # configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h
+          fi
 
           # TODO: Leaving these alone for now
           # Configure sensorless homing (still disably by default)
@@ -765,6 +770,9 @@ jobs:
           # configValue RETRACT_LENGTH 1 Marlin/Configuration_adv.h
           # configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
 
+          # Adjust our bed tramming positions to be more accurately over the bed screws
+          configValue TRAMMING_POINT_XY "{ {  20, 15 }, { 180, 15 }, { 180, 175 }, { 20, 175 } }" Marlin/Configuration_adv.h
+
 
 
       - name: 'Configure: PID'
@@ -845,11 +853,11 @@ jobs:
           # Enable safe homing on the Z axis (disabled by default, enabled in Jyers)
           configEnable Z_SAFE_HOMING Marlin/Configuration.h
 
-          # Tweak Z homing position
-          # configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
-          # configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
-          configValue Z_SAFE_HOMING_X_POINT "((X_BED_SIZE - 10) \/ 2)" Marlin/Configuration.h
-          configValue Z_SAFE_HOMING_Y_POINT "((Y_BED_SIZE - 10) \/ 2)" Marlin/Configuration.h
+          # Tweak safe Z homing position (safe position to move to when homing only Z)
+          configValue Z_SAFE_HOMING_X_POINT X_CENTER Marlin/Configuration.h
+          configValue Z_SAFE_HOMING_Y_POINT Y_CENTER Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_X_POINT "((X_BED_SIZE - 10) \/ 2)" Marlin/Configuration.h
+          # configValue Z_SAFE_HOMING_Y_POINT "((Y_BED_SIZE - 10) \/ 2)" Marlin/Configuration.h
 
           # Enable BLTouch/CRTouch support
           configEnable BLTOUCH Marlin/Configuration.h
@@ -919,7 +927,8 @@ jobs:
           # configValue MESH_INSET 10 Marlin/Configuration.h
           # TODO: Lowered mesh inset back to default 1
           # configValue MESH_INSET 1 Marlin/Configuration.h
-          configValue MESH_INSET 10 Marlin/Configuration.h
+          # configValue MESH_INSET 10 Marlin/Configuration.h
+          configValue MESH_INSET 5 Marlin/Configuration.h # Reduced mesh inset to account for our already offset bed size and positions
 
           # Enable Hilbert Curve for UBL (reduces travel)
           configEnable UBL_HILBERT_CURVE Marlin/Configuration.h
@@ -941,7 +950,8 @@ jobs:
 
           # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
           # configValue PROBING_MARGIN 10 Marlin/Configuration.h
-          configValue PROBING_MARGIN 20 Marlin/Configuration.h
+          # configValue PROBING_MARGIN 20 Marlin/Configuration.h
+          configValue PROBING_MARGIN 0 Marlin/Configuration.h # Since our bed size and positions already account for this, we don't need additional margin?
 
           # Disable retrying bed leveling after a failed attempt
           configDisable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
@@ -1037,6 +1047,7 @@ jobs:
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
           configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.20 }" Marlin/Configuration.h
+          # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.10 }" Marlin/Configuration.h
 
           # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
           #configValue E0_CURRENT 300 Marlin/Configuration_adv.h
@@ -1047,21 +1058,31 @@ jobs:
           # TODO: Further increasing extruder current, as 0.7 is the recommendation from Bondtech, I think?
           #configValue E0_CURRENT 650 Marlin/Configuration_adv.h
 
+          ## TODO: These need tweaking!
+          # Configure encoder resolution, acceleration etc.
+          configValue ENCODER_10X_STEPS_PER_SEC 60 Marlin/Configuration_adv.h
+          configValue ENCODER_100X_STEPS_PER_SEC 90 Marlin/Configuration_adv.h
+
+          # Configure the LCD timeout for returning to the main menu/status screen
+          # configValue LCD_TIMEOUT_TO_STATUS 60000 Marlin/Configuration_adv.h
+          configValue LCD_TIMEOUT_TO_STATUS -1 Marlin/Configuration_adv.h
 
 
-      - name: 'Configure: Hybrid Threshold'
-        if: ${{ matrix.hybrid-threshold }}
-        id: configure_hybrid_threshold
-        run: |-
 
-          # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
-          cd ${GITHUB_WORKSPACE}
-          source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+      ## TODO: Redo and refactor Core config above, as it also defined hybrid threshold stuff!
+      # - name: 'Configure: Hybrid Threshold'
+      #   if: ${{ matrix.hybrid-threshold }}
+      #   id: configure_hybrid_threshold
+      #   run: |-
 
-          # Enable and configure Hybrid Threshold
-          configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
-          configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
-          configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in Creality and BTT
+      #     # Source the helper build script (note the "true" at the end, which ensure we only want to source the script!)
+      #     cd ${GITHUB_WORKSPACE}
+      #     source ${GITHUB_WORKSPACE}/.github/workflows/scripts/configure_build_script.sh true
+
+      #     # Enable and configure Hybrid Threshold
+      #     configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
+      #     configValue Z_HYBRID_THRESHOLD 20 Marlin/Configuration_adv.h # Default is 3 in Creality, 20 in BTT
+      #     configValue E0_HYBRID_THRESHOLD 30 Marlin/Configuration_adv.h # Default is 30 in Creality and BTT
 
 
 
@@ -1183,8 +1204,8 @@ jobs:
           # configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
           # configValue LCD_FEEDBACK_FREQUENCY_HZ 1000 Marlin/Configuration.h
           # TODO: Frequency of 5000 to 8000 seems fine, so long as duration isn't too high!
-          configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 20 Marlin/Configuration.h
-          configValue LCD_FEEDBACK_FREQUENCY_HZ 5000 Marlin/Configuration.h
+          configValue LCD_FEEDBACK_FREQUENCY_DURATION_MS 30 Marlin/Configuration.h
+          configValue LCD_FEEDBACK_FREQUENCY_HZ 8000 Marlin/Configuration.h
 
           ## TODO: Experimental options for enabling the BTT BIGTREE_TFT35_E3_V3_0 display
           configEnable CR10_STOCKDISPLAY Marlin/Configuration.h

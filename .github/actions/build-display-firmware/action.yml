@@ -154,9 +154,11 @@ runs:
         # displayConfig preheat_temp_2 "T180 B50" ${BTT_DIST_DIR}/config.ini
         # displayConfig preheat_name_3 "PLA 3" ${BTT_DIST_DIR}/config.ini
         # displayConfig preheat_temp_3 "T210 B50" ${BTT_DIST_DIR}/config.ini
-        displayConfig touch_sound "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig touch_sound "1" ${BTT_DIST_DIR}/config.ini
         displayConfig toast_sound "0" ${BTT_DIST_DIR}/config.ini
-        displayConfig lcd_idle_brightness "1" ${BTT_DIST_DIR}/config.ini
+        displayConfig lcd_brightness "9" ${BTT_DIST_DIR}/config.ini
+        displayConfig lcd_idle_brightness "0" ${BTT_DIST_DIR}/config.ini
+        displayConfig lcd_idle_time "5" ${BTT_DIST_DIR}/config.ini
         displayConfig lcd_lock_on_idle "1" ${BTT_DIST_DIR}/config.ini
         displayConfig knob_led_color "6" ${BTT_DIST_DIR}/config.ini
         displayConfig custom_label_8 "MPC Autotune" ${BTT_DIST_DIR}/config.ini
