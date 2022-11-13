@@ -319,8 +319,8 @@ jobs:
           configValue X_MAX_POS "245" Marlin/Configuration.h # Rough maximum X position before running into the frame
           # configValue Y_MAX_POS "Y_BED_SIZE" Marlin/Configuration.h
           configValue Y_MAX_POS "220" Marlin/Configuration.h # Rough maximum Y position before running into the bed clips
-          # configValue Z_MAX_POS 235 Marlin/Configuration.h # NOTE: Lowered from 250 to prevent our specific printer from crashing
-          configValue Z_MAX_POS 220 Marlin/Configuration.h # This is the safest maximum Z height for our printer
+          # configValue Z_MAX_POS "235" Marlin/Configuration.h # NOTE: Lowered from 250 to prevent our specific printer from crashing
+          configValue Z_MAX_POS "220" Marlin/Configuration.h # This is the safest maximum Z height for our printer
 
           ## FIXME: !!! This is temporary until we figure out the EXACT bed size + offsets !!!
           # configValue X_BED_SIZE 235 Marlin/Configuration.h
@@ -390,7 +390,7 @@ jobs:
 
           # Turn off display after 5 minutes
           # configValue TOUCH_IDLE_SLEEP 300 Marlin/Configuration.h
-          configValue TOUCH_IDLE_SLEEP_MINS 1 Marlin/Configuration.h
+          configValue TOUCH_IDLE_SLEEP_MINS 5 Marlin/Configuration.h
 
           # Enable center point for bed tramming
           configEnable BED_TRAMMING_INCLUDE_CENTER Marlin/Configuration.h
@@ -486,7 +486,8 @@ jobs:
           configEnable FILAMENT_LOAD_UNLOAD_GCODES Marlin/Configuration_adv.h
 
           ## TODO: If we don't use hybrid threshold/spreadcycle, is this "custom" chopper timing still fine?!
-          configValue CHOPPER_TIMING CHOPPER_09STEP_24V Marlin/Configuration_adv.h
+          ## TODO: UPDATE: Not yet sure if it was this, but something caused MAJOR motor malfunctions, so disabling this for now!
+          # configValue CHOPPER_TIMING CHOPPER_09STEP_24V Marlin/Configuration_adv.h
           if ($HYBRID_THRESHOLD); then
             # configValue CHOPPER_TIMING CHOPPER_09STEP_24V Marlin/Configuration_adv.h
             configEnable HYBRID_THRESHOLD Marlin/Configuration_adv.h
@@ -771,7 +772,7 @@ jobs:
           # configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
 
           # Adjust our bed tramming positions to be more accurately over the bed screws
-          configValue TRAMMING_POINT_XY "{ {  20, 15 }, { 180, 15 }, { 180, 175 }, { 20, 175 } }" Marlin/Configuration_adv.h
+          configValue TRAMMING_POINT_XY "{ {  20, 25 }, { 180, 25 }, { 180, 185 }, { 20, 185 } }" Marlin/Configuration_adv.h
 
 
 
@@ -951,7 +952,7 @@ jobs:
           # Increase the probing margin (for BLTouch/UBL/ABL, default is 10)
           # configValue PROBING_MARGIN 10 Marlin/Configuration.h
           # configValue PROBING_MARGIN 20 Marlin/Configuration.h
-          configValue PROBING_MARGIN 0 Marlin/Configuration.h # Since our bed size and positions already account for this, we don't need additional margin?
+          configValue PROBING_MARGIN 5 Marlin/Configuration.h # Since our bed size and positions already account for this, we don't need additional margin?
 
           # Disable retrying bed leveling after a failed attempt
           configDisable G29_RETRY_AND_RECOVER Marlin/Configuration_adv.h
@@ -990,10 +991,12 @@ jobs:
           configValue DEFAULT_AXIS_STEPS_PER_UNIT "{ 80.0, 80.0, 400.0, 415.0 }" Marlin/Configuration.h
 
           # Customized and optimized speed and acceleration values for this particular printer/firmware setup
-          configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+          # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 5, 25}" Marlin/Configuration.h
+          configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 10, 50}" Marlin/Configuration.h
           # configValue DEFAULT_MAX_FEEDRATE "{ 500, 500, 20, 50}" Marlin/Configuration.h
           # configValue DEFAULT_MAX_FEEDRATE "{ 1000, 1000, 20, 50}" Marlin/Configuration.h
-          configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
+          # configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 1000 }" Marlin/Configuration.h
+          configValue DEFAULT_MAX_ACCELERATION "{ 500, 500, 100, 5000 }" Marlin/Configuration.h
           # configValue DEFAULT_MAX_ACCELERATION "{ 1000, 1000, 100, 5000 }" Marlin/Configuration.h
           # configValue DEFAULT_MAX_ACCELERATION "{ 2000, 2000, 100, 2000 }" Marlin/Configuration.h
           configValue DEFAULT_ACCELERATION 500 Marlin/Configuration.h
