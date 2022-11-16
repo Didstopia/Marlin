@@ -783,7 +783,7 @@ jobs:
           configValue BED_TRAMMING_INSET_LFRB "{ 28, 26, 28, 26 }" Marlin/Configuration.h
 
           # Custom abort print g-code that presents the print and makes it easier to clean up
-          configValue EVENT_GCODE_SD_ABORT "\"G91; G1 E-2 F2700; G1 E-2 Z0.2 F2400; G1 X5 Y5 F3000; G1 Z10; G90; G1 X0 Y220; M106 S0; M104 S0; M140 S0; M84 X Y E;\"" Marlin/Configuration_adv.h
+          configValue EVENT_GCODE_SD_ABORT \"G91; G1 E-2 F2700; G1 E-2 Z0\.2 F2400; G1 X5 Y5 F3000; G1 Z10; G90; G1 X0 Y220; M106 S0; M104 S0; M140 S0; M84 X Y E;\" Marlin/Configuration_adv.h
 
           # Move the media menu to the top
           configEnable MEDIA_MENU_AT_TOP Marlin/Configuration_adv.h
