@@ -1057,7 +1057,7 @@ jobs:
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.48 }" Marlin/Configuration.h
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.44 }" Marlin/Configuration.h
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.19 }" Marlin/Configuration.h
-          configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.23 }" Marlin/Configuration.h
+          configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.25 }" Marlin/Configuration.h
           # configValue NOZZLE_TO_PROBE_OFFSET "{ -31.00, -3.00, -1.10 }" Marlin/Configuration.h
 
           # Lower extruder current to roughly a half/third of the default (650 / 3 = 216)
