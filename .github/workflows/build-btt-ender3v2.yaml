@@ -648,7 +648,9 @@ jobs:
           # https://marlinfw.org/docs/features/fwretract.html
           # https://blog.prusaprinters.org/slic3r-and-marlin-configuration-for-reprap-firmware-retraction-2_3686/
           # https://damsteen.nl/blog/2021/05/06/adjustable-retractions-during-printing-with-marlin-firmware-retractions
-          #configEnable FWRETRACT Marlin/Configuration_adv.h
+          configEnable FWRETRACT Marlin/Configuration_adv.h
+
+          ## TODO: Configure our calibrated firmware retraction settings here!
 
           # TODO: UPDATE: This makes much more noise and is faster/more aggressive,
           #               however it MAY have helped keep the Z axis motors in sync!
@@ -771,9 +773,14 @@ jobs:
           # configValue RETRACT_LENGTH 1 Marlin/Configuration_adv.h
           # configValue RETRACT_FEEDRATE 25 Marlin/Configuration_adv.h
 
-          ## FIXME: This is Y+5, but this somehow broke tramming?!
+          ## FIXME: This is Y+5/Y-5, but this somehow broke tramming?!
           # Adjust our bed tramming positions to be more accurately over the bed screws
           # configValue TRAMMING_POINT_XY "{ {  20, 25 }, { 180, 25 }, { 180, 185 }, { 20, 185 } }" Marlin/Configuration_adv.h
+          configValue TRAMMING_POINT_XY "{ {  28, 26 }, { 198, 26 }, { 198, 197 }, { 28, 197 } }" Marlin/Configuration_adv.h
+
+          ## TODO: The R(ight) and B(ack) might be wrong, if they don't use bed size but max pos instead!
+          # Adjust assisted tramming bed offsets
+          configValue BED_TRAMMING_INSET_LFRB "{ 28, 26, 28, 26 }" Marlin/Configuration.h
 
 
 
@@ -898,7 +905,7 @@ jobs:
           # configValue LEVELING_BED_TEMP 50 Marlin/Configuration.h
 
           # Enable bed tramming with a probe
-          configEnable BED_TRAMMING_USE_PROBE Marlin/Configuration.h
+          # configEnable BED_TRAMMING_USE_PROBE Marlin/Configuration.h
 
           # Enable multiple probes
           configValue MULTIPLE_PROBING 2 Marlin/Configuration.h
