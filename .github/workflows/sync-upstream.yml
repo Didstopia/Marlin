@@ -46,14 +46,15 @@ jobs:
     - name: Sync upstream changes
       id: sync
       # uses: aormsby/Fork-Sync-With-Upstream-action@master
-      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.2
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
       with:
         # Target branch in this repository
         target_sync_branch: 2.1.x
         # REQUIRED 'target_repo_token' exactly like this!
         # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
         target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
+        target_branch_push_args: '--force'
         # Upstream branch in another repository
         upstream_sync_branch: 2.1.x
         upstream_sync_repo: MarlinFirmware/Marlin
@@ -63,6 +64,8 @@ jobs:
 
         # Rebase instead of merge
         git_config_pull_rebase: true
+        
+        shallow_since: '2 days ago'
 
         # FIXME: Override test_mode when running locally with ACL
         # Set test_mode true to run tests instead of the true action!!
@@ -119,8 +122,8 @@ jobs:
     - name: Sync upstream changes
       id: sync
       # uses: aormsby/Fork-Sync-With-Upstream-action@master
-      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.2
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
       with:
         # Target branch in this repository
         target_sync_branch: bugfix-2.1.x
