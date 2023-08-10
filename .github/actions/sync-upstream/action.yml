@@ -2,15 +2,19 @@ name: 'Sync Upstream'
 description: 'Force syncs a branch from an upstream repository.'
 inputs:
   branch:
-    description: 'Branch to sync. Optional, default is the current branch.'
+    description: 'Branch to sync. Optional, defaults to the currently checked out branch.'
     required: false
   upstream-repo:
     description: 'Upstream repository in the format owner/repo. Required, not set by default.'
     required: true
+  protected-branches:
+    description: 'Comma-separated list of branches that should not be synced. Defaults to "master,main,production".'
+    default: 'master,main,production'
+    required: false
 runs:
   using: 'composite'
   steps:
     - run: chmod +x ${{ github.action_path }}/sync.sh
       shell: bash
-    - run: ${{ github.action_path }}/sync.sh "${{ inputs.branch }}" "${{ inputs.upstream-repo }}"
+    - run: ${{ github.action_path }}/sync.sh "${{ inputs.branch }}" "${{ inputs.upstream-repo }}" "${{ inputs.protected-branches }}"
       shell: bash
