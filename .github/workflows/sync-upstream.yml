@@ -82,7 +82,7 @@ jobs:
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
     - name: Build Trigger
-      if: steps.sync.outputs.has_new_commits == 'true' && env.ACT != 'true'
+      if: steps.sync.outputs.synced == 'true'
       run: |
         echo "New commits were found and synced, triggering a new firmware build"
         [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
@@ -99,11 +99,11 @@ jobs:
             }'
     
     # - name: No new commits
-    #   if: steps.sync.outputs.has_new_commits == 'false'
+    #   if: steps.sync.outputs.synced == 'false'
     #   run: echo "There were no new commits."
       
-    # - name: Show value of 'has_new_commits'
-    #   run: echo ${{ steps.sync.outputs.has_new_commits }}
+    # - name: Show value of 'synced'
+    #   run: echo ${{ steps.sync.outputs.synced }}
 
   sync_bugfix_branch:
     ## TODO: Test running on self-hosted runners instead
@@ -164,7 +164,7 @@ jobs:
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
     - name: Build Trigger
-      if: steps.sync.outputs.has_new_commits == 'true' && env.ACT != 'true'
+      if: steps.sync.outputs.synced == 'true'
       run: |
         echo "New commits were found and synced, triggering a new firmware build"
         [ -z "${{ secrets.GITHUB_TOKEN }}" ] && echo "Skipping, no GITHUB_TOKEN" && exit 0
@@ -181,8 +181,8 @@ jobs:
             }'
     
     # - name: No new commits
-    #   if: steps.sync.outputs.has_new_commits == 'false'
+    #   if: steps.sync.outputs.synced == 'false'
     #   run: echo "There were no new commits."
       
-    # - name: Show value of 'has_new_commits'
-    #   run: echo ${{ steps.sync.outputs.has_new_commits }}
+    # - name: Show value of 'synced'
+    #   run: echo ${{ steps.sync.outputs.synced }}
