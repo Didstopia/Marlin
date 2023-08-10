@@ -44,9 +44,11 @@ jobs:
     # Sync upstream repository
     - name: Sync Upstream Repository
       id: sync
-      uses: ./.github/actions/sync-upstream
+      # uses: ./.github/actions/sync-upstream
+      uses: Didstopia/Actions/sync-upstream@master
       with:
         upstream-repo: MarlinFirmware/Marlin
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     # REQUIRED step
     # Step 2: run the sync action
@@ -127,9 +129,11 @@ jobs:
     # Sync upstream repository
     - name: Sync Upstream Repository
       id: sync
-      uses: ./.github/actions/sync-upstream
+      # uses: ./.github/actions/sync-upstream
+      uses: Didstopia/Actions/sync-upstream@master
       with:
         upstream-repo: MarlinFirmware/Marlin
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     # REQUIRED step
     # Step 2: run the sync action
