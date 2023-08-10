@@ -41,35 +41,42 @@ jobs:
         # REQUIRED if your upstream repo is private (see wiki)
         persist-credentials: false
 
+    # Sync upstream repository
+    - name: Sync Upstream Repository
+      id: sync
+      uses: ./.github/actions/sync-upstream
+      with:
+        upstream-repo: MarlinFirmware/Marlin
+
     # REQUIRED step
     # Step 2: run the sync action
-    - name: Sync upstream changes
-      id: sync
-      # uses: aormsby/Fork-Sync-With-Upstream-action@master
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
-      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
-      with:
-        # Target branch in this repository
-        target_sync_branch: 2.1.x
-        # REQUIRED 'target_repo_token' exactly like this!
-        # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-        target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
-        target_branch_push_args: '--force'
-        # Upstream branch in another repository
-        upstream_sync_branch: 2.1.x
-        upstream_sync_repo: MarlinFirmware/Marlin
-        # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
-        # Overwrite and keep the upstream commits
-        upstream_pull_args: '-s recursive -Xtheirs --allow-unrelated-histories'
-
-        # Rebase instead of merge
-        git_config_pull_rebase: true
-        
-        shallow_since: '2 days ago'
-
-        # FIXME: Override test_mode when running locally with ACL
-        # Set test_mode true to run tests instead of the true action!!
-        test_mode: false
+    #- name: Sync upstream changes
+    #  id: sync
+    #  # uses: aormsby/Fork-Sync-With-Upstream-action@master
+    #  uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+    #  # uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
+    #  with:
+    #    # Target branch in this repository
+    #    target_sync_branch: 2.1.x
+    #    # REQUIRED 'target_repo_token' exactly like this!
+    #    # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+    #    target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
+    #    target_branch_push_args: '--force'
+    #    # Upstream branch in another repository
+    #    upstream_sync_branch: 2.1.x
+    #    upstream_sync_repo: MarlinFirmware/Marlin
+    #    # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+    #    # Overwrite and keep the upstream commits
+    #    upstream_pull_args: '-s recursive -Xtheirs --allow-unrelated-histories'
+    #
+    #    # Rebase instead of merge
+    #    git_config_pull_rebase: true
+    #    
+    #    shallow_since: '2 days ago'
+    #
+    #    # FIXME: Override test_mode when running locally with ACL
+    #    # Set test_mode true to run tests instead of the true action!!
+    #    test_mode: false
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
     - name: Build Trigger
@@ -117,32 +124,39 @@ jobs:
         # REQUIRED if your upstream repo is private (see wiki)
         persist-credentials: false
 
+    # Sync upstream repository
+    - name: Sync Upstream Repository
+      id: sync
+      uses: ./.github/actions/sync-upstream
+      with:
+        upstream-repo: MarlinFirmware/Marlin
+
     # REQUIRED step
     # Step 2: run the sync action
-    - name: Sync upstream changes
-      id: sync
-      # uses: aormsby/Fork-Sync-With-Upstream-action@master
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
-      # uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
-      with:
-        # Target branch in this repository
-        target_sync_branch: bugfix-2.1.x
-        # REQUIRED 'target_repo_token' exactly like this!
-        # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-        target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
-        # Upstream branch in another repository
-        upstream_sync_branch: bugfix-2.1.x
-        upstream_sync_repo: MarlinFirmware/Marlin
-        # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
-        # Overwrite and keep the upstream commits
-        upstream_pull_args: '-s recursive -Xtheirs --allow-unrelated-histories'
-
-        # Rebase instead of merge
-        git_config_pull_rebase: true
-
-        # FIXME: Override test_mode when running locally with ACL
-        # Set test_mode true to run tests instead of the true action!!
-        test_mode: false
+    #- name: Sync upstream changes
+    #  id: sync
+    #  # uses: aormsby/Fork-Sync-With-Upstream-action@master
+    #  uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+    #  # uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
+    #  with:
+    #    # Target branch in this repository
+    #    target_sync_branch: bugfix-2.1.x
+    #    # REQUIRED 'target_repo_token' exactly like this!
+    #    # target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+    #    target_repo_token: ${{ secrets.GH_API_WORKFLOWS_TOKEN }}
+    #    # Upstream branch in another repository
+    #    upstream_sync_branch: bugfix-2.1.x
+    #    upstream_sync_repo: MarlinFirmware/Marlin
+    #    # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+    #    # Overwrite and keep the upstream commits
+    #    upstream_pull_args: '-s recursive -Xtheirs --allow-unrelated-histories'
+    #
+    #    # Rebase instead of merge
+    #    git_config_pull_rebase: true
+    #
+    #    # FIXME: Override test_mode when running locally with ACL
+    #    # Set test_mode true to run tests instead of the true action!!
+    #    test_mode: false
       
     # Step 3: Display a sample message based on the sync output var 'has_new_commits'
     - name: Build Trigger
