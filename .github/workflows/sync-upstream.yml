@@ -40,6 +40,8 @@ jobs:
         ref: 2.1.x
         # REQUIRED if your upstream repo is private (see wiki)
         persist-credentials: false
+        # Speed up the cloning by reducing the depth
+        fetch-depth: 1
 
     # Sync upstream repository
     - name: Sync Upstream Repository
@@ -125,6 +127,8 @@ jobs:
         ref: bugfix-2.1.x
         # REQUIRED if your upstream repo is private (see wiki)
         persist-credentials: false
+        # Speed up the cloning by reducing the depth
+        fetch-depth: 1
 
     # Sync upstream repository
     - name: Sync Upstream Repository
